@@ -9,28 +9,31 @@ export const metadata = {
 const pretendard = localFont({
   src: [
     {
-      path: "../public/fonts/Pretendard-Regular.woff2",
+      path: "./font/Pretendard-Regular.ttf",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../public/fonts/Pretendard-Medium.woff2",
+      path: "./font/Pretendard-Medium.ttf",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../public/fonts/Pretendard-SemiBold.woff2",
+      path: "./font/Pretendard-SemiBold.ttf",
       weight: "600",
       style: "normal",
     },
     {
-      path: "../public/fonts/Pretendard-Bold.woff2",
+      path: "./font/Pretendard-Bold.ttf",
       weight: "700",
       style: "normal",
     },
+    {
+      path: "./font/Pretendard-ExtraBold.ttf",
+      weight: "800",
+      style: "normal",
+    },
   ],
-  display: "swap",
-  variable: "--font-pretendard",
 });
 
 export default function RootLayout({
@@ -39,12 +42,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className={pretendard.variable}>
-      <body
-        className={`font-sans min-h-screen bg-white ${pretendard.className}`}
-      >
-        {children}
-      </body>
+    <html lang="ko" className={pretendard.className}>
+      <body>{children}</body>
     </html>
   );
 }
