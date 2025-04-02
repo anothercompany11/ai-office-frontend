@@ -1,13 +1,37 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
+export const metadata = {
   title: "AI Office",
-  description: "AI Office - 학생을 위한 AI 챗봇 서비스",
+  description: "AI Office Frontend",
 };
+
+const pretendard = localFont({
+  src: [
+    {
+      path: "../public/fonts/Pretendard-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Pretendard-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Pretendard-SemiBold.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Pretendard-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  display: "swap",
+  variable: "--font-pretendard",
+});
 
 export default function RootLayout({
   children,
@@ -15,9 +39,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko">
-      <body className={inter.className}>
-        <div className="min-h-screen bg-background">{children}</div>
+    <html lang="ko" className={pretendard.variable}>
+      <body
+        className={`font-sans min-h-screen bg-white ${pretendard.className}`}
+      >
+        {children}
       </body>
     </html>
   );

@@ -1,6 +1,12 @@
 {
   "name": "ai-office-frontend",
   "packageManager": "yarn@4.8.1",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
   "dependencies": {
     "@hookform/resolvers": "^5.0.0",
     "@radix-ui/react-dialog": "^1.1.6",
@@ -22,7 +28,10 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
     "@types/tailwindcss": "^3.1.0",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
     "tailwindcss": "^4.1.0",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.8.2"

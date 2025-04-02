@@ -1,0 +1,1 @@
+self.__NEXT_FONT_MANIFEST="{\"pages\":{},\"app\":{\"/Users/shinseunghun/Documents/projects/ai-office/ai-office-frontend/app/layout\":[\"static/media/f7401023c75072a7-s.p.woff2\",\"static/media/ebe3bc9fea1e3fab-s.p.woff2\",\"static/media/024def93fb733aa9-s.p.woff2\",\"static/media/b45d4a66dad6511d-s.p.woff2\"]},\"appUsingSizeAdjust\":true,\"pagesUsingSizeAdjust\":false}"
