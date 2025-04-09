@@ -1,6 +1,6 @@
 "use client";
 
-import { authApi } from "@/lib/api";
+import { authApi } from "@/app/api";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 

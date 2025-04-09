@@ -1,219 +1,227 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageRole } from "@/types";
-import { PlusCircle } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import ChatInput from "./_components/ChatInput";
-import ChatMessage from "./_components/ChatMessage";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { conversationApi } from "../api/conversation";
+import { ClientConversation } from "../api/dto/conversation";
+import { useAuth } from "../context/AuthContext";
+import ChatInterface from "./_components/ChatInterface";
+import ConversationSidebar from "./_components/ConversationSidebar";
 
-// Tailwind CSS 테스트 컴포넌트
-const TailwindTest = () => {
-  return (
-    <div className="fixed top-4 right-4 p-4 bg-white border-2 border-blue-500 shadow-lg rounded-lg z-50">
-      <h3 className="text-lg font-bold text-blue-600 mb-2">
-        TailwindCSS 테스트
-      </h3>
-      <div className="grid grid-cols-2 gap-2">
-        <div className="bg-red-500 text-white p-2 rounded">빨간색</div>
-        <div className="bg-green-500 text-white p-2 rounded">초록색</div>
-        <div className="bg-blue-500 text-white p-2 rounded">파란색</div>
-        <div className="bg-yellow-500 text-black p-2 rounded">노란색</div>
-      </div>
-    </div>
-  );
-};
-
-interface Message {
-  id: string;
-  content: string;
-  role: MessageRole;
-  timestamp: string;
-}
-
-interface Conversation {
-  id: string;
-  title: string;
-  lastMessage: string;
-  timestamp: string;
-  messages: Message[];
-}
-
-// 더미 데이터
-const dummyAssistantResponse = [
-  "안녕하세요! AI 챗봇입니다. 무엇을 도와드릴까요?",
-  "그것에 대한 답변은 다음과 같습니다. 먼저 문제를 이해해야 합니다...",
-  "수학 문제에 대한 질문이군요. 이 문제는 다음과 같이 풀 수 있습니다...",
-  "물리학 개념에 대해 설명해 드리겠습니다. 이 개념은...",
-  "네, 과제에 도움이 필요하신 것 같네요. 어떤 부분이 어려우신가요?",
-];
+// 대화 항목 인터페이스 정의는 DTO로 이동
+type Conversation = ClientConversation;
 
 export default function ChatPage() {
-  const [conversations, setConversations] = useState<Conversation[]>([
-    {
-      id: "1",
-      title: "새로운 대화",
-      lastMessage: "안녕하세요!",
-      timestamp: "2024-03-20 14:30",
-      messages: [],
-    },
-  ]);
-  const [selectedConversationId, setSelectedConversationId] =
-    useState<string>("1");
-  const [isLoading, setIsLoading] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [isLoadingConversations, setIsLoadingConversations] = useState(true);
+  const [currentConversationId, setCurrentConversationId] = useState<
+    string | null
+  >(null);
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  // 대화 목록 로드
+  const loadConversations = useCallback(async () => {
+    try {
+      setIsLoadingConversations(true);
+      const response = await conversationApi.getConversations();
 
-  // 선택된 대화 가져오기
-  const selectedConversation =
-    conversations.find((c) => c.id === selectedConversationId) ||
-    conversations[0];
+      if (response.status === "success" && Array.isArray(response.data)) {
+        const formattedConversations = response.data.map((conv) => ({
+          id: conv.id,
+          title: conv.title || "새 대화",
+          preview: conv.preview || "",
+          lastUpdated: new Date(conv.updated_at),
+          folder_id: conv.folder_id,
+        }));
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [selectedConversation?.messages]);
+        setConversations(formattedConversations);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handleSendMessage = async (content: string) => {
-    if (!content.trim() || isLoading) return;
-
-    setIsLoading(true);
-
-    const timestamp = new Date().toLocaleString();
-    const userMessage: Message = {
-      id: `${Date.now()}-user`,
-      content,
-      role: MessageRole.USER,
-      timestamp,
-    };
-
-    // 대화 업데이트
-    setConversations((prev) => {
-      return prev.map((conv) => {
-        if (conv.id === selectedConversationId) {
-          return {
-            ...conv,
-            lastMessage: content,
-            timestamp,
-            messages: [...conv.messages, userMessage],
-          };
+        // 대화가 있으면 첫 번째 대화 선택
+        if (formattedConversations.length > 0 && !currentConversationId) {
+          setCurrentConversationId(formattedConversations[0].id);
         }
-        return conv;
-      });
-    });
+      }
+    } catch (error) {
+      console.error("대화 목록을 불러오는 중 오류 발생:", error);
+    } finally {
+      setIsLoadingConversations(false);
+    }
+  }, [currentConversationId]);
 
-    // 딜레이 시뮬레이션 (실제로는 API 호출)
-    setTimeout(() => {
-      // 랜덤 응답 생성
-      const randomResponse =
-        dummyAssistantResponse[
-          Math.floor(Math.random() * dummyAssistantResponse.length)
-        ];
-      const assistantMessage: Message = {
-        id: `${Date.now()}-assistant`,
-        content: randomResponse,
-        role: MessageRole.ASSISTANT,
-        timestamp: new Date().toLocaleString(),
-      };
+  // 로그인 상태 체크 및 대화 목록 로드
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/auth");
+      return;
+    }
 
-      // 대화 업데이트
-      setConversations((prev) => {
-        return prev.map((conv) => {
-          if (conv.id === selectedConversationId) {
-            return {
-              ...conv,
-              messages: [...conv.messages, assistantMessage],
-            };
+    if (user) {
+      loadConversations();
+    }
+  }, [user, isLoading, router, loadConversations]);
+
+  // 새 대화 생성
+  const handleNewConversation = async () => {
+    try {
+      const response = await conversationApi.createConversation("새 대화");
+
+      if (response.status === "success" && response.data) {
+        const formattedConversation: Conversation = {
+          id: response.data.id,
+          title: response.data.title || "새 대화",
+          preview: "",
+          lastUpdated: new Date(response.data.created_at),
+          folder_id: response.data.folder_id,
+        };
+
+        setConversations((prev) => [formattedConversation, ...prev]);
+        setCurrentConversationId(formattedConversation.id);
+      }
+    } catch (error) {
+      console.error("새 대화를 생성하는 중 오류 발생:", error);
+    }
+  };
+
+  // 대화 선택
+  const handleSelectConversation = (id: string) => {
+    setCurrentConversationId(id);
+  };
+
+  // 대화 삭제
+  const handleDeleteConversation = async (id: string) => {
+    try {
+      const response = await conversationApi.deleteConversation(id);
+
+      if (response.status === "success") {
+        setConversations((prev) => prev.filter((conv) => conv.id !== id));
+
+        // 현재 대화가 삭제되었으면 첫 번째 대화로 전환
+        if (currentConversationId === id) {
+          const remainingConversations = conversations.filter(
+            (conv) => conv.id !== id
+          );
+          if (remainingConversations.length > 0) {
+            setCurrentConversationId(remainingConversations[0].id);
+          } else {
+            setCurrentConversationId(null);
           }
-          return conv;
-        });
-      });
-
-      setIsLoading(false);
-    }, 1500);
+        }
+      }
+    } catch (error) {
+      console.error("대화를 삭제하는 중 오류 발생:", error);
+    }
   };
 
-  const handleNewConversation = () => {
-    const newId = Date.now().toString();
-    const newConversation: Conversation = {
-      id: newId,
-      title: "새로운 대화",
-      lastMessage: "새로운 대화가 시작되었습니다.",
-      timestamp: new Date().toLocaleString(),
-      messages: [],
-    };
+  // 대화 정보 업데이트 (제목, 미리보기)
+  const updateConversation = useCallback(
+    (id: string, data: Partial<Conversation>) => {
+      // 새 대화 ID가 기존에 없는 경우 (새로운 대화 생성)
+      if (data.id && !conversations.some((conv) => conv.id === id)) {
+        const newConversation: Conversation = {
+          id,
+          title: data.title || "새 대화",
+          preview: data.preview || "",
+          lastUpdated: data.lastUpdated || new Date(),
+          folder_id: data.folder_id,
+        };
 
-    setConversations((prev) => [...prev, newConversation]);
-    setSelectedConversationId(newId);
+        setConversations((prev) => [newConversation, ...prev]);
+        setCurrentConversationId(id);
+        return;
+      }
+
+      // 기존 대화 업데이트
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === id
+            ? {
+                ...conv,
+                ...data,
+                lastUpdated: data.lastUpdated || new Date(), // 항상 업데이트 시간 갱신
+              }
+            : conv
+        )
+      );
+    },
+    [conversations]
+  );
+
+  // 대화를 폴더에 할당
+  const assignConversationToFolder = async (
+    conversationId: string,
+    folderId: string | null
+  ) => {
+    try {
+      // 폴더 ID가 null이면 폴더에서 제거하는 것을 의미
+      const response = await conversationApi.updateConversation(
+        conversationId,
+        {
+          folder_id: folderId,
+        }
+      );
+
+      if (response.status === "success") {
+        // 대화 목록 상태 업데이트
+        setConversations((prev) =>
+          prev.map((conv) =>
+            conv.id === conversationId
+              ? {
+                  ...conv,
+                  folder_id: folderId || undefined,
+                  lastUpdated: new Date(),
+                }
+              : conv
+          )
+        );
+      }
+    } catch (error) {
+      console.error("대화를 폴더에 할당하는 중 오류 발생:", error);
+    }
   };
+
+  // 로딩 중이면 로딩 표시
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-xl">로딩 중...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex h-screen bg-background">
-      <TailwindTest />
-      <div className="w-80 border-r p-4 flex flex-col h-full">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">대화 목록</h2>
-          <Button variant="outline" size="icon" onClick={handleNewConversation}>
-            <PlusCircle className="h-5 w-5" />
-          </Button>
-        </div>
-        <div className="flex-1 overflow-auto">
-          {conversations.map((conversation) => (
-            <button
-              key={conversation.id}
-              onClick={() => setSelectedConversationId(conversation.id)}
-              className={`w-full text-left p-3 rounded-lg hover:bg-accent mb-2 transition-colors ${
-                selectedConversationId === conversation.id ? "bg-accent" : ""
-              }`}
-            >
-              <div className="font-medium truncate">{conversation.title}</div>
-              <div className="text-sm text-muted-foreground truncate">
-                {conversation.lastMessage}
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">
-                {conversation.timestamp}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="flex h-screen bg-white">
+      <ConversationSidebar
+        conversations={conversations}
+        currentConversationId={currentConversationId}
+        onSelectConversation={handleSelectConversation}
+        onNewConversation={handleNewConversation}
+        onDeleteConversation={handleDeleteConversation}
+      />
 
-      <div className="flex-1 flex flex-col">
-        <div className="p-4 border-b">
-          <h1 className="text-xl font-bold">AI 챗봇</h1>
-        </div>
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
-            {selectedConversation.messages.length === 0 ? (
-              <div className="text-center py-10 text-muted-foreground">
-                <p className="text-lg">새로운 대화를 시작하세요</p>
-                <p className="text-sm">질문을 입력하면 AI가 답변해 드립니다.</p>
-              </div>
-            ) : (
-              selectedConversation.messages.map((message) => (
-                <ChatMessage
-                  key={message.id}
-                  content={message.content}
-                  role={message.role}
-                  timestamp={message.timestamp}
-                />
-              ))
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollArea>
-        <div className="p-4 border-t">
-          <ChatInput onSend={handleSendMessage} disabled={isLoading} />
-          {isLoading && (
-            <div className="text-sm text-center mt-2 text-muted-foreground">
-              AI가 응답을 생성 중입니다...
+      <div className="flex-1">
+        {currentConversationId ? (
+          <ChatInterface
+            conversationId={currentConversationId}
+            onUpdateConversation={updateConversation}
+            onAssignToFolder={assignConversationToFolder}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold mb-4">대화가 없습니다</h2>
+              <p className="text-gray-500 mb-6">
+                새 대화를 시작하거나 왼쪽 메뉴에서 대화를 선택하세요.
+              </p>
+              <button
+                onClick={handleNewConversation}
+                className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800"
+              >
+                새 대화 시작하기
+              </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

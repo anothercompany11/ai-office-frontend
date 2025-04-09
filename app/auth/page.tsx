@@ -1,16 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { authApi } from "@/app/api";
+import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from "@/components/ui/card";
 import {
   Form,
@@ -21,10 +18,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const loginSchema = z.object({
-  code: z.string().min(1, "인증 코드를 입력해주세요"),
+  code: z
+    .string()
+    .length(8, "인증 코드는 8자리여야 합니다.")
+    .regex(
+      /^[A-Za-z0-9]{8}$/,
+      "인증 코드는 영문자와 숫자로만 구성되어야 합니다."
+    ),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -32,18 +39,38 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      code: "",
+    },
   });
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      // TODO: API 호출 구현
-      console.log(data);
-      router.push("/chat");
-    } catch (err) {
-      setError("인증 코드가 유효하지 않습니다.");
+      setIsLoading(true);
+      setError(null);
+
+      // 로그인 시도 전에 기존 토큰 제거
+      await authApi.logout();
+
+      const result = await authApi.login(data.code);
+      console.log("로그인 결과:", result);
+
+      if (result.status === "success" && result.data?.access_token) {
+        // 토큰 저장은 authApi.login()에서 처리됨
+        console.log("토큰 저장 완료, /chat으로 이동합니다");
+        router.push("/chat");
+      } else {
+        setError(result.message || "로그인에 실패했습니다.");
+      }
+    } catch (err: any) {
+      console.error("로그인 오류:", err);
+      setError(err.message || "인증 코드가 유효하지 않습니다.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -68,6 +95,7 @@ export default function LoginPage() {
                         placeholder="인증 코드를 입력하세요"
                         className="h-12"
                         {...field}
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -75,8 +103,12 @@ export default function LoginPage() {
                 )}
               />
               {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full h-12">
-                로그인
+              <Button
+                type="submit"
+                className="w-full h-12"
+                disabled={isLoading}
+              >
+                {isLoading ? "로그인 중..." : "로그인"}
               </Button>
             </form>
           </Form>
