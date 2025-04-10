@@ -7,9 +7,15 @@ interface ChatMessageProps {
   role: MessageRole;
   content: string;
   timestamp?: string;
+  isStreaming?: boolean;
 }
 
-const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
+const ChatMessage = ({
+  role,
+  content,
+  timestamp,
+  isStreaming = false,
+}: ChatMessageProps) => {
   const isUser = role === MessageRole.USER;
 
   return (
@@ -36,8 +42,16 @@ const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
                 ) : (
                   <div className="min-h-8 text-message relative flex w-full flex-col gap-2 text-start break-words whitespace-normal [.text-message+&]:mt-5">
                     <div className="flex w-full flex-col gap-1 empty:hidden first:pt-[3px]">
-                      <div className="markdown prose w-full break-words bg-gray-100 text-gray-800 rounded-xl p-5">
-                        <MarkdownRenderer content={content} />
+                      <div className="markdown prose w-full break-words bg-gray-100 text-gray-800 rounded-xl p-5 min-h-[50px]">
+                        {content ? (
+                          <MarkdownRenderer content={content} />
+                        ) : isStreaming ? (
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+                          </div>
+                        ) : null}
                       </div>
                     </div>
                   </div>

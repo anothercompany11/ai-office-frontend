@@ -85,12 +85,6 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         {...props}
       />
     ),
-    // pre 태그 커스텀 (코드 블록 컨테이너)
-    pre: ({ children, ...props }: any) => (
-      <pre className="overflow-visible! my-4" {...props}>
-        {children}
-      </pre>
-    ),
     // 코드 블록 구문 강조 및 복사 버튼 처리
     code: ({
       node,
@@ -131,8 +125,26 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         );
       }
 
+      // 코드 블록은 일반 코드 태그로 처리하지 않고, 대신 별도의 사용자 정의 요소로 대체
+      return null;
+    },
+    // 코드 블록을 위한 별도 컴포넌트 - pre 태그 안에서 처리하여 p 태그 내부에 div가 들어가는 문제 방지
+    pre: ({ children, className, ...props }: any) => {
+      // pre 태그의 자식 요소에서 code 태그와 언어 정보 추출
+      let language = "";
+      let content = "";
+
+      // children이 있고 유효한 code 요소인지 확인
+      if (children && children.props) {
+        // code 태그의 className에서 언어 추출
+        const match = /language-(\w+)/.exec(children.props.className || "");
+        language = match && match[1] ? match[1] : "";
+        // 코드 내용 추출
+        content = String(children.props.children).replace(/\n$/, "");
+      }
+
       return (
-        <div className="contain-inline-size rounded-md border-[0.5px] border-token-border-medium relative bg-gray-900">
+        <div className="my-4 contain-inline-size rounded-md border-[0.5px] border-token-border-medium relative bg-gray-900">
           {/* 언어 표시 및 코드 블록 헤더 */}
           <div className="flex items-center text-gray-400 px-4 py-2 text-xs font-sans justify-between h-9 bg-gray-800 select-none rounded-t-[5px]">
             {language || "코드"}
@@ -164,7 +176,6 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
               codeTagProps={{
                 className: "whitespace-pre! language-" + language,
               }}
-              {...props}
             >
               {content}
             </SyntaxHighlighter>

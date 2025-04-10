@@ -44,6 +44,7 @@ const ChatInterface = ({
   const [folders, setFolders] = useState<Folder[]>([]);
   const [showFolderOptions, setShowFolderOptions] = useState(false);
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+  const [currentAssistantMessage, setCurrentAssistantMessage] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const folderMenuRef = useRef<HTMLDivElement>(null);
@@ -247,89 +248,130 @@ const ChatInterface = ({
 
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
+    setCurrentAssistantMessage(""); // 어시스턴트 응답 초기화
 
     try {
-      // API 호출 - 대화 ID 전달
-      const response = await conversationApi.sendMessage(
+      // 스트리밍 API 호출
+      const stream = await conversationApi.sendStreamingMessage(
         content,
         conversationId
       );
 
-      // 응답 메시지 처리 및 추가
-      if (response.status === "success" && response.data) {
-        const assistantMessage = response.data.message;
-        const responseConversationId = response.data.conversation_id;
+      if (!stream) {
+        throw new Error("스트리밍 응답을 받을 수 없습니다.");
+      }
 
-        // 대화 ID가 없거나 새로운 대화인 경우, 서버에서 반환된 ID를 사용
-        let currentConversationId = conversationId;
-        if (!conversationId || conversationId === "new") {
-          currentConversationId = responseConversationId;
+      let responseConversationId: string | null = null;
+      let fullContent = "";
 
-          // 부모 컴포넌트에 새 대화 ID 알림 (page.tsx에서 처리해야 함)
-          if (typeof onUpdateConversation === "function") {
-            onUpdateConversation(responseConversationId, {
-              id: responseConversationId,
-              title:
-                content.length > 30
-                  ? `${content.substring(0, 27)}...`
-                  : content,
-              preview: content,
-              lastUpdated: new Date(),
-            });
+      // 스트림 처리를 위한 reader 설정
+      const reader = stream.getReader();
+      const decoder = new TextDecoder();
+
+      // 첫 청크에서 content 값이 있을 수 있도록 약간 지연
+      setCurrentAssistantMessage(" ");
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        // 청크 디코딩
+        const chunk = decoder.decode(value, { stream: true });
+
+        // SSE 형식 처리 (data: {...} 형식의 라인들)
+        const lines = chunk
+          .split("\n\n")
+          .filter((line) => line.trim().startsWith("data:"));
+
+        for (const line of lines) {
+          const dataContent = line.replace("data: ", "").trim();
+
+          // 스트림 종료 신호 확인
+          if (dataContent === "[DONE]") {
+            continue;
           }
-        }
-
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: MessageRole.ASSISTANT,
-            content: assistantMessage.content,
-            id: assistantMessage.id,
-            created_at: assistantMessage.created_at,
-          },
-        ]);
-
-        // 첫 메시지인 경우, 대화 제목 업데이트
-        if (messages.length <= 1 && content.length > 0) {
-          const title =
-            content.length > 30 ? `${content.substring(0, 27)}...` : content;
 
           try {
-            // 새 대화 ID로 제목 업데이트
-            await conversationApi.updateConversation(
-              currentConversationId,
-              title
-            );
-            onUpdateConversation(currentConversationId, {
-              title,
-              preview: content,
-              lastUpdated: new Date(),
-            });
-            setNewTitle(title);
-          } catch (err) {
-            console.error("대화 제목 자동 업데이트 실패:", err);
+            const parsedData = JSON.parse(dataContent);
+
+            // 오류 메시지 처리
+            if (parsedData.error) {
+              throw new Error(parsedData.error);
+            }
+
+            // 첫 번째 청크가 conversation_id인 경우 (새 대화)
+            if (parsedData.conversation_id && !responseConversationId) {
+              responseConversationId = parsedData.conversation_id;
+              continue;
+            }
+
+            // 일반 텍스트 청크 처리
+            if (parsedData.content) {
+              fullContent += parsedData.content;
+              setCurrentAssistantMessage(fullContent);
+            }
+          } catch (error) {
+            console.error("스트림 데이터 파싱 오류:", error);
           }
-        } else {
-          // 미리보기 업데이트 (기존 대화인 경우)
-          onUpdateConversation(currentConversationId, {
+        }
+      }
+
+      // 새 대화인 경우 ID 처리
+      let currentConversationId = conversationId;
+      if (
+        (!conversationId || conversationId === "new") &&
+        responseConversationId
+      ) {
+        currentConversationId = responseConversationId;
+
+        // 부모 컴포넌트에 새 대화 ID 알림
+        if (typeof onUpdateConversation === "function") {
+          onUpdateConversation(responseConversationId, {
+            id: responseConversationId,
+            title:
+              content.length > 30 ? `${content.substring(0, 27)}...` : content,
             preview: content,
             lastUpdated: new Date(),
           });
         }
-      } else {
-        console.warn("응답 형식이 예상과 다릅니다:", response);
-        // 기본 오류 메시지 대신 가능한 경우 응답 내용 사용
-        const errorContent =
-          response.message ||
-          "죄송합니다. 응답을 처리하는 중 오류가 발생했습니다.";
+      }
 
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: MessageRole.ASSISTANT,
-            content: errorContent,
-          },
-        ]);
+      // 완성된 응답 메시지 추가
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: MessageRole.ASSISTANT,
+          content: fullContent,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+
+      // 첫 메시지인 경우, 대화 제목 업데이트
+      if (messages.length <= 1 && content.length > 0) {
+        const title =
+          content.length > 30 ? `${content.substring(0, 27)}...` : content;
+
+        try {
+          // 새 대화 ID로 제목 업데이트
+          await conversationApi.updateConversation(
+            currentConversationId,
+            title
+          );
+          onUpdateConversation(currentConversationId, {
+            title,
+            preview: content,
+            lastUpdated: new Date(),
+          });
+          setNewTitle(title);
+        } catch (err) {
+          console.error("대화 제목 자동 업데이트 실패:", err);
+        }
+      } else {
+        // 미리보기 업데이트 (기존 대화인 경우)
+        onUpdateConversation(currentConversationId, {
+          preview: content,
+          lastUpdated: new Date(),
+        });
       }
     } catch (error) {
       console.error("메시지 전송 오류:", error);
@@ -344,6 +386,7 @@ const ChatInterface = ({
       ]);
     } finally {
       setIsLoading(false);
+      setCurrentAssistantMessage(""); // 스트리밍 완료 후 초기화
     }
   };
 
@@ -390,28 +433,11 @@ const ChatInterface = ({
           ))}
 
           {isLoading && (
-            <article className="w-full text-token-text-primary" dir="auto">
-              <h5 className="sr-only">AI is typing:</h5>
-              <div className="text-base my-auto mx-auto py-5 px-6">
-                <div className="mx-auto flex flex-1 text-base gap-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] group/turn-messages">
-                  <div className="group/conversation-turn relative flex w-full min-w-0 flex-col">
-                    <div className="relative flex-col gap-1 md:gap-3">
-                      <div className="flex max-w-full flex-col grow">
-                        <div className="min-h-8 text-message relative flex w-full flex-col gap-2 text-start break-words whitespace-normal [.text-message+&]:mt-5">
-                          <div className="flex w-full flex-col gap-1 empty:hidden first:pt-[3px]">
-                            <div className="flex items-center space-x-2">
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </article>
+            <ChatMessage
+              role={MessageRole.ASSISTANT}
+              content={currentAssistantMessage}
+              isStreaming={true}
+            />
           )}
         </div>
         <div

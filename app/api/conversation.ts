@@ -110,4 +110,40 @@ export const conversationApi = {
       };
     }
   },
+
+  // 스트리밍 메시지 전송
+  async sendStreamingMessage(
+    content: string,
+    conversationId?: string
+  ): Promise<ReadableStream<Uint8Array> | null> {
+    try {
+      const request: SendMessageRequest = {
+        message: content,
+        conversation_id: conversationId,
+      };
+
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/chat/stream`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+          body: JSON.stringify(request),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP 오류! 상태: ${response.status}`);
+      }
+
+      return response.body;
+    } catch (error) {
+      console.error("스트리밍 메시지 전송 오류:", error);
+      return null;
+    }
+  },
 };
