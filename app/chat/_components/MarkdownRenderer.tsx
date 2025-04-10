@@ -1,5 +1,11 @@
-import React from "react";
+import { Check, Copy } from "lucide-react";
+import React, { useState } from "react";
+import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import rehypeExternalLinks from "rehype-external-links";
+import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 
 interface MarkdownRendererProps {
@@ -14,104 +20,202 @@ interface CodeComponentProps {
   children?: React.ReactNode;
 }
 
-const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
+// 코드 복사 버튼 컴포넌트
+const CopyButton = ({ code }: { code: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("클립보드 복사 실패:", err);
+    }
+  };
+
   return (
-    <div className="markdown-body prose prose-invert max-w-none">
+    <button
+      onClick={handleCopy}
+      className="flex gap-1 items-center select-none px-4 py-1 text-gray-400 hover:text-gray-200 transition-colors"
+      aria-label="Copy"
+    >
+      {copied ? (
+        <>
+          <Check className="w-4 h-4" />
+          <span>복사됨</span>
+        </>
+      ) : (
+        <>
+          <Copy className="w-4 h-4" />
+          <span>복사</span>
+        </>
+      )}
+    </button>
+  );
+};
+
+const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
+  const components: Components = {
+    h1: ({ node, ...props }: any) => (
+      <h1 className="text-2xl font-bold mt-6 mb-4" {...props} />
+    ),
+    h2: ({ node, ...props }: any) => (
+      <h2 className="text-xl font-bold mt-5 mb-3" {...props} />
+    ),
+    h3: ({ node, ...props }: any) => (
+      <h3 className="text-lg font-bold mt-4 mb-2" {...props} />
+    ),
+    h4: ({ node, ...props }: any) => (
+      <h4 className="text-base font-bold mt-3 mb-2" {...props} />
+    ),
+    p: ({ node, ...props }: any) => (
+      <p className="my-2 text-base leading-relaxed" {...props} />
+    ),
+    ul: ({ node, ...props }: any) => (
+      <ul className="list-disc ml-6 my-2" {...props} />
+    ),
+    ol: ({ node, ...props }: any) => (
+      <ol className="list-decimal ml-6 my-2" {...props} />
+    ),
+    li: ({ node, ...props }: any) => <li className="my-1" {...props} />,
+    blockquote: ({ node, ...props }: any) => (
+      <blockquote
+        className="border-l-4 border-gray-300 pl-4 italic my-3"
+        {...props}
+      />
+    ),
+    // pre 태그 커스텀 (코드 블록 컨테이너)
+    pre: ({ children, ...props }: any) => (
+      <pre className="overflow-visible! my-4" {...props}>
+        {children}
+      </pre>
+    ),
+    // 코드 블록 구문 강조 및 복사 버튼 처리
+    code: ({
+      node,
+      inline,
+      className,
+      children,
+      ...props
+    }: CodeComponentProps) => {
+      const match = /language-(\w+)/.exec(className || "");
+      const language = match && match[1] ? match[1] : "";
+      const content = String(children).replace(/\n$/, "");
+
+      // 인라인 코드 처리 - ChatGPT 스타일로 개선
+      if (inline) {
+        return (
+          <code
+            className="bg-gray-100 text-pink-500 dark:bg-gray-800 dark:text-pink-400 px-1 py-0.5 rounded text-sm font-mono"
+            {...props}
+          >
+            {children}
+          </code>
+        );
+      }
+
+      // 외부에서 코드 블록 내용이 한 줄인지 확인
+      const isSingleWord =
+        !content.includes("\n") && content.trim().split(/\s+/).length === 1;
+
+      // 단일 단어나 짧은 코드는 인라인 스타일로 처리 (옵션)
+      if (isSingleWord && content.length < 20) {
+        return (
+          <code
+            className="bg-gray-100 text-pink-500 dark:bg-gray-800 dark:text-pink-400 px-1.5 py-0.5 rounded text-sm font-mono"
+            {...props}
+          >
+            {children}
+          </code>
+        );
+      }
+
+      return (
+        <div className="contain-inline-size rounded-md border-[0.5px] border-token-border-medium relative bg-gray-900">
+          {/* 언어 표시 및 코드 블록 헤더 */}
+          <div className="flex items-center text-gray-400 px-4 py-2 text-xs font-sans justify-between h-9 bg-gray-800 select-none rounded-t-[5px]">
+            {language || "코드"}
+          </div>
+
+          {/* 복사 버튼 컨테이너 */}
+          <div className="sticky top-9">
+            <div className="absolute end-0 bottom-0 flex h-9 items-center pe-2">
+              <div className="bg-gray-800 text-gray-400 flex items-center rounded-sm px-2 font-sans text-xs">
+                <CopyButton code={content} />
+              </div>
+            </div>
+          </div>
+
+          {/* 코드 블록 본문 */}
+          <div className="overflow-y-auto p-4" dir="ltr">
+            <SyntaxHighlighter
+              style={vscDarkPlus}
+              language={language || "text"}
+              showLineNumbers={false}
+              PreTag="div"
+              wrapLongLines={true}
+              customStyle={{
+                margin: 0,
+                padding: 0,
+                background: "transparent",
+                fontSize: "0.875rem",
+              }}
+              codeTagProps={{
+                className: "whitespace-pre! language-" + language,
+              }}
+              {...props}
+            >
+              {content}
+            </SyntaxHighlighter>
+          </div>
+        </div>
+      );
+    },
+    a: ({ node, ...props }: any) => (
+      <a
+        className="text-blue-400 hover:underline"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      />
+    ),
+    table: ({ node, ...props }: any) => (
+      <div className="pointer-events-none relative left-[50%] flex w-[100cqw] translate-x-[-50%] justify-center *:pointer-events-auto">
+        <div className="tableContainer">
+          <table className="min-w-full" {...props} />
+        </div>
+      </div>
+    ),
+    thead: ({ node, ...props }: any) => <thead {...props} />,
+    tbody: ({ node, ...props }: any) => <tbody {...props} />,
+    tr: ({ node, ...props }: any) => <tr {...props} />,
+    th: ({ node, ...props }: any) => (
+      <th className="px-4 py-2 text-left font-medium" {...props} />
+    ),
+    td: ({ node, ...props }: any) => <td className="px-4 py-2" {...props} />,
+    strong: ({ node, ...props }: any) => (
+      <strong className="font-bold" {...props} />
+    ),
+    em: ({ node, ...props }: any) => <em className="italic" {...props} />,
+    hr: ({ node, ...props }: any) => (
+      <hr className="my-4 border-gray-700" style={{}} {...props} />
+    ),
+  };
+
+  return (
+    <div className="markdown prose dark:prose-invert w-full break-words dark">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        components={{
-          h1: ({ node, ...props }) => (
-            <h1 className="text-2xl font-bold mt-6 mb-4" {...props} />
-          ),
-          h2: ({ node, ...props }) => (
-            <h2 className="text-xl font-bold mt-5 mb-3" {...props} />
-          ),
-          h3: ({ node, ...props }) => (
-            <h3 className="text-lg font-bold mt-4 mb-2" {...props} />
-          ),
-          h4: ({ node, ...props }) => (
-            <h4 className="text-base font-bold mt-3 mb-2" {...props} />
-          ),
-          p: ({ node, ...props }) => <p className="my-2" {...props} />,
-          ul: ({ node, ...props }) => (
-            <ul className="list-disc ml-6 my-2" {...props} />
-          ),
-          ol: ({ node, ...props }) => (
-            <ol className="list-decimal ml-6 my-2" {...props} />
-          ),
-          li: ({ node, ...props }) => <li className="my-1" {...props} />,
-          blockquote: ({ node, ...props }) => (
-            <blockquote
-              className="border-l-4 border-gray-300 pl-4 italic my-3"
-              {...props}
-            />
-          ),
-          code: ({
-            node,
-            inline,
-            className,
-            children,
-            ...props
-          }: CodeComponentProps) => {
-            const match = /language-(\w+)/.exec(className || "");
-            const language = match && match[1] ? match[1] : "";
-
-            if (inline) {
-              return (
-                <span
-                  className="bg-gray-800 text-white px-1 py-0.5 rounded text-sm font-mono"
-                  {...props}
-                >
-                  {children}
-                </span>
-              );
-            }
-
-            return (
-              <div className="my-4">
-                <pre className="bg-gray-800 p-4 rounded-md overflow-auto">
-                  <code
-                    className="text-sm text-white block font-mono"
-                    {...props}
-                  >
-                    {children}
-                  </code>
-                </pre>
-              </div>
-            );
-          },
-          a: ({ node, ...props }) => (
-            <a className="text-blue-400 hover:underline" {...props} />
-          ),
-          table: ({ node, ...props }) => (
-            <div className="overflow-x-auto my-4">
-              <table
-                className="min-w-full border-collapse border border-gray-700"
-                {...props}
-              />
-            </div>
-          ),
-          thead: ({ node, ...props }) => (
-            <thead className="bg-gray-800" {...props} />
-          ),
-          tbody: ({ node, ...props }) => (
-            <tbody className="divide-y divide-gray-700" {...props} />
-          ),
-          tr: ({ node, ...props }) => (
-            <tr className="border-b border-gray-700" {...props} />
-          ),
-          th: ({ node, ...props }) => (
-            <th className="px-4 py-2 text-left font-medium" {...props} />
-          ),
-          td: ({ node, ...props }) => <td className="px-4 py-2" {...props} />,
-          strong: ({ node, ...props }) => (
-            <strong className="font-bold" {...props} />
-          ),
-          em: ({ node, ...props }) => <em className="italic" {...props} />,
-          hr: ({ node, ...props }) => (
-            <hr className="my-4 border-gray-700" {...props} />
-          ),
-        }}
+        rehypePlugins={[
+          rehypeRaw,
+          [
+            rehypeExternalLinks,
+            { target: "_blank", rel: ["noopener", "noreferrer"] },
+          ],
+        ]}
+        components={components}
+        skipHtml={false}
       >
         {content}
       </ReactMarkdown>
