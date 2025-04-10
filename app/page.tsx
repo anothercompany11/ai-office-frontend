@@ -1,5 +1,6 @@
 "use client";
 
+import { authApi } from "@/app/api";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,8 +10,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // 로그인 상태 확인
+    const isLoggedIn = authApi.isLoggedIn();
+
+    // 로그인 상태에 따라 리다이렉트
+    if (isLoggedIn) {
+      router.push("/chat");
+    } else {
+      router.push("/auth");
+    }
+  }, [router]);
+
   return (
     <div className="container mx-auto p-4 flex items-center justify-center min-h-screen">
       <Card className="w-full max-w-md shadow-lg">
@@ -24,11 +41,11 @@ export default function Home() {
           <Link href="/chat" className="block">
             <Button className="w-full h-12 text-lg">AI 챗봇</Button>
           </Link>
-          <Link href="/assignments" className="block">
-            <Button className="w-full h-12 text-lg" variant="outline">
-              과제 관리
+          <div className="block">
+            <Button className="w-full h-12 text-lg" variant="outline" disabled>
+              과제 관리 (준비 중)
             </Button>
-          </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
