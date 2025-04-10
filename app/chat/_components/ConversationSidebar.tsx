@@ -785,7 +785,7 @@ const ConversationSidebar = ({
                     if (e.key === "Enter") createFolder();
                     if (e.key === "Escape") setIsCreatingFolder(false);
                   }}
-                  className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm"
+                  className="flex-1 px-2 py-1.5 border border-gray-400 rounded text-sm bg-white text-gray-900 placeholder-gray-500 font-medium shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
                   placeholder="프로젝트 이름"
                   autoFocus
                 />
