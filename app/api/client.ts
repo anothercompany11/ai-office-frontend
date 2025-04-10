@@ -45,6 +45,30 @@ export const TokenService = {
   },
 };
 
+// CSRF 토큰 관리
+export const CSRFTokenService = {
+  // 토큰 저장
+  setToken(token: string): void {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("csrf_token", token);
+    }
+  },
+
+  // 토큰 가져오기
+  getToken(): string | null {
+    return typeof window !== "undefined"
+      ? localStorage.getItem("csrf_token")
+      : null;
+  },
+
+  // 토큰 삭제
+  removeToken(): void {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("csrf_token");
+    }
+  },
+};
+
 // API 요청 헤더 생성
 export const createHeaders = (
   needsAuth: boolean = true,
@@ -66,17 +90,144 @@ export const createHeaders = (
   return headers;
 };
 
+// 토큰 갱신 함수
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value: ApiResponse<any> | PromiseLike<ApiResponse<any>>) => void;
+  reject: (reason?: any) => void;
+  config: RequestInit & { url: string };
+}> = [];
+
+const processQueue = (error: any = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(apiRequest(prom.config.url, prom.config));
+    }
+  });
+
+  failedQueue = [];
+};
+
+export const refreshToken = async (): Promise<boolean> => {
+  try {
+    const csrfToken = CSRFTokenService.getToken();
+    if (!csrfToken) {
+      return false;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ csrf_token: csrfToken }),
+      credentials: "include", // 쿠키 포함
+    });
+
+    const responseData = await response.json();
+    if (responseData.status === "success" && responseData.data?.access_token) {
+      TokenService.setToken(responseData.data.access_token);
+
+      // 새 CSRF 토큰이 있으면 저장
+      if (responseData.data.csrf_token) {
+        CSRFTokenService.setToken(responseData.data.csrf_token);
+      }
+
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("토큰 갱신 오류:", error);
+    return false;
+  }
+};
+
 // API 요청 기본 함수
 export async function apiRequest<T = any>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   try {
+    // 쿠키 전송을 위한 credentials 추가
+    options.credentials = "include";
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
     const responseData = await response.json();
 
     // 서버 응답 로깅 (디버깅용)
     console.log(`API 응답 (${endpoint}):`, responseData);
+
+    // 401 에러 처리
+    if (
+      responseData.status === "error" &&
+      (responseData.code === "401" || response.status === 401)
+    ) {
+      // 이미 토큰 갱신 중이면 큐에 넣기
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({
+            resolve: (value: ApiResponse<T> | PromiseLike<ApiResponse<T>>) => {
+              resolve(value as ApiResponse<T>);
+            },
+            reject,
+            config: { ...options, url: endpoint },
+          });
+        });
+      }
+
+      isRefreshing = true;
+
+      // 토큰 갱신 시도
+      const refreshed = await refreshToken();
+      isRefreshing = false;
+
+      if (refreshed) {
+        // 갱신 성공하면 이전 요청들 처리
+        processQueue();
+
+        // 헤더에 새 토큰 설정
+        if (options.headers && typeof options.headers === "object") {
+          const newHeaders = { ...options.headers } as Record<string, string>;
+          newHeaders["Authorization"] = `Bearer ${TokenService.getToken()}`;
+          options.headers = newHeaders;
+        }
+
+        // 요청 재시도
+        return apiRequest(endpoint, options);
+      } else {
+        // 갱신 실패 시 큐에 있는 요청들 모두 에러로 처리
+        processQueue(new Error("토큰 갱신 실패"));
+
+        // 로그인 페이지로 이동
+        if (typeof window !== "undefined") {
+          // 모든 토큰 제거
+          TokenService.removeToken();
+          CSRFTokenService.removeToken();
+
+          // 로그인 페이지로 리다이렉트 (현재 경로가 로그인 페이지가 아닌 경우)
+          if (
+            !window.location.pathname.includes("/auth") &&
+            !window.location.pathname.includes("/login")
+          ) {
+            window.location.href = "/auth";
+          }
+        }
+
+        return {
+          status: "error",
+          code: "401",
+          message: "인증이 만료되었습니다. 다시 로그인해주세요.",
+          errors: [
+            {
+              code: "UNAUTHORIZED",
+              message: "인증이 만료되었습니다. 다시 로그인해주세요.",
+            },
+          ],
+        };
+      }
+    }
 
     // 서버 응답 구조 확인
     if (responseData.status === "success") {
@@ -121,6 +272,7 @@ export async function get<T = any>(
   return apiRequest<T>(endpoint, {
     method: "GET",
     headers: createHeaders(needsAuth),
+    credentials: "include", // 쿠키 포함
   });
 }
 
@@ -152,6 +304,7 @@ export async function put<T = any, U = any>(
     method: "PUT",
     headers: createHeaders(needsAuth),
     body: body ? JSON.stringify(body) : undefined,
+    credentials: "include", // 쿠키 포함
   });
 }
 
@@ -162,5 +315,6 @@ export async function del<T = any>(
   return apiRequest<T>(endpoint, {
     method: "DELETE",
     headers: createHeaders(needsAuth),
+    credentials: "include", // 쿠키 포함
   });
 }

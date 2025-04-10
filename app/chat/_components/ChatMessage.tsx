@@ -1,6 +1,7 @@
 "use client";
 
 import { MessageRole } from "@/types";
+import MarkdownRenderer from "./MarkdownRenderer";
 
 interface ChatMessageProps {
   role: MessageRole;
@@ -35,8 +36,8 @@ const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
                 ) : (
                   <div className="min-h-8 text-message relative flex w-full flex-col gap-2 text-start break-words whitespace-normal [.text-message+&]:mt-5">
                     <div className="flex w-full flex-col gap-1 empty:hidden first:pt-[3px]">
-                      <div className="markdown prose w-full break-words text-gray-800">
-                        <p>{content}</p>
+                      <div className="markdown prose w-full break-words bg-gray-100 text-gray-800 rounded-xl p-5">
+                        <MarkdownRenderer content={content} />
                       </div>
                     </div>
                   </div>

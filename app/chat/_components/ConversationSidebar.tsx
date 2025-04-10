@@ -6,6 +6,7 @@ import {
   DndContext,
   DragEndEvent,
   DragOverEvent,
+  DragOverlay,
   DragStartEvent,
   MouseSensor,
   TouchSensor,
@@ -99,6 +100,10 @@ function ConversationItem({
         maxWidth: "100%",
         boxSizing: "border-box" as const,
         margin: "0 2px",
+        boxShadow: "0 5px 10px rgba(0, 0, 0, 0.1)",
+        background: "white",
+        borderRadius: "8px",
+        border: "1px solid #e5e7eb",
       }
     : undefined;
 
@@ -193,6 +198,32 @@ interface ConversationFolder {
   updated_at: string;
   conversations: ConversationForFolder[];
 }
+
+// 드래그 오버레이 컴포넌트
+const DragOverlayContent = ({
+  type,
+  id,
+  conversations,
+}: {
+  type: string;
+  id: string;
+  conversations: Conversation[];
+}) => {
+  if (type === "conversation") {
+    const conversation = conversations.find((c) => c.id === id);
+    if (!conversation) return null;
+
+    return (
+      <div className="bg-white border border-gray-200 shadow-lg rounded-lg p-3 w-64 flex items-center">
+        <span className="text-sm font-medium text-gray-700 truncate">
+          {conversation.title}
+        </span>
+      </div>
+    );
+  }
+
+  return null;
+};
 
 const ConversationSidebar = ({
   conversations,
@@ -333,11 +364,35 @@ const ConversationSidebar = ({
     if (newFolderName.trim()) {
       try {
         setIsLoading(true);
-        await folderApi.createFolder(newFolderName);
-        await loadFolders();
+
+        // 폴더 생성 전 UI 작업 중지
         setIsCreatingFolder(false);
+
+        // 폴더 API 호출
+        const response = await folderApi.createFolder(newFolderName);
+        console.log("폴더 생성 응답:", response);
+
+        if (response.status === "success" && response.data) {
+          // 성공 시 폴더 목록에 직접 추가
+          const newFolder = response.data;
+          setFolders((prev) => [
+            ...prev,
+            {
+              ...newFolder,
+              conversations: [],
+            },
+          ]);
+        } else {
+          // API가 성공하지 않았을 경우 전체 목록 다시 로드
+          await loadFolders();
+        }
+
+        // 폴더 이름 초기화
+        setNewFolderName("");
       } catch (error) {
         console.error("폴더 생성 오류:", error);
+        // 오류 발생 시 폴더 목록 다시 로드
+        await loadFolders();
       } finally {
         setIsLoading(false);
       }
@@ -647,43 +702,38 @@ const ConversationSidebar = ({
       onDragCancel={handleDragCancel}
       modifiers={[restrictToWindowEdges]}
     >
-      <div className="w-64 h-full border-r border-gray-200 flex flex-col bg-white group/sidebar overflow-hidden">
-        {/* 헤더 */}
-        <div className="z-20 p-2 text-xs font-semibold select-none overflow-clip ps-2 pt-7">
-          <h2
-            id="folders-heading"
-            className="flex h-[26px] w-full items-center gap-1 text-xs text-gray-800 cursor-pointer"
-            onClick={() => setShowFolders(!showFolders)}
-          >
-            <span>
-              {showFolders ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              )}
-            </span>
-            <span>프로젝트</span>
-            <span className="ml-auto transition-opacity duration-300 opacity-0 group-hover/sidebar:opacity-100">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  startCreatingFolder();
-                }}
-                aria-label="새 프로젝트 만들기"
-                className="me-1 flex items-center rounded-lg hover:bg-gray-100 focus-visible:opacity-100"
-                disabled={isLoading || isCreatingFolder}
+      <div className="h-full flex flex-col bg-white w-80">
+        {/* 사이드바 내용 */}
+        <div className="flex-1 overflow-auto">
+          <aside className="p-2">
+            {/* 폴더 섹션 헤더 */}
+            <div className="z-20 text-xs font-semibold select-none overflow-clip">
+              <h2
+                id="folders-heading"
+                className="flex h-[26px] w-full items-center gap-1 text-xs text-gray-800 cursor-pointer"
+                onClick={() => setShowFolders(!showFolders)}
               >
-                <div className="flex h-[26px] w-[26px] items-center justify-center text-gray-700">
-                  <Plus size={16} />
-                </div>
-              </button>
-            </span>
-          </h2>
-        </div>
+                <span>
+                  {showFolders ? (
+                    <ChevronDown size={16} />
+                  ) : (
+                    <ChevronRight size={16} />
+                  )}
+                </span>
+                <span>프로젝트</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    startCreatingFolder();
+                  }}
+                  className="ml-auto p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+                  title="프로젝트 추가"
+                >
+                  <Plus size={14} />
+                </button>
+              </h2>
+            </div>
 
-        {/* 폴더와 대화 목록 */}
-        <div className="flex-grow overflow-y-auto overflow-x-hidden pt-1">
-          <aside className="flex flex-col gap-4 w-full max-w-full">
             {/* 폴더 목록 */}
             {showFolders && (
               <FolderList
@@ -699,10 +749,23 @@ const ConversationSidebar = ({
                     );
                 }}
                 onDeleteFolder={(folderId) => {
+                  // 삭제 전 UI에서 미리 제거
+                  setFolders((prevFolders) =>
+                    prevFolders.filter((folder) => folder.id !== folderId)
+                  );
+
+                  // API 호출
                   folderApi
                     .deleteFolder(folderId)
-                    .then(() => loadFolders())
-                    .catch((error) => console.error("폴더 삭제 오류:", error));
+                    .then(() => {
+                      console.log(`폴더 ${folderId} 삭제 완료`);
+                      // 이미 UI에서 제거했으므로 loadFolders는 호출하지 않음
+                    })
+                    .catch((error) => {
+                      console.error("폴더 삭제 오류:", error);
+                      // 오류 발생 시 다시 폴더 목록 로드
+                      loadFolders();
+                    });
                 }}
                 onCreateFolder={startCreatingFolder}
                 onDeleteConversation={onDeleteConversation}
@@ -812,6 +875,17 @@ const ConversationSidebar = ({
           </button>
         </div>
       </div>
+
+      {/* DragOverlay 추가 */}
+      <DragOverlay>
+        {activeId && draggedType === "conversation" && (
+          <DragOverlayContent
+            type={draggedType}
+            id={activeId}
+            conversations={conversationsState}
+          />
+        )}
+      </DragOverlay>
     </DndContext>
   );
 };

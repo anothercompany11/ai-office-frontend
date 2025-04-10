@@ -1,4 +1,10 @@
-import { ApiResponse, get, post, TokenService } from "./client";
+import {
+  ApiResponse,
+  CSRFTokenService,
+  get,
+  post,
+  TokenService,
+} from "./client";
 import {
   LoginRequest,
   RefreshTokenRequest,
@@ -6,30 +12,6 @@ import {
   User,
   UserTokenData,
 } from "./dto/auth";
-
-// CSRF 토큰 관리
-const CSRFTokenService = {
-  // 토큰 저장
-  setToken(token: string): void {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("csrf_token", token);
-    }
-  },
-
-  // 토큰 가져오기
-  getToken(): string | null {
-    return typeof window !== "undefined"
-      ? localStorage.getItem("csrf_token")
-      : null;
-  },
-
-  // 토큰 삭제
-  removeToken(): void {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("csrf_token");
-    }
-  },
-};
 
 // 인증 API 모듈
 export const authApi = {
@@ -66,18 +48,22 @@ export const authApi = {
   // 로그아웃
   async logout(): Promise<ApiResponse<boolean>> {
     try {
-      const response = await post("/auth/logout");
+      // 백엔드에 로그아웃 요청
+      const response = await post<boolean, void>("/auth/logout");
 
-      // 로컬 저장소에서 토큰 제거
+      // 로컬 토큰 삭제
       TokenService.removeToken();
       CSRFTokenService.removeToken();
 
+      // 로그아웃 결과 반환
       return response;
     } catch (error) {
       console.error("로그아웃 오류:", error);
-      // 에러가 발생해도 로컬의 토큰은 제거
+
+      // 오류가 발생해도 로컬 토큰은 삭제
       TokenService.removeToken();
       CSRFTokenService.removeToken();
+
       return {
         status: "error",
         code: "LOGOUT_ERROR",
@@ -128,7 +114,24 @@ export const authApi = {
 
   // 사용자 정보 가져오기
   async getUserInfo(): Promise<ApiResponse<User>> {
-    return get<User>("/auth/user");
+    try {
+      return await get<User>("/auth/user");
+    } catch (error) {
+      console.error("사용자 정보 가져오기 오류:", error);
+
+      // 401 오류 발생 시 이벤트 발생
+      if (error instanceof Response && error.status === 401) {
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("unauthorized"));
+        }
+      }
+
+      return {
+        status: "error",
+        code: "USER_INFO_ERROR",
+        message: "사용자 정보를 가져오는 중 오류가 발생했습니다.",
+      };
+    }
   },
 
   // 토큰에서 사용자 정보 추출
@@ -157,11 +160,18 @@ export const authApi = {
 
   // 로그인 상태 확인
   isLoggedIn(): boolean {
-    return TokenService.isLoggedIn();
+    const token = TokenService.getToken();
+    console.log("authApi.isLoggedIn - 토큰 존재 여부:", !!token); // 디버깅용 로그
+    return !!token;
   },
 
   // Access 토큰 가져오기
   getAccessToken(): string | null {
     return TokenService.getToken();
+  },
+
+  // CSRF 토큰 가져오기
+  getCSRFToken(): string | null {
+    return CSRFTokenService.getToken();
   },
 };

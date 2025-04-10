@@ -60,9 +60,19 @@ export default function LoginPage() {
       console.log("로그인 결과:", result);
 
       if (result.status === "success" && result.data?.access_token) {
-        // 토큰 저장은 authApi.login()에서 처리됨
-        console.log("토큰 저장 완료, /chat으로 이동합니다");
-        router.push("/chat");
+        // 토큰 저장 후 잠시 대기
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        // 토큰이 제대로 저장되었는지 확인
+        const storedToken = authApi.getAccessToken();
+        console.log("저장된 토큰:", storedToken);
+
+        if (storedToken) {
+          console.log("토큰 저장 완료, /chat으로 이동합니다");
+          window.location.href = "/chat";
+        } else {
+          setError("토큰 저장에 실패했습니다.");
+        }
       } else {
         setError(result.message || "로그인에 실패했습니다.");
       }
@@ -93,7 +103,7 @@ export default function LoginPage() {
                     <FormControl>
                       <Input
                         placeholder="인증 코드를 입력하세요"
-                        className="h-12"
+                        className="h-12 text-white"
                         {...field}
                         disabled={isLoading}
                       />

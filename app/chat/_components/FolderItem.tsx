@@ -65,6 +65,13 @@ function FolderConversationItem({
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
         zIndex: 999,
         position: "relative" as const,
+        boxShadow: "0 5px 10px rgba(0, 0, 0, 0.1)",
+        background: "white",
+        width: "calc(100% - 8px)",
+        borderRadius: "8px",
+        border: "1px solid #e5e7eb",
+        padding: "4px 8px",
+        margin: "0 4px",
       }
     : undefined;
 
@@ -76,7 +83,7 @@ function FolderConversationItem({
       {...attributes}
       className={`flex items-center justify-between px-2 py-1 text-sm rounded-lg cursor-pointer hover:bg-gray-50 group ${
         isCurrentConversation ? "text-blue-600 font-medium" : "text-gray-700"
-      } ${isActive ? "opacity-50" : ""}`}
+      } ${isActive ? "opacity-90" : ""}`}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(conversation.id);
