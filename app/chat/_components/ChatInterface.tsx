@@ -24,12 +24,14 @@ interface ChatInterfaceProps {
     conversationId: string,
     folderId: string | null
   ) => Promise<void>;
+  isNewChat?: boolean; // 새 대화 여부
 }
 
 const ChatInterface = ({
   conversationId,
   onUpdateConversation,
   onAssignToFolder,
+  isNewChat = false,
 }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<ClientMessage[]>([
     {
@@ -64,6 +66,20 @@ const ChatInterface = ({
   // 메시지 불러오기
   const loadConversationMessages = async (id: string) => {
     try {
+      // "new" 대화인 경우 API 호출하지 않음
+      if (id === "new" || isNewChat) {
+        setMessages([
+          {
+            role: MessageRole.ASSISTANT,
+            content: "안녕하세요! 무엇을 도와드릴까요?",
+          },
+        ]);
+        setNewTitle("새 대화");
+        setCurrentFolderId(null);
+        setIsLoading(false);
+        return;
+      }
+
       setIsLoading(true);
       const response = await conversationApi.getConversation(id);
 
@@ -130,15 +146,18 @@ const ChatInterface = ({
 
   // 초기 로드
   useEffect(() => {
-    loadFolders();
-  }, []);
+    // "new" 대화인 경우 폴더 목록 로드하지 않음
+    if (conversationId !== "new" && !isNewChat) {
+      loadFolders();
+    }
+  }, [conversationId, isNewChat]);
 
   // 대화 ID가 변경될 때마다 메시지 로드
   useEffect(() => {
     if (conversationId) {
       loadConversationMessages(conversationId);
     }
-  }, [conversationId]);
+  }, [conversationId, isNewChat]);
 
   // 메시지 목록이 변경될 때마다 스크롤을 아래로 이동
   useEffect(() => {
@@ -189,6 +208,15 @@ const ChatInterface = ({
     if (newTitle.trim()) {
       try {
         setIsLoading(true);
+
+        // "new" 대화인 경우 서버 API 호출 건너뛰기
+        if (conversationId === "new" || isNewChat) {
+          onUpdateConversation(conversationId, { title: newTitle });
+          setEditingConversationTitle(false);
+          setIsLoading(false);
+          return;
+        }
+
         const response = await conversationApi.updateConversation(
           conversationId,
           newTitle
@@ -324,16 +352,22 @@ const ChatInterface = ({
       ) {
         currentConversationId = responseConversationId;
 
-        // 부모 컴포넌트에 새 대화 ID 알림
+        // 부모 컴포넌트에 새 대화 ID 알림 (새 대화 생성 시)
+        const title =
+          content.length > 30 ? `${content.substring(0, 27)}...` : content;
+
         if (typeof onUpdateConversation === "function") {
-          onUpdateConversation(responseConversationId, {
+          // 대화 목록에 즉시 추가되도록 필요한 정보 전달
+          onUpdateConversation(conversationId, {
             id: responseConversationId,
-            title:
-              content.length > 30 ? `${content.substring(0, 27)}...` : content,
+            title: title,
             preview: content,
             lastUpdated: new Date(),
           });
         }
+
+        // 새 ID로 폴더 목록 로드
+        loadFolders();
       }
 
       // 완성된 응답 메시지 추가
@@ -346,28 +380,36 @@ const ChatInterface = ({
         },
       ]);
 
-      // 첫 메시지인 경우, 대화 제목 업데이트
+      // 제목과 미리보기 업데이트 처리
       if (messages.length <= 1 && content.length > 0) {
+        // 첫 메시지인 경우
         const title =
           content.length > 30 ? `${content.substring(0, 27)}...` : content;
 
         try {
-          // 새 대화 ID로 제목 업데이트
-          await conversationApi.updateConversation(
-            currentConversationId,
-            title
-          );
-          onUpdateConversation(currentConversationId, {
-            title,
-            preview: content,
-            lastUpdated: new Date(),
-          });
+          // "new" 대화가 아닌 경우에만 제목 업데이트 API 호출 (이미 위에서 새 대화 생성 시 처리됨)
+          if (conversationId !== "new" && !isNewChat) {
+            await conversationApi.updateConversation(
+              currentConversationId,
+              title
+            );
+          }
+
+          // 새 대화가 아닌 경우 로컬 상태 업데이트
+          if (conversationId !== "new") {
+            onUpdateConversation(currentConversationId, {
+              title,
+              preview: content,
+              lastUpdated: new Date(),
+            });
+          }
+
           setNewTitle(title);
         } catch (err) {
           console.error("대화 제목 자동 업데이트 실패:", err);
         }
       } else {
-        // 미리보기 업데이트 (기존 대화인 경우)
+        // 기존 대화의 미리보기 업데이트
         onUpdateConversation(currentConversationId, {
           preview: content,
           lastUpdated: new Date(),

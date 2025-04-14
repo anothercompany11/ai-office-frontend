@@ -119,7 +119,7 @@ export const conversationApi = {
     try {
       const request: SendMessageRequest = {
         message: content,
-        conversation_id: conversationId,
+        conversation_id: conversationId === "new" ? undefined : conversationId,
       };
 
       const response = await fetch(

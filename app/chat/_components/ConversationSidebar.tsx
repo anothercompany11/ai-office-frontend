@@ -247,7 +247,8 @@ const ConversationSidebar = ({
 
   // 대화 목록 변경 시 상태 업데이트
   useEffect(() => {
-    setConversationsState(conversations);
+    // "new" ID를 가진 임시 대화만 목록에서 제외 (실제 서버에서 생성된 대화는 포함)
+    setConversationsState(conversations.filter((conv) => conv.id !== "new"));
   }, [conversations]);
 
   // 센서 설정 (드래그 감지)

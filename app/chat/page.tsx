@@ -20,6 +20,16 @@ export default function ChatPage() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
 
+  // 현재 대화 ID 설정 (로컬 스토리지에도 저장)
+  const setCurrentConversationWithStorage = useCallback((id: string | null) => {
+    setCurrentConversationId(id);
+    if (id) {
+      localStorage.setItem("currentConversationId", id);
+    } else {
+      localStorage.removeItem("currentConversationId");
+    }
+  }, []);
+
   // 대화 목록 로드
   const loadConversations = useCallback(async () => {
     try {
@@ -35,11 +45,36 @@ export default function ChatPage() {
           folder_id: conv.folder_id,
         }));
 
-        setConversations(formattedConversations);
+        // 로컬 스토리지에서 저장된 대화 ID 확인
+        const savedId = localStorage.getItem("currentConversationId");
 
-        // 대화가 있으면 첫 번째 대화 선택
-        if (formattedConversations.length > 0 && !currentConversationId) {
-          setCurrentConversationId(formattedConversations[0].id);
+        // "new" 대화 상태인 경우 로컬 상태만 업데이트 (서버에 요청 안 보냄)
+        if (savedId === "new") {
+          const newConversation: Conversation = {
+            id: "new",
+            title: "새 대화",
+            preview: "",
+            lastUpdated: new Date(),
+          };
+          setConversations([...formattedConversations]);
+          // 빈 대화창 상태만 유지하고 대화 목록에는 추가하지 않음
+          setCurrentConversationWithStorage("new");
+        } else {
+          setConversations(formattedConversations);
+
+          // 저장된 ID가 있고 서버에 해당 대화가 존재하면 사용
+          if (
+            savedId &&
+            savedId !== "new" &&
+            formattedConversations.some((conv) => conv.id === savedId)
+          ) {
+            setCurrentConversationWithStorage(savedId);
+          } else if (
+            formattedConversations.length > 0 &&
+            !currentConversationId
+          ) {
+            setCurrentConversationWithStorage(formattedConversations[0].id);
+          }
         }
       }
     } catch (error) {
@@ -47,7 +82,7 @@ export default function ChatPage() {
     } finally {
       setIsLoadingConversations(false);
     }
-  }, [currentConversationId]);
+  }, [currentConversationId, setCurrentConversationWithStorage]);
 
   // 로그인 상태 체크 및 대화 목록 로드
   useEffect(() => {
@@ -63,29 +98,16 @@ export default function ChatPage() {
 
   // 새 대화 생성
   const handleNewConversation = async () => {
-    try {
-      const response = await conversationApi.createConversation("새 대화");
+    // 임시 ID 생성 (실제 ID는 첫 메시지 전송 시 서버에서 받음)
+    const tempId = "new";
 
-      if (response.status === "success" && response.data) {
-        const formattedConversation: Conversation = {
-          id: response.data.id,
-          title: response.data.title || "새 대화",
-          preview: "",
-          lastUpdated: new Date(response.data.created_at),
-          folder_id: response.data.folder_id,
-        };
-
-        setConversations((prev) => [formattedConversation, ...prev]);
-        setCurrentConversationId(formattedConversation.id);
-      }
-    } catch (error) {
-      console.error("새 대화를 생성하는 중 오류 발생:", error);
-    }
+    // 대화 목록에는 추가하지 않고 UI 상태만 변경
+    setCurrentConversationWithStorage(tempId);
   };
 
   // 대화 선택
   const handleSelectConversation = (id: string) => {
-    setCurrentConversationId(id);
+    setCurrentConversationWithStorage(id);
   };
 
   // 대화 삭제
@@ -102,9 +124,9 @@ export default function ChatPage() {
             (conv) => conv.id !== id
           );
           if (remainingConversations.length > 0) {
-            setCurrentConversationId(remainingConversations[0].id);
+            setCurrentConversationWithStorage(remainingConversations[0].id);
           } else {
-            setCurrentConversationId(null);
+            setCurrentConversationWithStorage(null);
           }
         }
       }
@@ -117,34 +139,50 @@ export default function ChatPage() {
   const updateConversation = useCallback(
     (id: string, data: Partial<Conversation>) => {
       // 새 대화 ID가 기존에 없는 경우 (새로운 대화 생성)
-      if (data.id && !conversations.some((conv) => conv.id === id)) {
+      if (
+        data.id &&
+        id !== data.id &&
+        !conversations.some((conv) => conv.id === data.id)
+      ) {
         const newConversation: Conversation = {
-          id,
+          id: data.id,
           title: data.title || "새 대화",
           preview: data.preview || "",
           lastUpdated: data.lastUpdated || new Date(),
           folder_id: data.folder_id,
         };
 
-        setConversations((prev) => [newConversation, ...prev]);
-        setCurrentConversationId(id);
+        // "new" 상태였던 대화를 실제 ID로 대체
+        if (id === "new" && currentConversationId === "new") {
+          console.log("새 대화 생성 완료:", data.id);
+          // 대화 목록에 새 대화 추가하고 현재 선택된 대화를 업데이트
+          setConversations((prev) => [newConversation, ...prev]);
+          setCurrentConversationWithStorage(data.id);
+        } else {
+          // 일반적인 경우 (새로운 대화)
+          setConversations((prev) => [newConversation, ...prev]);
+          setCurrentConversationWithStorage(data.id);
+        }
+
         return;
       }
 
-      // 기존 대화 업데이트
-      setConversations((prev) =>
-        prev.map((conv) =>
-          conv.id === id
-            ? {
-                ...conv,
-                ...data,
-                lastUpdated: data.lastUpdated || new Date(), // 항상 업데이트 시간 갱신
-              }
-            : conv
-        )
-      );
+      // 기존 대화 업데이트 (ID는 "new"가 아닌 경우)
+      if (id !== "new") {
+        setConversations((prev) =>
+          prev.map((conv) =>
+            conv.id === id
+              ? {
+                  ...conv,
+                  ...data,
+                  lastUpdated: data.lastUpdated || new Date(), // 항상 업데이트 시간 갱신
+                }
+              : conv
+          )
+        );
+      }
     },
-    [conversations]
+    [conversations, setCurrentConversationWithStorage, currentConversationId]
   );
 
   // 대화를 폴더에 할당
@@ -204,9 +242,11 @@ export default function ChatPage() {
       <div className="flex-1">
         {currentConversationId ? (
           <ChatInterface
+            key={currentConversationId}
             conversationId={currentConversationId}
             onUpdateConversation={updateConversation}
             onAssignToFolder={assignConversationToFolder}
+            isNewChat={currentConversationId === "new"}
           />
         ) : (
           <div className="flex h-full items-center justify-center">
