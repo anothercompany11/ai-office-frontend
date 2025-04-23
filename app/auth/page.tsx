@@ -30,7 +30,7 @@ const loginSchema = z.object({
     .length(8, "인증 코드는 8자리여야 합니다.")
     .regex(
       /^[A-Za-z0-9]{8}$/,
-      "인증 코드는 영문자와 숫자로만 구성되어야 합니다."
+      "인증 코드는 영문자와 숫자로만 구성되어야 합니다.",
     ),
 });
 
@@ -88,7 +88,9 @@ export default function LoginPage() {
     <div className="container mx-auto p-4 flex items-center justify-center min-h-screen">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">로그인</CardTitle>
+          <CardTitle className="text-2xl font-bold font-hakgyo-ansim text-primary-normal">
+            로그인
+          </CardTitle>
           <CardDescription>인증 코드를 입력하여 로그인하세요</CardDescription>
         </CardHeader>
         <CardContent>
