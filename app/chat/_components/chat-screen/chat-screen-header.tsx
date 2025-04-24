@@ -18,6 +18,7 @@ import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import Image from "next/image";
+
 const ChatScreenHeader = () => {
   const [showMobileGuide, setShowMobileGuide] = useState(false);
 
@@ -62,15 +63,8 @@ const ChatScreenHeader = () => {
 
   return (
     <div className="py-5 px-8 flex justify-between items-center">
-      {/* <style jsx global>{`
-        .swiper-pagination-bullet {
-          background-color: #fca5a5 !important;
-        }
-        .swiper-pagination-bullet-active {
-          background-color: #000000 !important;
-        }
-      `}</style> */}
       <p className="text-body-l font-hakgyo-ansim">Chat AI 오피스</p>
+
       <div className="hidden web:block">
         <Popover>
           <PopoverTrigger asChild>
@@ -86,6 +80,7 @@ const ChatScreenHeader = () => {
           </PopoverContent>
         </Popover>
       </div>
+
       <div className="block web:hidden">
         <Dialog>
           <DialogTrigger asChild>
@@ -93,7 +88,7 @@ const ChatScreenHeader = () => {
               <CircleHelp className="size-6 text-primary" />
             </button>
           </DialogTrigger>
-          <DialogContent className="">
+          <DialogContent className="mobile-guide-dialog-content">
             <DialogHeader>
               <p className="text-title-s text-label-assistive">
                 AI오피스 프롬프트 가이드{" "}
@@ -107,7 +102,7 @@ const ChatScreenHeader = () => {
                 bulletClass: "swiper-pagination-bullet",
                 bulletActiveClass: "swiper-pagination-bullet-active",
               }}
-              className="w-full"
+              className="w-full mobile-guide-swiper"
             >
               {guideContents.map((section, index) => (
                 <SwiperSlide key={index} className="px-[14px]">
