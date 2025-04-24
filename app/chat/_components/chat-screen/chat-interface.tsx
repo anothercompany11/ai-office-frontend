@@ -5,8 +5,8 @@ import { ClientConversation, ClientMessage } from "@/app/api/dto/conversation";
 import { folderApi } from "@/app/api/folder";
 import { MessageRole } from "@/types";
 import { useEffect, useRef, useState } from "react";
-import ChatInput from "./ChatInput";
-import ChatMessage from "./ChatMessage";
+import ChatInput from "./chat-input";
+import ChatMessage from "./chat-message";
 
 // 폴더 타입 정의
 interface Folder {
@@ -22,7 +22,7 @@ interface ChatInterfaceProps {
   onUpdateConversation: (id: string, data: Partial<ClientConversation>) => void;
   onAssignToFolder: (
     conversationId: string,
-    folderId: string | null
+    folderId: string | null,
   ) => Promise<void>;
   isNewChat?: boolean; // 새 대화 여부
 }
@@ -219,7 +219,7 @@ const ChatInterface = ({
 
         const response = await conversationApi.updateConversation(
           conversationId,
-          newTitle
+          newTitle,
         );
 
         if (response.status === "success") {
@@ -282,7 +282,7 @@ const ChatInterface = ({
       // 스트리밍 API 호출
       const stream = await conversationApi.sendStreamingMessage(
         content,
-        conversationId
+        conversationId,
       );
 
       if (!stream) {
@@ -391,7 +391,7 @@ const ChatInterface = ({
           if (conversationId !== "new" && !isNewChat) {
             await conversationApi.updateConversation(
               currentConversationId,
-              title
+              title,
             );
           }
 

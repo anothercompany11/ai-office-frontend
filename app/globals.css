@@ -26,6 +26,7 @@
   --background: #ffffff;
 
   --line: #eeeff1;
+  --line-alternative: #f9fafa;
 
   --status-error: #e82929;
 
@@ -82,6 +83,7 @@
   }
 
   .text-title-3 {
+    font-family: var(--font-hakgyo-ansim);
     font-size: 16px;
     line-height: 160%;
     letter-spacing: 0%;
@@ -202,6 +204,18 @@
   /* ========== Line ========== */
   .border-line {
     border-color: var(--line);
+  }
+  .text-line {
+    color: var(--line);
+  }
+  .text-line-alternative {
+    color: var(--line-alternative);
+  }
+  .border-line-alternative {
+    border-color: var(--line-alternative);
+  }
+  .bg-line-alternative {
+    background-color: var(--line-alternative);
   }
 
   /* ========== Status ========== */

@@ -1,7 +1,7 @@
 "use client";
 
 import { MessageRole } from "@/types";
-import MarkdownRenderer from "./MarkdownRenderer";
+import MarkdownRenderer from "./markdown-renderer";
 
 interface ChatMessageProps {
   role: MessageRole;

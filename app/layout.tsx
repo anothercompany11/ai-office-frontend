@@ -7,6 +7,22 @@ export const metadata = {
   description: "AI Office Frontend",
 };
 
+const hakgyoAnsim = localFont({
+  src: [
+    {
+      path: "./font/Hakgyoansim-Allimjang-TTF-R.woff",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./font/Hakgyoansim-Allimjang-TTF-B.woff",
+      weight: "700",
+      style: "bold",
+    },
+  ],
+  variable: "--font-hakgyonansim",
+});
+
 const pretendard = localFont({
   src: [
     {
@@ -36,13 +52,6 @@ const pretendard = localFont({
     },
   ],
   variable: "--font-pretendard",
-});
-
-const hakgyoAnsim = localFont({
-  src: "./font/HakgyoAnsim.ttf",
-  weight: "400",
-  style: "normal",
-  variable: "--font-hakgyo-ansim",
 });
 
 export default function RootLayout({

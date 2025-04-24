@@ -2,7 +2,7 @@ import { cn } from "@/app/lib/utils";
 import { useDroppable } from "@dnd-kit/core";
 import { ChevronDown, ChevronRight, Folder, MoreVertical } from "lucide-react";
 import React, { RefObject } from "react";
-import { ChatFolder, DragItemType } from "./types";
+import { ChatFolder, DragItemType } from "../types";
 
 interface DroppableFolderProps {
   folder: ChatFolder;
@@ -103,7 +103,7 @@ export function DroppableFolder({
       className={cn(
         "group w-full text-left rounded-lg active:opacity-90 h-9 flex items-center gap-2.5 p-2",
         isSelected ? "bg-gray-200" : "hover:bg-gray-100",
-        isOver ? "bg-blue-50" : ""
+        isOver ? "bg-blue-50" : "",
       )}
       onClick={handleClick}
       data-folder-id={folder.id}

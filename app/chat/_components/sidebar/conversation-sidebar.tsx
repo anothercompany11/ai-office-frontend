@@ -19,7 +19,7 @@ import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { ChevronDown, ChevronRight, Folder, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import FolderList from "./FolderList";
+import FolderList from "./folder-list";
 
 // 폴더 타입 정의
 interface Folder {
@@ -266,7 +266,7 @@ const ConversationSidebar = ({
         delay: 250,
         tolerance: 5,
       },
-    })
+    }),
   );
 
   // 폴더 목록 로드
@@ -281,7 +281,7 @@ const ConversationSidebar = ({
         console.log(
           "폴더 데이터 로드 성공:",
           response.data.length,
-          "개의 폴더"
+          "개의 폴더",
         );
 
         // 현재 대화 상태 불러오기 (최신)
@@ -299,7 +299,7 @@ const ConversationSidebar = ({
             }));
 
           console.log(
-            `폴더 ${folder.name}(${folder.id})에 ${folderConversations.length}개의 대화 할당됨`
+            `폴더 ${folder.name}(${folder.id})에 ${folderConversations.length}개의 대화 할당됨`,
           );
           return {
             ...folder,
@@ -347,7 +347,7 @@ const ConversationSidebar = ({
           ...folder,
           conversations: folderConversations,
         };
-      })
+      }),
     );
   };
 
@@ -421,7 +421,7 @@ const ConversationSidebar = ({
 
   // 대화 내역을 시간에 따라 그룹화하는 함수
   const groupConversationsByTime = (
-    conversations: Conversation[]
+    conversations: Conversation[],
   ): GroupedConversations => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -461,7 +461,7 @@ const ConversationSidebar = ({
 
   // 폴더에 없는 대화만 필터링하여, conversationsState에서 가져오도록 수정
   const groupedConversations = groupConversationsByTime(
-    conversationsState.filter((c) => !c.folder_id)
+    conversationsState.filter((c) => !c.folder_id),
   );
 
   // 드래그 시작 처리 핸들러
@@ -506,7 +506,7 @@ const ConversationSidebar = ({
 
     // UI 즉시 업데이트를 위해 현재 대화 객체 찾기
     const draggedConversation = conversationsState.find(
-      (c) => c.id === conversationId
+      (c) => c.id === conversationId,
     );
 
     if (!draggedConversation) {
@@ -532,20 +532,20 @@ const ConversationSidebar = ({
 
       try {
         console.log(
-          `대화 ${conversationId}를 폴더 ${targetFolderId}로 이동 시도...`
+          `대화 ${conversationId}를 폴더 ${targetFolderId}로 이동 시도...`,
         );
 
         // 1. API 호출로 서버 상태 업데이트
         const response = await conversationApi.updateConversation(
           conversationId,
-          { folder_id: targetFolderId }
+          { folder_id: targetFolderId },
         );
 
         console.log(`서버 응답:`, response);
 
         if (response.status === "success") {
           console.log(
-            `서버 업데이트 성공: 대화 ${conversationId}를 폴더 ${targetFolderId}로 이동`
+            `서버 업데이트 성공: 대화 ${conversationId}를 폴더 ${targetFolderId}로 이동`,
           );
 
           // 2. UI 상태 업데이트
@@ -554,8 +554,8 @@ const ConversationSidebar = ({
             prev.map((conv) =>
               conv.id === conversationId
                 ? { ...conv, folder_id: targetFolderId }
-                : conv
-            )
+                : conv,
+            ),
           );
 
           // 2-2. 원래 폴더에서 대화 제거 (있는 경우)
@@ -566,12 +566,12 @@ const ConversationSidebar = ({
                   return {
                     ...folder,
                     conversations: folder.conversations.filter(
-                      (c) => c.id !== conversationId
+                      (c) => c.id !== conversationId,
                     ),
                   };
                 }
                 return folder;
-              })
+              }),
             );
           }
 
@@ -583,7 +583,7 @@ const ConversationSidebar = ({
                   ...folder,
                   conversations: [
                     ...folder.conversations.filter(
-                      (c) => c.id !== conversationId
+                      (c) => c.id !== conversationId,
                     ),
                     {
                       id: draggedConversation.id,
@@ -594,7 +594,7 @@ const ConversationSidebar = ({
                 };
               }
               return folder;
-            })
+            }),
           );
         } else {
           console.error("대화 이동 API 호출 실패:", response.message);
@@ -623,14 +623,14 @@ const ConversationSidebar = ({
         // 1. API 호출로 서버 상태 업데이트
         const response = await conversationApi.updateConversation(
           conversationId,
-          { folder_id: null }
+          { folder_id: null },
         );
 
         console.log(`서버 응답:`, response);
 
         if (response.status === "success") {
           console.log(
-            `서버 업데이트 성공: 대화 ${conversationId}를 폴더 밖으로 이동`
+            `서버 업데이트 성공: 대화 ${conversationId}를 폴더 밖으로 이동`,
           );
 
           // 2-1. 원래 폴더에서 대화 제거 (먼저 실행)
@@ -639,12 +639,12 @@ const ConversationSidebar = ({
             const updatedFolders = prevFolders.map((folder) => {
               if (folder.id === originalFolderId) {
                 console.log(
-                  `폴더 ${folder.id}에서 대화 ${conversationId} 제거`
+                  `폴더 ${folder.id}에서 대화 ${conversationId} 제거`,
                 );
                 return {
                   ...folder,
                   conversations: folder.conversations.filter(
-                    (c) => c.id !== conversationId
+                    (c) => c.id !== conversationId,
                   ),
                 };
               }
@@ -659,7 +659,7 @@ const ConversationSidebar = ({
             const updated = prev.map((conv) =>
               conv.id === conversationId
                 ? { ...conv, folder_id: undefined }
-                : conv
+                : conv,
             );
             console.log("대화 상태 업데이트:", updated);
             return updated;
@@ -704,6 +704,7 @@ const ConversationSidebar = ({
       modifiers={[restrictToWindowEdges]}
     >
       <div className="h-full flex flex-col bg-white w-80">
+        <p className="bg-red-300">헬로우~</p>
         {/* 사이드바 내용 */}
         <div className="flex-1 overflow-auto">
           <aside className="p-2">
@@ -746,13 +747,13 @@ const ConversationSidebar = ({
                     .updateFolder(folderId, newName)
                     .then(() => loadFolders())
                     .catch((error) =>
-                      console.error("폴더 이름 변경 오류:", error)
+                      console.error("폴더 이름 변경 오류:", error),
                     );
                 }}
                 onDeleteFolder={(folderId) => {
                   // 삭제 전 UI에서 미리 제거
                   setFolders((prevFolders) =>
-                    prevFolders.filter((folder) => folder.id !== folderId)
+                    prevFolders.filter((folder) => folder.id !== folderId),
                   );
 
                   // API 호출

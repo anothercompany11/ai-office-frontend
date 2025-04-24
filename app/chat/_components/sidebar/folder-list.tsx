@@ -1,5 +1,5 @@
 import { useState } from "react";
-import FolderItem from "./FolderItem";
+import FolderItem from "./folder-item";
 
 // 폴더 관련 타입 정의
 interface Conversation {
