@@ -1,6 +1,41 @@
 @import "tailwindcss";
 
 :root {
+  /* Typography */
+  --font-pretendard: var(--font-pretendard);
+  --font-hakgyo-ansim: var(--font-hakgyo-ansim);
+
+  /* Primary Colors */
+  --color-primary-normal: #00ac78;
+  --color-primary-strong: #58ffbf;
+  --color-primary-gradient: linear-gradient(to right, #102b24, #2b6858);
+
+  /* White */
+  --color-white: #ffffff;
+
+  /* Label Colors */
+  --color-label-strong: #000000;
+  --color-label-normal: #2a2b32;
+  --color-label-natural: #5e616e;
+  --color-label-alternative: #a7a9b4;
+  --color-label-assistive: #c8c9d0;
+
+  /* Background Colors */
+  --color-background-natural: #f4f4f6;
+  --color-background-alternative: #f9fafa;
+  --color-background-normal: #ffffff;
+
+  /* Line Colors */
+  --color-line-normal: #eeeff1;
+
+  /* Status Colors */
+  --color-status-error: #e82929;
+
+  /* Component Colors */
+  --color-component-strong: #d6d7dc;
+  --color-component-dimmer: rgba(0, 0, 0, 0.7);
+
+  /* System Colors */
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -8,8 +43,24 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-pretendard: var(--font-pretendard);
+  --font-hakgyo-ansim: var(--font-hakgyo-ansim);
+  --color-primary-normal: var(--color-primary-normal);
+  --color-primary-strong: var(--color-primary-strong);
+  --color-primary-gradient: var(--color-primary-gradient);
+  --color-white: var(--color-white);
+  --color-label-strong: var(--color-label-strong);
+  --color-label-normal: var(--color-label-normal);
+  --color-label-natural: var(--color-label-natural);
+  --color-label-alternative: var(--color-label-alternative);
+  --color-label-assistive: var(--color-label-assistive);
+  --color-background-natural: var(--color-background-natural);
+  --color-background-alternative: var(--color-background-alternative);
+  --color-background-normal: var(--color-background-normal);
+  --color-line-normal: var(--color-line-normal);
+  --color-status-error: var(--color-status-error);
+  --color-component-strong: var(--color-component-strong);
+  --color-component-dimmer: var(--color-component-dimmer);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,4 +73,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: var(--font-pretendard);
 }

@@ -35,6 +35,14 @@ const pretendard = localFont({
       style: "normal",
     },
   ],
+  variable: "--font-pretendard",
+});
+
+const hakgyoAnsim = localFont({
+  src: "./font/HakgyoAnsim.ttf",
+  weight: "400",
+  style: "normal",
+  variable: "--font-hakgyo-ansim",
 });
 
 export default function RootLayout({
@@ -43,8 +51,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className={pretendard.className}>
-      <body>
+    <html lang="ko">
+      <body
+        className={`${pretendard.variable} ${hakgyoAnsim.variable} font-pretendard`}
+      >
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
