@@ -1,10 +1,3 @@
-// 드래그 아이템 타입
-export enum DragItemType {
-  CONVERSATION = "conversation",
-  FOLDER = "folder",
-  FOLDER_TARGET = "folder_target",
-}
-
 // 대화 타입 정의
 export interface Conversation {
   id: string;
@@ -17,10 +10,25 @@ export interface Conversation {
   folder_id?: string; // API와의 호환성을 위한 속성
 }
 
-// 채팅 폴더 타입 정의
-export interface ChatFolder {
+export interface Folder {
   id: string;
   name: string;
-  isDefault: boolean;
-  conversations: Conversation[];
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type TimeGroup =
+  | "today"
+  | "yesterday"
+  | "previous7Days"
+  | "previous30Days"
+  | "older";
+
+export interface GroupedConversations {
+  today: Conversation[];
+  yesterday: Conversation[];
+  previous7Days: Conversation[];
+  previous30Days: Conversation[];
+  older: Conversation[];
 }

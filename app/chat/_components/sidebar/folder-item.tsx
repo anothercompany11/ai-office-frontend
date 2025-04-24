@@ -21,7 +21,7 @@ interface Conversation {
 }
 
 // 폴더 타입 정의
-interface ConversationFolder {
+export interface ConversationFolder {
   id: string;
   name: string;
   is_default: boolean;
@@ -181,7 +181,7 @@ export default function FolderItem({
   // 대화 삭제 핸들러
   const handleDeleteConversation = (
     e: React.MouseEvent,
-    conversationId: string
+    conversationId: string,
   ) => {
     e.stopPropagation();
     if (window.confirm("이 대화를 삭제하시겠습니까?")) {

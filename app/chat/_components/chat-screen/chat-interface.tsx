@@ -437,23 +437,6 @@ const ChatInterface = ({
 
   return (
     <main className="relative h-full w-full flex-1 flex flex-col overflow-hidden">
-      {/* 상단 헤더 */}
-      <div className="sticky top-0 z-20 flex items-center justify-between h-12 px-3 bg-white border-b border-gray-200">
-        <div className="flex items-center gap-2">
-          <button className="py-1.5 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100">
-            AI 오피스
-          </button>
-        </div>
-        <div className="flex items-center gap-2">
-          {/* 프로필/아바타 */}
-          <button className="h-8 w-8 rounded-full hover:bg-gray-100">
-            <div className="flex items-center justify-center bg-blue-300 text-white h-full w-full rounded-full">
-              <span className="text-xs">AI</span>
-            </div>
-          </button>
-        </div>
-      </div>
-
       {/* 채팅 메시지 영역 - 스크롤 가능 영역 */}
       <div
         ref={chatContainerRef}

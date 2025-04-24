@@ -270,6 +270,10 @@
   span {
     @apply whitespace-pre-line;
   }
+
+  button {
+    @apply cursor-pointer;
+  }
 }
 
 /* 인풋 자동완성 시 배경색상 */

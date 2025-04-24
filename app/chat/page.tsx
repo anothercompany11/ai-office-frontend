@@ -42,15 +42,13 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-screen bg-white">
-      <aside className="w-80 min-w-80 border-r border-gray-200">
-        <ConversationSidebar
-          conversations={conversations}
-          currentConversationId={currentId}
-          onSelectConversation={selectConversation}
-          onNewConversation={createNewConversation}
-          onDeleteConversation={deleteConversation}
-        />
-      </aside>
+      <ConversationSidebar
+        conversations={conversations}
+        currentConversationId={currentId}
+        onSelectConversation={selectConversation}
+        onNewConversation={createNewConversation}
+        onDeleteConversation={deleteConversation}
+      />
 
       <ChatScreenContainer
         currentId={currentId}
