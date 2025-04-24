@@ -34,6 +34,11 @@
   --component-dimmer: rgba(0, 0, 0, 0.7);
 }
 
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-web: 641px;
+}
+
 @layer utilities {
   /* 쉐도우 */
   .shadow-original {
