@@ -13,6 +13,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
 
 const ChatScreenHeader = () => {
   const [showMobileGuide, setShowMobileGuide] = useState(false);
@@ -65,6 +69,14 @@ const ChatScreenHeader = () => {
 
   return (
     <div className="py-5 px-8 flex justify-between items-center">
+      {/* <style jsx global>{`
+        .swiper-pagination-bullet {
+          background-color: #fca5a5 !important;
+        }
+        .swiper-pagination-bullet-active {
+          background-color: #000000 !important;
+        }
+      `}</style> */}
       <p className="text-body-l font-hakgyo-ansim">Chat AI 오피스</p>
       <div className="hidden web:block">
         <Popover>
@@ -92,6 +104,36 @@ const ChatScreenHeader = () => {
             <DialogHeader>
               <DialogTitle>Chat AI 오피스 가이드</DialogTitle>
             </DialogHeader>
+            <Swiper
+              modules={[Pagination]}
+              pagination={{
+                clickable: true,
+                bulletClass: "swiper-pagination-bullet",
+                bulletActiveClass: "swiper-pagination-bullet-active",
+              }}
+              className="w-full h-[400px]"
+            >
+              {guideContents.map((section, index) => (
+                <SwiperSlide key={index} className="p-4">
+                  <div className="h-full">
+                    <h3 className="text-lg font-bold mb-4">{section.title}</h3>
+                    <div className="space-y-3">
+                      {section.items.map((item, itemIndex) => (
+                        <div
+                          key={itemIndex}
+                          className="p-3 bg-gray-50 rounded-lg"
+                        >
+                          <h4 className="font-medium">{item.title}</h4>
+                          <p className="text-sm text-gray-600">
+                            {item.description}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </DialogContent>
         </Dialog>
       </div>

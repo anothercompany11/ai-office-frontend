@@ -289,3 +289,18 @@ input:-webkit-autofill:active {
   box-shadow: 0 0 0px 1000px #fff inset !important;
   -webkit-text-fill-color: #000 !important;
 }
+
+/* Swiper Pagination Styles */
+.swiper-pagination-bullet {
+  background-color: #a7a9b4 !important;
+  width: 8px !important;
+  height: 8px !important;
+  opacity: 1 !important;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #58ffbf !important;
+  width: 21px !important;
+  height: 8px !important;
+  border-radius: 50px !important;
+}
