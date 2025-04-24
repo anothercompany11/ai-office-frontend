@@ -5,8 +5,8 @@ import { ClientConversation, ClientMessage } from "@/app/api/dto/conversation";
 import { folderApi } from "@/app/api/folder";
 import { MessageRole } from "@/types";
 import { useEffect, useRef, useState } from "react";
-import ChatInput from "./ChatInput";
-import ChatMessage from "./ChatMessage";
+import ChatInput from "./chat-input";
+import ChatMessage from "./chat-message";
 
 // 폴더 타입 정의
 interface Folder {
@@ -22,7 +22,7 @@ interface ChatInterfaceProps {
   onUpdateConversation: (id: string, data: Partial<ClientConversation>) => void;
   onAssignToFolder: (
     conversationId: string,
-    folderId: string | null
+    folderId: string | null,
   ) => Promise<void>;
   isNewChat?: boolean; // 새 대화 여부
 }
@@ -219,7 +219,7 @@ const ChatInterface = ({
 
         const response = await conversationApi.updateConversation(
           conversationId,
-          newTitle
+          newTitle,
         );
 
         if (response.status === "success") {
@@ -282,7 +282,7 @@ const ChatInterface = ({
       // 스트리밍 API 호출
       const stream = await conversationApi.sendStreamingMessage(
         content,
-        conversationId
+        conversationId,
       );
 
       if (!stream) {
@@ -391,7 +391,7 @@ const ChatInterface = ({
           if (conversationId !== "new" && !isNewChat) {
             await conversationApi.updateConversation(
               currentConversationId,
-              title
+              title,
             );
           }
 
@@ -437,23 +437,6 @@ const ChatInterface = ({
 
   return (
     <main className="relative h-full w-full flex-1 flex flex-col overflow-hidden">
-      {/* 상단 헤더 */}
-      <div className="sticky top-0 z-20 flex items-center justify-between h-12 px-3 bg-white border-b border-gray-200">
-        <div className="flex items-center gap-2">
-          <button className="py-1.5 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100">
-            AI 오피스
-          </button>
-        </div>
-        <div className="flex items-center gap-2">
-          {/* 프로필/아바타 */}
-          <button className="h-8 w-8 rounded-full hover:bg-gray-100">
-            <div className="flex items-center justify-center bg-blue-300 text-white h-full w-full rounded-full">
-              <span className="text-xs">AI</span>
-            </div>
-          </button>
-        </div>
-      </div>
-
       {/* 채팅 메시지 영역 - 스크롤 가능 영역 */}
       <div
         ref={chatContainerRef}
