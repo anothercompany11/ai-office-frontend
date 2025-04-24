@@ -1,8 +1,58 @@
 import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
+
+const customTwMerge = extendTailwindMerge({
+  extend: {
+    classGroups: {
+      "font-size": [
+        "text-h1-l",
+        "text-h1-m",
+        "text-h1-r",
+        "text-h1-s",
+        "text-h1-xs",
+        "text-h2-l",
+        "text-h2-m",
+        "text-h2-r",
+        "text-h2-s",
+        "text-title-l",
+        "text-title-m",
+        "text-title-s",
+        "text-title-xs",
+        "text-subtitle-l",
+        "text-subtitle-m",
+        "text-subtitle-s",
+        "text-subtitle-xs",
+        "text-body-l",
+        "text-body-m",
+        "text-body-s",
+        "text-display-1",
+        "text-display-2",
+        "text-display-3",
+        "text-display-4",
+        "text-title-1",
+        "text-title-2",
+        "text-title-3",
+        "text-title-4",
+        "text-heading-1",
+        "text-heading-2",
+        "text-heading-3",
+        "text-heading-4",
+        "text-heading-5",
+        "text-headline-1",
+        "text-headline-2",
+        "text-headline-3",
+        "text-body-1",
+        "text-body-2",
+        "text-body-3",
+        "text-body-4",
+        "text-caption",
+      ],
+    },
+  },
+});
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return customTwMerge(clsx(inputs));
 }
 
 /**
@@ -35,7 +85,7 @@ export function formatRelativeTime(timestamp: string): string {
     // YYYY-MM-DD 형식으로 표시
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
       2,
-      "0"
+      "0",
     )}-${String(date.getDate()).padStart(2, "0")}`;
   }
 }

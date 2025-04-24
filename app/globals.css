@@ -1,77 +1,268 @@
 @import "tailwindcss";
 
 :root {
-  /* Typography */
-  --font-pretendard: var(--font-pretendard);
-  --font-hakgyo-ansim: var(--font-hakgyo-ansim);
+  --font-pretendard: "Pretendard", sans-serif;
+  --font-hakgyo-ansim: "Hakgyoansim", sans-serif;
 
-  /* Primary Colors */
-  --color-primary-normal: #00ac78;
-  --color-primary-strong: #58ffbf;
-  --color-primary-gradient: linear-gradient(to right, #102b24, #2b6858);
+  /* ========== Border Radius ========== */
+  --radius: 12px;
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 
-  /* White */
-  --color-white: #ffffff;
+  /* ========== Color Variables ========== */
+  --primary: #00ac78;
+  --primary-strong: #58ffbf;
+  --primary-gradient: #102b24;
+  --primary-foreground: #000000;
 
-  /* Label Colors */
-  --color-label-strong: #000000;
-  --color-label-normal: #2a2b32;
-  --color-label-natural: #5e616e;
-  --color-label-alternative: #a7a9b4;
-  --color-label-assistive: #c8c9d0;
+  --label-strong: #000000;
+  --label: #2a2832;
+  --label-natural: #5e616e;
+  --label-alternative: #a7a9b4;
+  --label-assistive: #c8c9d0;
 
-  /* Background Colors */
-  --color-background-natural: #f4f4f6;
-  --color-background-alternative: #f9fafa;
-  --color-background-normal: #ffffff;
-
-  /* Line Colors */
-  --color-line-normal: #eeeff1;
-
-  /* Status Colors */
-  --color-status-error: #e82929;
-
-  /* Component Colors */
-  --color-component-strong: #d6d7dc;
-  --color-component-dimmer: rgba(0, 0, 0, 0.7);
-
-  /* System Colors */
+  --background-natural: #f4f4f6;
+  --background-alternative: #f9fafa;
   --background: #ffffff;
-  --foreground: #171717;
+
+  --line: #eeeff1;
+
+  --status-error: #e82929;
+
+  --component-strong: #d6d7dc;
+  --component-dimmer: rgba(0, 0, 0, 0.7);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-pretendard: var(--font-pretendard);
-  --font-hakgyo-ansim: var(--font-hakgyo-ansim);
-  --color-primary-normal: var(--color-primary-normal);
-  --color-primary-strong: var(--color-primary-strong);
-  --color-primary-gradient: var(--color-primary-gradient);
-  --color-white: var(--color-white);
-  --color-label-strong: var(--color-label-strong);
-  --color-label-normal: var(--color-label-normal);
-  --color-label-natural: var(--color-label-natural);
-  --color-label-alternative: var(--color-label-alternative);
-  --color-label-assistive: var(--color-label-assistive);
-  --color-background-natural: var(--color-background-natural);
-  --color-background-alternative: var(--color-background-alternative);
-  --color-background-normal: var(--color-background-normal);
-  --color-line-normal: var(--color-line-normal);
-  --color-status-error: var(--color-status-error);
-  --color-component-strong: var(--color-component-strong);
-  --color-component-dimmer: var(--color-component-dimmer);
-}
+@layer utilities {
+  /* 쉐도우 */
+  .shadow-original {
+    box-shadow: 0px 0px 100px 0px #e3ffcd40;
+  }
+  /* 그라데이션 */
+  .bg-gradient {
+    background: linear-gradient(180deg, #102b24 0%, #2b6858 100%);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* ========== Font Family ========== */
+  .font-pretendard {
+    font-family: var(--font-pretendard);
+  }
+
+  .font-hakgyo-ansim {
+    font-family: var(--font-hakgyo-ansim);
+  }
+
+  /* ========== Typography ========== */
+  .text-title-m {
+    font-size: 16px;
+    line-height: 150%;
+    letter-spacing: -0.3%;
+    font-weight: 700;
+  }
+
+  .text-title-xs {
+    font-size: 12px;
+    line-height: 140%;
+    letter-spacing: -0.3%;
+    font-weight: 700;
+  }
+
+  .text-title-1 {
+    font-size: 24px;
+    line-height: 160%;
+    letter-spacing: 0%;
+    font-weight: 400;
+  }
+
+  .text-title-2 {
+    font-size: 20px;
+    line-height: 160%;
+    letter-spacing: 0%;
+    font-weight: 400;
+  }
+
+  .text-title-3 {
+    font-size: 16px;
+    line-height: 160%;
+    letter-spacing: 0%;
+    font-weight: 400;
+  }
+
+  .text-subtitle-l {
+    font-size: 18px;
+    line-height: 150%;
+    letter-spacing: -0.3%;
+    font-weight: 600;
+  }
+
+  .text-subtitle-s {
+    font-size: 14px;
+    line-height: 150%;
+    letter-spacing: -0.3%;
+    font-weight: 600;
+  }
+
+  .text-body-l {
+    font-size: 18px;
+    line-height: 150%;
+    letter-spacing: -0.3%;
+    font-weight: 400;
+  }
+
+  .text-body-m {
+    font-size: 16px;
+    line-height: 150%;
+    letter-spacing: -0.3%;
+    font-weight: 400;
+  }
+
+  .text-body-s {
+    font-size: 14px;
+    line-height: 150%;
+    letter-spacing: -0.3%;
+    font-weight: 400;
+  }
+
+  .text-caption {
+    font-size: 12px;
+    line-height: 140%;
+    letter-spacing: -0.3%;
+    font-weight: 400;
+  }
+
+  /* ========== Border Radius ========== */
+  .rounded-lg {
+    /* 12px */
+    border-radius: var(--radius);
+  }
+
+  .rounded-md {
+    /* 10px */
+    border-radius: var(--radius-md);
+  }
+
+  .rounded-sm {
+    /* 6px */
+    border-radius: var(--radius-sm);
+  }
+
+  /* ========== Primary ========== */
+  .text-primary {
+    color: var(--primary);
+  }
+  .text-primary-foreground {
+    color: var(--primary-foreground);
+  }
+  .bg-primary {
+    background-color: var(--primary);
+  }
+  .border-primary {
+    border-color: var(--primary);
+  }
+
+  .text-primary-strong {
+    color: var(--primary-strong);
+  }
+  .bg-primary-strong {
+    background-color: var(--primary-strong);
+  }
+
+  .bg-primary-gradient {
+    background-color: var(--primary-gradient);
+  }
+
+  /* ========== Label Colors ========== */
+  .text-label-strong {
+    color: var(--label-strong);
+  }
+  .text-label {
+    color: var(--label);
+  }
+  .text-label-natural {
+    color: var(--label-natural);
+  }
+  .text-label-alternative {
+    color: var(--label-alternative);
+  }
+  .text-label-assistive {
+    color: var(--label-assistive);
+  }
+
+  /* ========== Background ========== */
+  .bg-background {
+    background-color: var(--background);
+  }
+  .bg-background-natural {
+    background-color: var(--background-natural);
+  }
+  .bg-background-alternative {
+    background-color: var(--background-alternative);
+  }
+
+  /* ========== Line ========== */
+  .border-line {
+    border-color: var(--line);
+  }
+
+  /* ========== Status ========== */
+  .text-status-error {
+    color: var(--status-error);
+  }
+  .bg-status-error {
+    background-color: var(--status-error);
+  }
+  .border-status-error {
+    border: 2px solid var(--status-error);
+  }
+
+  /* ========== Component ========== */
+  .bg-component-strong {
+    background-color: var(--component-strong);
+  }
+
+  .bg-component-dimmer {
+    background-color: var(--component-dimmer);
+  }
+
+  /* ========== Accordion Animation ========== */
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  .animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
+  }
+}
+@layer base {
+  p,
+  span {
+    @apply whitespace-pre-line;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-pretendard);
+/* 인풋 자동완성 시 배경색상 */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  box-shadow: 0 0 0px 1000px #fff inset !important;
+  -webkit-text-fill-color: #000 !important;
 }
