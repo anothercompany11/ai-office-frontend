@@ -17,12 +17,13 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
-
+import Image from "next/image";
 const ChatScreenHeader = () => {
   const [showMobileGuide, setShowMobileGuide] = useState(false);
 
   const guideContents = [
     {
+      imageUrl: "/png/guide-1.png",
       title: "일반 대화",
       items: [
         {
@@ -31,37 +32,29 @@ const ChatScreenHeader = () => {
         },
         {
           title: "날씨 확인",
-          description: "오늘 날씨링 미세먼지 농도 알려줘",
+          description: "오늘 날씨랑 미세먼지 농도 알려줘",
         },
         {
-          title: "힐링 정리",
-          description: "오늘 힐링 투두 리스트 만들어줘",
-        },
-      ],
-    },
-    {
-      title: "날씨 확인",
-      items: [
-        {
-          title: "일기 예보",
-          description: "이번 주 날씨는 어떨까?",
-        },
-        {
-          title: "미세먼지",
-          description: "오늘 마스크 써야할까?",
+          title: "할일 정리",
+          description: "오늘 할일 투두 리스트 만들어줘",
         },
       ],
     },
     {
-      title: "힐링 정리",
+      imageUrl: "/png/guide-2.png",
+      title: "주제 탐구",
       items: [
         {
-          title: "투두리스트",
-          description: "오늘의 할일을 정리해볼까?",
+          title: "논문 검색",
+          description: "해당 주제에 대한 논문 검색해줘",
         },
         {
-          title: "일정관리",
-          description: "이번주 일정을 관리해줘",
+          title: "심화 질문",
+          description: "지구 중력은 어떤 원리로 작용하는거야?",
+        },
+        {
+          title: "난이도 설정",
+          description: "전기 발명 과정을 이해하기 쉽게 알려줘",
         },
       ],
     },
@@ -100,9 +93,12 @@ const ChatScreenHeader = () => {
               <CircleHelp className="size-6 text-primary" />
             </button>
           </DialogTrigger>
-          <DialogContent className="p-6">
+          <DialogContent className="">
             <DialogHeader>
-              <DialogTitle>Chat AI 오피스 가이드</DialogTitle>
+              <p className="text-title-s text-label-assistive">
+                AI오피스 프롬프트 가이드{" "}
+              </p>
+              <DialogTitle>AI 어떻게 활용하면 좋을까요?</DialogTitle>
             </DialogHeader>
             <Swiper
               modules={[Pagination]}
@@ -111,24 +107,37 @@ const ChatScreenHeader = () => {
                 bulletClass: "swiper-pagination-bullet",
                 bulletActiveClass: "swiper-pagination-bullet-active",
               }}
-              className="w-full h-[400px]"
+              className="w-full"
             >
               {guideContents.map((section, index) => (
-                <SwiperSlide key={index} className="p-4">
-                  <div className="h-full">
-                    <h3 className="text-lg font-bold mb-4">{section.title}</h3>
-                    <div className="space-y-3">
-                      {section.items.map((item, itemIndex) => (
-                        <div
-                          key={itemIndex}
-                          className="p-3 bg-gray-50 rounded-lg"
-                        >
-                          <h4 className="font-medium">{item.title}</h4>
-                          <p className="text-sm text-gray-600">
-                            {item.description}
-                          </p>
-                        </div>
-                      ))}
+                <SwiperSlide key={index} className="px-[14px]">
+                  <div className="h-full bg-white rounded-xl">
+                    <div className="h-[200px] bg-gray-100 rounded-t-xl">
+                      <Image
+                        src={section.imageUrl}
+                        alt="AI 어떻게 활용하면 좋을까요?"
+                        width={300}
+                        height={300}
+                        className="w-full h-full object-cover rounded-t-xl"
+                      />
+                    </div>
+                    <div className="px-3 pt-4 pb-6">
+                      <h3 className="text-center text-title-2 font-hakgyo-ansim mb-4">
+                        {section.title}
+                      </h3>
+                      <div className="space-y-2">
+                        {section.items.map((item, itemIndex) => (
+                          <div
+                            key={itemIndex}
+                            className="p-3 space-y-1 bg-background-alternative rounded-lg"
+                          >
+                            <h4 className="text-subtitle-s">{item.title}</h4>
+                            <p className="text-body-s text-label">
+                              {item.description}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </SwiperSlide>
