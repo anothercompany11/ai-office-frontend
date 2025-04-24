@@ -69,7 +69,7 @@ interface GuideCardProps {
 
 const GuideCard = ({ src, title, guideList }: GuideCardProps) => {
   return (
-    <div className="rounded-lg border border-line flex flex-col gap-4 bg-white py-6 px-4">
+    <div className="rounded-xl border border-line flex flex-col gap-4 bg-white py-6 px-4 w-[280px]">
       <div className="flex flex-col items-center gap-1">
         <Image
           src={`/png/icon/${src}.png`}
@@ -86,7 +86,7 @@ const GuideCard = ({ src, title, guideList }: GuideCardProps) => {
             key={guide.title}
           >
             <p className="text-subtitle-s">{guide.title}</p>
-            <p className="text-body-3 text-label">{guide.desc}</p>
+            <p className="text-body-s text-label">{guide.desc}</p>
           </div>
         ))}
       </div>

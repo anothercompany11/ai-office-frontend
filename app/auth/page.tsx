@@ -7,7 +7,7 @@ import LoginForm from "./_components/login-form";
 export default function LoginPage() {
   return (
     <div className="flex bg-gradient items-center justify-center min-h-screen">
-      <div className="bg-[#102B24] shadow-original border-[#74ac97] rounded-lg w-full flex flex-col gap-10 items-center py-10 px-6 max-w-[350px] border">
+      <div className="bg-[#102B24] shadow-original border-[#74ac97] rounded-[20px] w-full flex flex-col gap-10 items-center py-10 px-6 max-w-[350px] border">
         <div className="flex flex-col gap-6 items-center">
           <Logo />
           <Image
