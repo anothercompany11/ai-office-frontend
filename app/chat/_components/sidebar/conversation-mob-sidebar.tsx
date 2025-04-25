@@ -158,8 +158,8 @@ export default function ConversationMobSidebar({
     >
       <div
         className={`${
-          isSidebarVisible ? "flex" : "hidden"
-        } fixed inset-0 z-50 h-full flex-col w-[280px] min-w-[280px] flex-shrink-0 px-4 bg-white`}
+          isSidebarVisible ? "translate-x-0" : "-translate-x-full"
+        } fixed inset-0 z-50 h-full flex-col w-[280px] min-w-[280px] flex-shrink-0 px-4 bg-white transition-transform duration-300 ease-in-out`}
       >
         <div className="flex items-center justify-between py-[21.5px]">
           <Image
@@ -269,6 +269,13 @@ export default function ConversationMobSidebar({
           <DragOverlayContent id={activeId} conversations={convState} />
         )}
       </DragOverlay>
+
+      {isSidebarVisible && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 transition-opacity duration-300"
+          onClick={() => setIsSidebarVisible(false)}
+        />
+      )}
     </DndContext>
   );
 }

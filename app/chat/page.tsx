@@ -12,7 +12,7 @@ import ChatHeader from "./_components/chat-header/chat-header";
 export default function ChatPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
 
   // 채팅 관리 훅
   const {
