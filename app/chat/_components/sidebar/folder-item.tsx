@@ -1,5 +1,5 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Check,
   FolderClosed,
@@ -11,6 +11,11 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // 폴더 내부 대화 타입
 interface Conversation {
@@ -251,82 +256,76 @@ export default function FolderItem({
         </div>
         {!isRenaming && (
           <div className="relative" ref={menuRef}>
-            <button
-              onClick={toggleMenu}
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
-              title="폴더 메뉴"
-              aria-label="폴더 메뉴"
-            >
-              <MoreHorizontal size={18} className="text-label-alternative" />
-            </button>
-            <AnimatePresence>
-              {showMenu && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                  transition={{ duration: 0.1, ease: "easeOut" }}
-                  className="absolute space-y-3 right-[-140px] top-0 w-[140px] bg-white shadow-md rounded-md p-2 z-[9999] border border-line"
-                  onClick={(e) => e.stopPropagation()}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  onClick={toggleMenu}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="폴더 메뉴"
+                  aria-label="폴더 메뉴"
                 >
+                  <MoreHorizontal
+                    size={18}
+                    className="text-label-alternative"
+                  />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="absolute w-[140px] p-2 space-y-3 border border-line bg-white rounded-lg top-[-20px] left-[-10px]">
+                <button
+                  onClick={handleStartRenaming}
+                  className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
+                >
+                  <span className="text-body-s text-label-strong">
+                    이름 변경하기
+                  </span>
+                  <Pencil size={14} />
+                </button>
+                {!folder.is_default && (
                   <button
-                    onClick={handleStartRenaming}
+                    onClick={handleDeleteFolder}
                     className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
                   >
-                    <span className="text-body-s text-label-strong">
-                      이름 변경하기
+                    <span className="text-body-s text-status-error">
+                      삭제하기
                     </span>
-                    <Pencil size={14} />
+                    <Trash2 size={18} className="text-status-error" />
                   </button>
-                  {!folder.is_default && (
-                    <button
-                      onClick={handleDeleteFolder}
-                      className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
-                    >
-                      <span className="text-body-s text-status-error">
-                        삭제하기
-                      </span>
-                      <Trash2 size={18} className="text-status-error" />
-                    </button>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                )}
+              </PopoverContent>
+            </Popover>
           </div>
         )}
       </div>
 
-      <AnimatePresence>
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={{ height: "auto", opacity: 1 }}
+        exit={{ height: 0, opacity: 0 }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
+        className="overflow-hidden"
+      >
         {isExpanded &&
           folder.conversations &&
           folder.conversations.length > 0 && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="overflow-hidden"
-            >
-              <ul className="space-y-1 ml-8">
-                {folder.conversations.map((conversation: Conversation) => (
-                  <li key={conversation.id}>
-                    <FolderConversationItem
-                      conversation={conversation}
-                      isCurrentConversation={
-                        currentConversationId === conversation.id
-                      }
-                      isActive={activeId === conversation.id}
-                      onSelect={onSelectConversation}
-                      onDelete={(e) =>
-                        handleDeleteConversation(e, conversation.id)
-                      }
-                    />
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
+            <ul className="space-y-1 ml-8">
+              {folder.conversations.map((conversation: Conversation) => (
+                <li key={conversation.id}>
+                  <FolderConversationItem
+                    conversation={conversation}
+                    isCurrentConversation={
+                      currentConversationId === conversation.id
+                    }
+                    isActive={activeId === conversation.id}
+                    onSelect={onSelectConversation}
+                    onDelete={(e) =>
+                      handleDeleteConversation(e, conversation.id)
+                    }
+                  />
+                </li>
+              ))}
+            </ul>
           )}
-      </AnimatePresence>
+      </motion.div>
     </div>
   );
 }
