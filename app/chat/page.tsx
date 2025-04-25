@@ -2,11 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import ChatInterface from "./_components/chat-screen/chat-interface";
 import ConversationSidebar from "./_components/sidebar/conversation-sidebar";
 import useConversations from "@/hooks/use-conversation";
 import { useAuth } from "../context/AuthContext";
-import ChatScreenHeader from "./_components/chat-screen/chat-screen-header";
 import ChatScreenContainer from "./_components/chat-screen/chat-screen-container";
 
 export default function ChatPage() {
@@ -27,6 +25,7 @@ export default function ChatPage() {
     pendingFirstMsg,
     clearPendingFirstMsg,
     assignToFolder,
+    finalizeNewConversation,
   } = useConversations();
 
   // 로그인 유무에 따른 처리
@@ -60,6 +59,7 @@ export default function ChatPage() {
         assignToFolder={assignToFolder}
         pendingFirstMsg={pendingFirstMsg}
         clearPendingFirstMsg={clearPendingFirstMsg}
+        finalizeNewConversation={finalizeNewConversation}
       />
     </div>
   );

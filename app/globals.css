@@ -37,11 +37,6 @@
   --component-alternative: #f4f4f6;
 }
 
-@theme {
-  --breakpoint-*: initial;
-  --breakpoint-web: 641px;
-}
-
 @layer utilities {
   /* 쉐도우 */
   .shadow-original {
