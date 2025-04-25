@@ -1,5 +1,5 @@
+import ChatHeader from "../chat-header/chat-header";
 import ChatInterface from "./chat-interface";
-import ChatScreenHeader from "./chat-screen-header";
 import EmptyChatScreen from "./empty-chat-screen";
 
 interface ChatScreenContainerProps {
@@ -24,7 +24,7 @@ const ChatScreenContainer = ({
 }: ChatScreenContainerProps) => {
   return (
     <div className="flex flex-col w-full bg-line-alternative">
-      <ChatScreenHeader />
+      <ChatHeader />
 
       {/* 대화가 선택된 경우 */}
       {currentId ? (

@@ -2,11 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import ChatInterface from "./_components/chat-screen/chat-interface";
 import ConversationSidebar from "./_components/sidebar/conversation-sidebar";
 import useConversations from "@/hooks/use-conversation";
 import { useAuth } from "../context/AuthContext";
-import ChatScreenHeader from "./_components/chat-screen/chat-screen-header";
 import ChatScreenContainer from "./_components/chat-screen/chat-screen-container";
 
 export default function ChatPage() {
