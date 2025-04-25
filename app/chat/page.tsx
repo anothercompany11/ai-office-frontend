@@ -20,9 +20,12 @@ export default function ChatPage() {
     currentId,
     loadConversations,
     selectConversation,
+    startBlankConversation,
     createNewConversation,
     deleteConversation,
     updateConversation,
+    pendingFirstMsg,
+    clearPendingFirstMsg,
     assignToFolder,
   } = useConversations();
 
@@ -46,7 +49,7 @@ export default function ChatPage() {
         conversations={conversations}
         currentConversationId={currentId}
         onSelectConversation={selectConversation}
-        onNewConversation={createNewConversation}
+        onNewConversation={startBlankConversation}
         onDeleteConversation={deleteConversation}
       />
 
@@ -55,6 +58,8 @@ export default function ChatPage() {
         createNewConversation={createNewConversation}
         updateConversation={updateConversation}
         assignToFolder={assignToFolder}
+        pendingFirstMsg={pendingFirstMsg}
+        clearPendingFirstMsg={clearPendingFirstMsg}
       />
     </div>
   );

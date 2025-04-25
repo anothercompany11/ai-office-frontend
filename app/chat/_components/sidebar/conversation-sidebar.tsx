@@ -155,6 +155,7 @@ export default function ConversationSidebar({
       modifiers={[restrictToWindowEdges]}
     >
       <div className="h-full flex flex-col max-w-[280px] border-r border-gray-200">
+        <div className="bg-red-300 w-full">hhhh</div>
         {/* Folders */}
         <aside className="flex-1 overflow-auto p-2">
           <header

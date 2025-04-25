@@ -13,6 +13,13 @@ export default function useConversations() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
   const [currentId, setCurrentId] = useState<string | null>(null);
+  const [pendingFirstMsg, setPendingFirstMsg] = useState<string | null>(null);
+
+  /* 새 대화 + 첫 메시지 저장 */
+  // const createNewConversation = (first?: string) => {
+  //   if (first) setPendingFirstMsg(first);
+  //   syncCurrentIdWithStorage("new");
+  // };
 
   /* 유틸 */
   const syncCurrentIdWithStorage = useCallback((id: string | null) => {
@@ -21,6 +28,40 @@ export default function useConversations() {
       ? localStorage.setItem("currentConversationId", id)
       : localStorage.removeItem("currentConversationId");
   }, []);
+
+  /* ---------- 1. 사이드바용: 빈 방 시작 ---------- */
+  const startBlankConversation = () => {
+    setPendingFirstMsg(null); // 버퍼 비우기
+    syncCurrentIdWithStorage("new"); // ChatInterface가 'new' 모드로
+  };
+
+  /* ---------- 2. EmptyChatScreen용: 방 생성 + 첫 질문 ---------- */
+  const createNewConversation = async (firstMsg: string, folderId?: string) => {
+    console.log("hhh");
+    setIsLoadingConversations(true);
+    try {
+      /* 서버에 방 생성 */
+      const res = await conversationApi.createConversation("새 대화", folderId);
+      if (res.status !== "success" || !res.data?.id) throw new Error("fail");
+
+      const newConv: Conversation = {
+        id: res.data.id,
+        title: res.data.title || "새 대화",
+        preview: "",
+        lastUpdated: new Date(),
+        folder_id: folderId,
+      };
+
+      /* 목록 prepend & 선택 */
+      setConversations((prev) => [newConv, ...prev]);
+      syncCurrentIdWithStorage(newConv.id);
+
+      /* ChatInterface로 첫 질문 넘기기 */
+      setPendingFirstMsg(firstMsg);
+    } finally {
+      setIsLoadingConversations(false);
+    }
+  };
 
   /* ────────── READ ────────── */
   const loadConversations = useCallback(async () => {
@@ -39,7 +80,18 @@ export default function useConversations() {
       const savedId = localStorage.getItem("currentConversationId");
       setConversations(formatted);
 
+      console.log("저장된 id", savedId);
+
       /** 로컬에 저장된 ID 우선, 없으면 첫 번째 대화 */
+      // if (
+      //   savedId &&
+      //   savedId !== "new" &&
+      //   formatted.some((c) => c.id === savedId)
+      // ) {
+      //   syncCurrentIdWithStorage(savedId);
+      // } else if (formatted.length > 0 && !currentId) {
+      //   syncCurrentIdWithStorage(formatted[0].id);
+      // }
       if (
         savedId &&
         savedId !== "new" &&
@@ -53,9 +105,6 @@ export default function useConversations() {
       setIsLoadingConversations(false);
     }
   }, [currentId, syncCurrentIdWithStorage]);
-
-  /* ────────── CREATE ────────── */
-  const createNewConversation = () => syncCurrentIdWithStorage("new");
 
   /* ────────── UPDATE ────────── */
   const updateConversation = useCallback(
@@ -134,10 +183,13 @@ export default function useConversations() {
 
     /* actions */
     loadConversations,
+    startBlankConversation,
     createNewConversation,
     updateConversation,
     deleteConversation,
     assignToFolder,
     selectConversation: syncCurrentIdWithStorage,
+    pendingFirstMsg, // ChatScreenContainer 로 노출
+    clearPendingFirstMsg: () => setPendingFirstMsg(null),
   };
 }

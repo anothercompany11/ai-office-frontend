@@ -25,6 +25,8 @@ interface ChatInterfaceProps {
     folderId: string | null,
   ) => Promise<void>;
   isNewChat?: boolean; // 새 대화 여부
+  initialMessage?: string | null;
+  onInitialHandled?: () => void;
 }
 
 const ChatInterface = ({
@@ -32,13 +34,19 @@ const ChatInterface = ({
   onUpdateConversation,
   onAssignToFolder,
   isNewChat = false,
+  initialMessage,
+  onInitialHandled,
 }: ChatInterfaceProps) => {
-  const [messages, setMessages] = useState<ClientMessage[]>([
-    {
-      role: MessageRole.ASSISTANT,
-      content: "안녕하세요! 무엇을 도와드릴까요?",
-    },
-  ]);
+  const [messages, setMessages] = useState<ClientMessage[]>(() =>
+    initialMessage
+      ? [] // 첫 메시지를 곧바로 보내므로 비워 둠
+      : [
+          {
+            role: MessageRole.ASSISTANT,
+            content: "안녕하세요! 무엇을 도와드릴까요?",
+          },
+        ],
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [editingConversationTitle, setEditingConversationTitle] =
     useState(false);
@@ -50,6 +58,35 @@ const ChatInterface = ({
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const folderMenuRef = useRef<HTMLDivElement>(null);
+
+  // 메세지 리스트가 있으면 메세지 전송
+  useEffect(() => {
+    if (initialMessage && messages.length !== 0) {
+      console.log("여기가 호출되면 안됨");
+      // 메세지 전송
+      handleSendMessage(initialMessage);
+
+      // 버퍼 비우기
+      onInitialHandled?.();
+    }
+  }, [initialMessage, messages]);
+
+  const sentInitial = useRef(false);
+
+  useEffect(() => {
+    if (initialMessage && !sentInitial.current) {
+      setMessages([{ role: MessageRole.USER, content: initialMessage }]);
+      handleSendMessage(initialMessage);
+      onInitialHandled?.();
+      sentInitial.current = true; // 다시는 실행 안 됨
+    }
+  }, [initialMessage]);
+  // 버퍼에 메시지가 있으면 메세지 리스트 업데이트
+  // useEffect(() => {
+  //   if (initialMessage) {
+  //     setMessages([{ role: MessageRole.USER, content: initialMessage }]);
+  //   }
+  // }, [initialMessage]);
 
   // 폴더 목록 불러오기
   const loadFolders = async () => {
@@ -266,6 +303,7 @@ const ChatInterface = ({
 
   // 메시지 전송 처리
   const handleSendMessage = async (content: string) => {
+    console.log("📌📌📌📌📌📌📌", typeof content, content);
     if (!content.trim() || isLoading) return;
 
     // 사용자 메시지 추가
@@ -448,9 +486,9 @@ const ChatInterface = ({
           className="pointer-events-none h-px w-px"
         ></div>
         <div className="mt-1.5 flex flex-col text-sm md:pb-9">
-          {messages.map((message, index) => (
+          {messages.map((message, idx) => (
             <ChatMessage
-              key={message.id || index}
+              key={message.id || idx}
               role={message.role}
               content={message.content}
               timestamp={message.created_at}
