@@ -88,12 +88,17 @@ const ChatScreenHeader = () => {
               <CircleHelp className="size-6 text-primary" />
             </button>
           </DialogTrigger>
-          <DialogContent className="mobile-guide-dialog-content">
+          <DialogContent
+            xPosition="out"
+            className="mobile-guide-dialog-content max-w-[328px]"
+          >
             <DialogHeader>
               <p className="text-title-s text-label-assistive">
                 AI오피스 프롬프트 가이드{" "}
               </p>
-              <DialogTitle>AI 어떻게 활용하면 좋을까요?</DialogTitle>
+              <DialogTitle className="font-hakgyo-ansim">
+                AI 어떻게 활용하면 좋을까요?
+              </DialogTitle>
             </DialogHeader>
             <Swiper
               modules={[Pagination]}

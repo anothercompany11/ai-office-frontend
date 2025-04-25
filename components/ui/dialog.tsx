@@ -49,24 +49,35 @@ function DialogOverlay({
 function DialogContent({
   className,
   children,
+  xPosition = "in",
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content>) {
+}: React.ComponentProps<typeof DialogPrimitive.Content> & {
+  xPosition?: "in" | "out";
+}) {
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[328px] translate-x-[-50%] translate-y-[-50%] gap-6 duration-200",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-6 duration-200",
           className,
         )}
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute top-[-36px] right-0 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
-          <XIcon className="text-white size-6" />
-          <span className="sr-only">Close</span>
-        </DialogPrimitive.Close>
+        {xPosition === "in" && (
+          <DialogPrimitive.Close className="absolute top-6 right-6 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+            <XIcon className="text-label-base size-6 text-component" />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+        )}
+        {xPosition === "out" && (
+          <DialogPrimitive.Close className="absolute top-[-36px] right-0 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+            <XIcon className="text-white size-6" />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+        )}
       </DialogPrimitive.Content>
     </DialogPortal>
   );
@@ -102,7 +113,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-title-1 font-hakgyo-ansim text-white", className)}
+      className={cn("text-title-1 text-white", className)}
       {...props}
     />
   );

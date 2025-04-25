@@ -27,6 +27,7 @@
 
   --line: #eeeff1;
   --line-alternative: #f9fafa;
+  --line-strong: #d6d7dc;
 
   --status-error: #e82929;
 
@@ -61,6 +62,13 @@
   }
 
   /* ========== Typography ========== */
+  .text-title-l {
+    font-size: 18px;
+    line-height: 150%;
+    letter-spacing: -0.3%;
+    font-weight: 700;
+  }
+
   .text-title-m {
     font-size: 16px;
     line-height: 150%;
@@ -231,6 +239,9 @@
   }
   .bg-line-alternative {
     background-color: var(--line-alternative);
+  }
+  .border-line-strong {
+    border-color: var(--line-strong);
   }
 
   /* ========== Status ========== */

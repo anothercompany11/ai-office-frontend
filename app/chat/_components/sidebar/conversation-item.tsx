@@ -8,6 +8,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useState } from "react";
+import TwoButtonModal from "./_components/two-button-modal";
 
 interface Props {
   conversation: Conversation;
@@ -25,6 +26,7 @@ export default function ConversationItem({
   onDelete,
 }: Props) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: conversation.id,
   });
@@ -72,7 +74,7 @@ export default function ConversationItem({
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger asChild>
               <button
-                className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 text-label-alternative ${
+                className={`opacity-0 group-hover:opacity-100 transition-opacity p-2 text-label-alternative ${
                   isPopoverOpen ? "opacity-100" : ""
                 }`}
                 aria-label="대화 메뉴"
@@ -83,11 +85,12 @@ export default function ConversationItem({
                 <MoreHorizontal size={18} />
               </button>
             </PopoverTrigger>
-            <PopoverContent className="absolute w-[140px] p-2 space-y-3 border border-line bg-white rounded-lg top-[-25px] left-[-10px]">
+            <PopoverContent className="absolute w-[140px] p-2 space-y-3 border border-line bg-white rounded-lg top-[-29px] left-[-10px]">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDelete(e, conversation.id);
+                  setIsPopoverOpen(false);
+                  setIsDeleteModalOpen(true);
                 }}
                 className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
               >
@@ -98,6 +101,16 @@ export default function ConversationItem({
           </Popover>
         </div>
       </div>
+      <TwoButtonModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={(e: React.MouseEvent) => {
+          onDelete(e, conversation.id);
+          setIsDeleteModalOpen(false);
+        }}
+        title="정말 삭제하시나요?"
+        description="삭제된 내용은 다시 복구할 수 없으며 모든 대화 내용이 영구적으로 삭제됩니다."
+      />
     </li>
   );
 }
