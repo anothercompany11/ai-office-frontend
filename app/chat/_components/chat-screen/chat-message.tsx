@@ -24,7 +24,7 @@ const ChatMessage = ({
       dir="auto"
     >
       <h5 className="sr-only">{isUser ? "You said:" : "AI said:"}</h5>
-      <div className="text-base my-auto mx-auto py-5 px-6">
+      <div className="text-base my-auto mx-auto py-5">
         <div className="mx-auto flex flex-1 text-base gap-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] group/turn-messages">
           <div className="group/conversation-turn relative flex w-full min-w-0 flex-col">
             <div className="relative flex-col gap-1 md:gap-3">

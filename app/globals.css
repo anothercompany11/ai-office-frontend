@@ -21,7 +21,7 @@
   --label-alternative: #a7a9b4;
   --label-assistive: #c8c9d0;
 
-  --background-natural: #f4f4f6;
+  --background-natural: #eeeff1;
   --background-alternative: #f9fafa;
   --background: #ffffff;
 
@@ -30,6 +30,7 @@
 
   --status-error: #e82929;
 
+  --component: #a7a9b4;
   --component-strong: #d6d7dc;
   --component-dimmer: rgba(0, 0, 0, 0.7);
 }
@@ -235,8 +236,11 @@
   }
 
   /* ========== Component ========== */
-  .bg-component-strong {
-    background-color: var(--component-strong);
+  .text-component {
+    color: var(--component);
+  }
+  .text-component-strong {
+    color: var(--component-strong);
   }
 
   .bg-component-dimmer {

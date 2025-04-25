@@ -2,6 +2,7 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Check,
+  FolderClosed,
   FolderIcon,
   FolderOpen,
   MoreHorizontal,
@@ -81,9 +82,7 @@ function FolderConversationItem({
       style={style}
       {...listeners}
       {...attributes}
-      className={`flex items-center justify-between px-2 py-1 text-sm rounded-lg cursor-pointer hover:bg-gray-50 group ${
-        isCurrentConversation ? "text-blue-600 font-medium" : "text-gray-700"
-      } ${isActive ? "opacity-90" : ""}`}
+      className={`flex items-center justify-between px-2 py-3 text-body-s rounded-lg cursor-pointer hover:bg-[#eeeff1] group `}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(conversation.id);
@@ -193,20 +192,19 @@ export default function FolderItem({
     <div className="mb-2">
       <div
         ref={setNodeRef}
-        className={`flex items-center px-2 py-1 cursor-pointer rounded-lg hover:bg-gray-50 group ${
-          isOver ? "bg-gray-100 border border-dashed border-gray-400" : ""
+        className={`flex items-center px-[13.5px] py-3 cursor-pointer rounded-lg hover:bg-[#F9FAFA] group ${
+          isOver
+            ? "bg-background-natural border border-dashed border-gray-400"
+            : ""
         }`}
         onClick={() => toggleFolder(folder.id)}
       >
-        <div className="flex items-center gap-1 flex-grow overflow-hidden">
-          {isExpanded ? (
-            <FolderOpen size={16} className="text-gray-500" />
-          ) : (
-            <FolderIcon size={16} className="text-gray-500" />
-          )}
+        <div className="flex items-center gap-[9px] flex-grow overflow-hidden">
+          <FolderClosed size={16} className="text-gray-500" />
+
           {isRenaming ? (
             <div
-              className="flex-grow px-1"
+              className="flex-grow px-1 "
               onClick={(e) => e.stopPropagation()}
             >
               <input
@@ -243,7 +241,7 @@ export default function FolderItem({
               </div>
             </div>
           ) : (
-            <span className="ml-1 text-sm text-gray-700 truncate">
+            <span className=" text-body-s text-label-strong truncate">
               {folder.name}
               {folder.is_default && (
                 <span className="ml-1 text-xs text-gray-500">(기본)</span>
@@ -255,11 +253,11 @@ export default function FolderItem({
           <div className="relative" ref={menuRef}>
             <button
               onClick={toggleMenu}
-              className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              className="opacity-0 group-hover:opacity-100 transition-opacity"
               title="폴더 메뉴"
               aria-label="폴더 메뉴"
             >
-              <MoreHorizontal size={16} />
+              <MoreHorizontal size={18} className="text-label-alternative" />
             </button>
             <AnimatePresence>
               {showMenu && (
@@ -268,23 +266,27 @@ export default function FolderItem({
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: -10 }}
                   transition={{ duration: 0.1, ease: "easeOut" }}
-                  className="absolute right-0 top-full mt-1 w-32 bg-white shadow-lg rounded-md py-1 z-10 border border-gray-200"
+                  className="absolute space-y-3 right-0 top-full w-[140px] bg-white shadow-lg rounded-md p-2 z-10 border border-gray-200"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
                     onClick={handleStartRenaming}
-                    className="flex items-center w-full px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
+                    className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
                   >
-                    <Pencil size={14} className="mr-2" />
-                    이름 변경
+                    <span className="text-body-s text-label-strong">
+                      이름 변경하기
+                    </span>
+                    <Pencil size={14} />
                   </button>
                   {!folder.is_default && (
                     <button
                       onClick={handleDeleteFolder}
-                      className="flex items-center w-full px-3 py-1.5 text-sm text-red-600 hover:bg-gray-100"
+                      className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
                     >
-                      <Trash2 size={14} className="mr-2" />
-                      삭제
+                      <span className="text-body-s text-status-error">
+                        삭제하기
+                      </span>
+                      <Trash2 size={18} className="text-status-error" />
                     </button>
                   )}
                 </motion.div>
@@ -305,7 +307,7 @@ export default function FolderItem({
               transition={{ duration: 0.2, ease: "easeInOut" }}
               className="overflow-hidden"
             >
-              <ul className="mt-1 ml-6 space-y-1">
+              <ul className="space-y-1 ml-8">
                 {folder.conversations.map((conversation: Conversation) => (
                   <li key={conversation.id}>
                     <FolderConversationItem

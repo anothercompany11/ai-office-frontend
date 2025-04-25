@@ -10,12 +10,12 @@ import {
   useSensors,
   DragOverlay,
 } from "@dnd-kit/core";
-import { ChevronDown, ChevronRight, Plus } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronsLeft, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { authApi, folderApi } from "@/app/api";
 import { conversationApi } from "@/app/api/conversation";
-
+import Image from "next/image";
 import {
   Conversation,
   Folder,
@@ -154,29 +154,31 @@ export default function ConversationSidebar({
       // onDragOver={handleDragOver}
       modifiers={[restrictToWindowEdges]}
     >
-      <div className="h-full flex flex-col max-w-[280px] border-r border-gray-200">
-        <div className="bg-red-300 w-full">hhhh</div>
+      <div className="h-full flex flex-col w-[280px] min-w-[280px] flex-shrink-0 px-4">
+        <div className="flex items-center justify-between py-[21.5px]">
+          <Image
+            src="/svg/logo.svg"
+            alt="chat-sidebar-bg"
+            width={97.45}
+            height={18.21}
+          />
+          <button>
+            <ChevronsLeft size={24} className="text-component" />
+          </button>
+        </div>
         {/* Folders */}
-        <aside className="flex-1 overflow-auto p-2">
-          <header
-            className="flex items-center gap-1 text-xs font-semibold cursor-pointer h-[26px]"
-            onClick={() => setShowFolders(!showFolders)}
-          >
-            {showFolders ? (
-              <ChevronDown size={16} />
-            ) : (
-              <ChevronRight size={16} />
-            )}
-            <span>프로젝트</span>
+        <aside className="flex-1 overflow-auto">
+          <header className="flex justify-between items-center px-2 py-[8.5px]">
+            <span className="text-xs">라이브러리</span>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setIsCreatingFolder(true);
                 setTimeout(() => newFolderInputRef.current?.focus());
               }}
-              className="ml-auto p-1 hover:bg-gray-100 rounded-full"
+              className=""
             >
-              <Plus size={14} />
+              <Plus size={10} />
             </button>
           </header>
 
@@ -217,29 +219,25 @@ export default function ConversationSidebar({
               />
             </div>
           )}
-
+          <div className="border-t border-line" />
           {/* Conversations */}
           <header
-            className="flex items-center gap-1 text-xs font-semibold cursor-pointer h-[26px] pt-3"
+            className="flex items-center text-title-xs py-[8.5px]"
             onClick={() => setShowConversations(!showConversations)}
           >
-            {showConversations ? (
-              <ChevronDown size={16} />
-            ) : (
-              <ChevronRight size={16} />
-            )}
-            <span>대화 내역</span>
+            <span>지난 대화</span>
           </header>
 
           {showConversations && (
             <ConversationsArea id="conversations-area">
               {Object.entries(grouped).map(([k, v]) =>
                 v.length ? (
-                  <section key={k} className="mt-5 first:mt-0 last:mb-5">
-                    <h3 className="px-4 text-xs font-semibold text-gray-800 pt-3 pb-2">
-                      {groupTitles[k as TimeGroup]}
-                    </h3>
-                    <ol className="px-2">
+                  <section
+                    key={k}
+                    className="mt-5 first:mt-0 last:mb-5 text-body-s"
+                  >
+                    <h3 className="pb-1">{groupTitles[k as TimeGroup]}</h3>
+                    <ol className="">
                       {v.map((c: Conversation) => (
                         <ConversationItem
                           key={c.id}

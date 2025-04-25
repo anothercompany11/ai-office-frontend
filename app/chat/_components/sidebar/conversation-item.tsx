@@ -43,18 +43,14 @@ export default function ConversationItem({
         style={style}
         {...listeners}
         {...attributes}
-        className={`group rounded-lg h-9 text-sm hover:bg-gray-50 ${
-          isActive ? "opacity-50" : ""
-        }`}
+        className={`group rounded-lg hover:bg-[#eeeff1] `}
       >
         <a
-          className="flex items-center gap-2 p-2 cursor-pointer"
+          className="flex items-center px-2 py-3 cursor-pointer"
           onClick={() => onSelect(conversation.id)}
         >
           <span
-            className={`grow overflow-hidden whitespace-nowrap ${
-              isCurrent ? "text-blue-600 font-medium" : "text-gray-700"
-            }`}
+            className={`grow overflow-hidden whitespace-nowrap text-body-s text-label-strong`}
             title={conversation.title}
           >
             {conversation.title}
