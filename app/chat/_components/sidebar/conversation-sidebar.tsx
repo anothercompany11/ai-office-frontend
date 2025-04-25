@@ -219,7 +219,7 @@ export default function ConversationSidebar({
               />
             </div>
           )}
-          <div className="border-t border-line" />
+          <div className="border-t border-line my-4" />
           {/* Conversations */}
           <header
             className="flex items-center text-title-xs py-[8.5px]"

@@ -189,7 +189,7 @@ export default function FolderItem({
   };
 
   return (
-    <div className="mb-2">
+    <div>
       <div
         ref={setNodeRef}
         className={`flex items-center px-[13.5px] py-3 cursor-pointer rounded-lg hover:bg-[#F9FAFA] group ${
@@ -266,7 +266,7 @@ export default function FolderItem({
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: -10 }}
                   transition={{ duration: 0.1, ease: "easeOut" }}
-                  className="absolute space-y-3 right-0 top-full w-[140px] bg-white shadow-lg rounded-md p-2 z-10 border border-gray-200"
+                  className="absolute space-y-3 right-[-140px] top-0 w-[140px] bg-white shadow-md rounded-md p-2 z-[9999] border border-line"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
