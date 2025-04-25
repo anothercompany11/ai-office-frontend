@@ -109,7 +109,6 @@ export default function ConversationItem({
           setIsDeleteModalOpen(false);
         }}
         title="정말 삭제하시나요?"
-        description="삭제된 내용은 다시 복구할 수 없으며 모든 대화 내용이 영구적으로 삭제됩니다."
       />
     </li>
   );

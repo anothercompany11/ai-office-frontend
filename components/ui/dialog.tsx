@@ -66,7 +66,7 @@ function DialogContent({
         {...props}
       >
         {children}
-        {xPosition === "in" && (
+        {/* {xPosition === "in" && (
           <DialogPrimitive.Close className="absolute top-6 right-6 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
             <XIcon className="text-label-base size-6 text-component" />
             <span className="sr-only">Close</span>
@@ -77,7 +77,7 @@ function DialogContent({
             <XIcon className="text-white size-6" />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
-        )}
+        )} */}
       </DialogPrimitive.Content>
     </DialogPortal>
   );
