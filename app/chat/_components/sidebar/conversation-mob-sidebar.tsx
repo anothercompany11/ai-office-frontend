@@ -248,7 +248,10 @@ export default function ConversationMobSidebar({
                           conversation={c}
                           isActive={activeId === c.id}
                           isCurrent={currentConversationId === c.id}
-                          onSelect={onSelectConversation}
+                          onSelect={() => {
+                            onSelectConversation(c.id);
+                            setIsSidebarVisible(false);
+                          }}
                           onDelete={(e) => {
                             e.stopPropagation();
                             onDeleteConversation(c.id);
