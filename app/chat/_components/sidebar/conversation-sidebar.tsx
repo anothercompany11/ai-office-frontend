@@ -10,20 +10,14 @@ import {
   useSensors,
   DragOverlay,
 } from "@dnd-kit/core";
-import { ChevronDown, ChevronRight, ChevronsLeft, Plus } from "lucide-react";
+import { ChevronsLeft, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { authApi, folderApi } from "@/app/api";
+import { folderApi } from "@/app/api";
 import { conversationApi } from "@/app/api/conversation";
 import Image from "next/image";
-import {
-  Conversation,
-  Folder,
-  GroupedConversations,
-  TimeGroup,
-} from "../types";
-
-import FolderList from "./folder-list"; // 기존 파일 그대로 사용
+import { Conversation, TimeGroup } from "../types";
+import FolderList from "./folder-list";
 import { useGroupedConversations } from "@/hooks/use-groupped-conversation";
 import ConversationsArea from "./conversation-area";
 import ConversationItem from "./conversation-item";

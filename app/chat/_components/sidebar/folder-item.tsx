@@ -3,8 +3,6 @@ import { motion } from "framer-motion";
 import {
   Check,
   FolderClosed,
-  FolderIcon,
-  FolderOpen,
   MoreHorizontal,
   Pencil,
   Trash2,
@@ -16,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import RenameFolderModal from "./_components/rename-folder-modal";
 
 // 폴더 내부 대화 타입
 interface Conversation {
@@ -143,6 +142,7 @@ export default function FolderItem({
   activeId,
 }: FolderItemProps) {
   const [isRenaming, setIsRenaming] = useState(false);
+  const [showRenameModal, setShowRenameModal] = useState(false); // 폴더 이름 변경 모달 노출 여부
   const [newName, setNewName] = useState(folder.name);
   const [showMenu, setShowMenu] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -197,7 +197,7 @@ export default function FolderItem({
 
   const handleStartRenaming = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsRenaming(true);
+    setShowRenameModal(true);
     setShowMenu(false);
   };
 
@@ -353,6 +353,16 @@ export default function FolderItem({
             </ul>
           )}
       </motion.div>
+      {/* ───────── 폴더 이름 변경 모달 ───────── */}
+      <RenameFolderModal
+        isOpen={showRenameModal}
+        defaultName={folder.name}
+        onClose={() => setShowRenameModal(false)}
+        onConfirm={(newName) => {
+          onRenameFolder(folder.id, newName);
+          setShowRenameModal(false);
+        }}
+      />
     </div>
   );
 }
