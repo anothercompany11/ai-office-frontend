@@ -32,6 +32,7 @@
 
   --component-strong: #d6d7dc;
   --component-dimmer: rgba(0, 0, 0, 0.7);
+  --component-alternative: #f4f4f6;
 }
 
 @theme {
@@ -195,6 +196,14 @@
     color: var(--label-assistive);
   }
 
+  /* ========== Component Colors ========== */
+  .text-component-alternative {
+    color: var(--component-alternative);
+  }
+  .bg-component-alternative {
+    background-color: var(--component-alternative);
+  }
+
   /* ========== Background ========== */
   .bg-background {
     background-color: var(--background);
@@ -283,7 +292,8 @@
 
 @theme {
   --breakpoint-*: initial;
-  --breakpoint-web: 650px;
+  --breakpoint-tab: 650px;
+  --breakpoint-web: 1024px;
 }
 
 /* 인풋 자동완성 시 배경색상 */

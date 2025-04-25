@@ -474,51 +474,48 @@ const ChatInterface = ({
   const currentFolder = folders.find((folder) => folder.id === currentFolderId);
 
   return (
-    <main className="relative h-full w-full flex-1 flex flex-col overflow-hidden">
+    <main className="relative transition-all duration-350 mx-auto flex flex-col">
       {/* 채팅 메시지 영역 - 스크롤 가능 영역 */}
       <div
         ref={chatContainerRef}
-        className="flex h-full flex-col overflow-y-auto [scrollbar-gutter:stable]"
+        className="flex overflow-y-auto tab:px-8 web:px-0 px-4 h-full flex-col"
       >
-        <div
-          aria-hidden="true"
-          data-edge="true"
-          className="pointer-events-none h-px w-px"
-        ></div>
-        <div className="mt-1.5 flex flex-col text-sm md:pb-9">
-          {messages.map((message, idx) => (
-            <ChatMessage
-              key={message.id || idx}
-              role={message.role}
-              content={message.content}
-              timestamp={message.created_at}
-            />
-          ))}
+        <div className="max-w-[680px] mx-auto">
+          <div
+            aria-hidden="true"
+            data-edge="true"
+            className="pointer-events-none h-px w-px"
+          ></div>
+          <div className="flex flex-col gap-6">
+            {messages.map((message, idx) => (
+              <ChatMessage
+                key={message.id || idx}
+                role={message.role}
+                content={message.content}
+                timestamp={message.created_at}
+              />
+            ))}
 
-          {isLoading && (
-            <ChatMessage
-              role={MessageRole.ASSISTANT}
-              content={currentAssistantMessage}
-              isStreaming={true}
-            />
-          )}
+            {isLoading && (
+              <ChatMessage
+                role={MessageRole.ASSISTANT}
+                content={currentAssistantMessage}
+                isStreaming={true}
+              />
+            )}
+          </div>
+          <div
+            aria-hidden="true"
+            data-edge="true"
+            className="pointer-events-none h-px w-px"
+          ></div>
         </div>
-        <div
-          aria-hidden="true"
-          data-edge="true"
-          className="pointer-events-none h-px w-px"
-        ></div>
       </div>
 
       {/* 채팅 입력 영역 - 고정 위치 */}
-      <div className="w-full sticky bottom-0 bg-white z-10">
-        <div className="max-w-3xl mx-auto">
+      <div className="w-full sticky max-w-[680px] tab:px-4 web:px-0 bg-line-alternative mx-auto mt-5 bottom-0 z-10">
+        <div className="tab:pb-10 tab:px-0 web:pb-20 mx-auto">
           <ChatInput onSend={handleSendMessage} disabled={isLoading} />
-        </div>
-
-        {/* 하단 정보 */}
-        <div className="text-gray-600 w-full border-t border-gray-100 flex min-h-8 items-center justify-center p-2 text-center text-xs">
-          <div>AI는 실수를 할 수 있습니다. 중요한 정보를 확인하세요.</div>
         </div>
       </div>
     </main>

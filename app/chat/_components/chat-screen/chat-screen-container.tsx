@@ -28,15 +28,17 @@ const ChatScreenContainer = ({
 
       {/* 대화가 선택된 경우 */}
       {currentId ? (
-        <ChatInterface
-          key={currentId}
-          conversationId={currentId}
-          onUpdateConversation={updateConversation}
-          onAssignToFolder={assignToFolder}
-          isNewChat={currentId === "new"}
-          initialMessage={pendingFirstMsg}
-          onInitialHandled={clearPendingFirstMsg}
-        />
+        <div className="max-h-[calc(100vh-67px)] overflow-y-auto">
+          <ChatInterface
+            key={currentId}
+            conversationId={currentId}
+            onUpdateConversation={updateConversation}
+            onAssignToFolder={assignToFolder}
+            isNewChat={currentId === "new"}
+            initialMessage={pendingFirstMsg}
+            onInitialHandled={clearPendingFirstMsg}
+          />
+        </div>
       ) : (
         /* 대화가 없을 경우 표시할 빈 화면 상태 */
         <EmptyChatScreen createNewConversation={createNewConversation} />
