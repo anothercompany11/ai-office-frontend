@@ -6,7 +6,7 @@ import ChatInput from "./chat-input";
 const EmptyChatScreen = ({
   createNewConversation,
 }: {
-  createNewConversation: (firstMsg: string, folderId?: string) => Promise<void>;
+  createNewConversation: (firstMsg: string) => void;
 }) => {
   const isMob = useGetCurrentDevice() === "mob";
   return (

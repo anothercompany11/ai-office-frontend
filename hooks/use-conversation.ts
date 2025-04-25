@@ -10,18 +10,13 @@ export type Conversation = ClientConversation;
  * 채팅 리스트와 관련된 모든 상태·행동 관리 훅
  */
 export default function useConversations() {
+  /* ────────── state ────────── */
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [pendingFirstMsg, setPendingFirstMsg] = useState<string | null>(null);
 
-  /* 새 대화 + 첫 메시지 저장 */
-  // const createNewConversation = (first?: string) => {
-  //   if (first) setPendingFirstMsg(first);
-  //   syncCurrentIdWithStorage("new");
-  // };
-
-  /* 유틸 */
+  /* ────────── utils ────────── */
   const syncCurrentIdWithStorage = useCallback((id: string | null) => {
     setCurrentId(id);
     id
@@ -29,41 +24,20 @@ export default function useConversations() {
       : localStorage.removeItem("currentConversationId");
   }, []);
 
-  /* ---------- 1. 사이드바용: 빈 방 시작 ---------- */
+  /* ────────── actions ────────── */
+  /** 1. 빈 방 시작 (사이드바 ‘+’ 버튼 등) */
   const startBlankConversation = () => {
-    setPendingFirstMsg(null); // 버퍼 비우기
-    syncCurrentIdWithStorage("new"); // ChatInterface가 'new' 모드로
+    setPendingFirstMsg(null);
+    syncCurrentIdWithStorage("new");
   };
 
-  /* ---------- 2. EmptyChatScreen용: 방 생성 + 첫 질문 ---------- */
-  const createNewConversation = async (firstMsg: string, folderId?: string) => {
-    console.log("hhh");
-    setIsLoadingConversations(true);
-    try {
-      /* 서버에 방 생성 */
-      const res = await conversationApi.createConversation("새 대화", folderId);
-      if (res.status !== "success" || !res.data?.id) throw new Error("fail");
-
-      const newConv: Conversation = {
-        id: res.data.id,
-        title: res.data.title || "새 대화",
-        preview: "",
-        lastUpdated: new Date(),
-        folder_id: folderId,
-      };
-
-      /* 목록 prepend & 선택 */
-      setConversations((prev) => [newConv, ...prev]);
-      syncCurrentIdWithStorage(newConv.id);
-
-      /* ChatInterface로 첫 질문 넘기기 */
-      setPendingFirstMsg(firstMsg);
-    } finally {
-      setIsLoadingConversations(false);
-    }
+  /** 2. EmptyChatScreen에서 첫 질문과 함께 새 방 생성 */
+  const createNewConversation = (firstMsg: string) => {
+    setCurrentId("new");
+    setPendingFirstMsg(firstMsg);
   };
 
-  /* ────────── READ ────────── */
+  /** 3. 목록 불러오기 */
   const loadConversations = useCallback(async () => {
     try {
       setIsLoadingConversations(true);
@@ -77,40 +51,23 @@ export default function useConversations() {
         lastUpdated: new Date(c.updated_at),
       }));
 
-      const savedId = localStorage.getItem("currentConversationId");
       setConversations(formatted);
-
-      console.log("저장된 id", savedId);
-
-      /** 로컬에 저장된 ID 우선, 없으면 첫 번째 대화 */
-      // if (
-      //   savedId &&
-      //   savedId !== "new" &&
-      //   formatted.some((c) => c.id === savedId)
-      // ) {
-      //   syncCurrentIdWithStorage(savedId);
-      // } else if (formatted.length > 0 && !currentId) {
-      //   syncCurrentIdWithStorage(formatted[0].id);
-      // }
-      if (
-        savedId &&
-        savedId !== "new" &&
-        formatted.some((c) => c.id === savedId)
-      ) {
-        syncCurrentIdWithStorage(savedId);
-      } else if (formatted.length > 0 && !currentId) {
-        syncCurrentIdWithStorage(formatted[0].id);
-      }
     } finally {
       setIsLoadingConversations(false);
     }
-  }, [currentId, syncCurrentIdWithStorage]);
+  }, []);
 
-  /* ────────── UPDATE ────────── */
+  /** 4. 스트리밍 종료 후 ‘new’ → 실제 ID 확정 */
+  const finalizeNewConversation = useCallback(
+    (realId: string) => syncCurrentIdWithStorage(realId),
+    [syncCurrentIdWithStorage],
+  );
+
+  /** 5. 대화 정보 업데이트(제목·미리보기 등) */
   const updateConversation = useCallback(
     (id: string, data: Partial<Conversation>) => {
       setConversations((prev) => {
-        // 새로 받은 실제 ID가 기존에 없다면 prepend
+        /* 새 ID가 아직 목록에 없으면 prepend */
         if (data.id && !prev.some((c) => c.id === data.id)) {
           const newConv: Conversation = {
             id: data.id,
@@ -122,25 +79,21 @@ export default function useConversations() {
           return [newConv, ...prev];
         }
 
-        // 기존 대화 업데이트
+        /* 기존 항목 업데이트 */
         return prev.map((c) =>
           c.id === id
-            ? {
-                ...c,
-                ...data,
-                lastUpdated: data.lastUpdated || new Date(),
-              }
+            ? { ...c, ...data, lastUpdated: data.lastUpdated || new Date() }
             : c,
         );
       });
 
-      // "new" → 실제 ID로 전환
-      if (id === "new" && data.id) syncCurrentIdWithStorage(data.id);
+      /* ⚠️ 여기서는 currentId를 바꾸지 않는다!
+         실제 ID 전환은 finalizeNewConversation에서만 수행 */
     },
-    [syncCurrentIdWithStorage],
+    [],
   );
 
-  /* ────────── DELETE ────────── */
+  /** 6. 대화 삭제 */
   const deleteConversation = useCallback(
     async (id: string) => {
       const res = await conversationApi.deleteConversation(id);
@@ -148,15 +101,12 @@ export default function useConversations() {
 
       setConversations((prev) => prev.filter((c) => c.id !== id));
 
-      if (currentId === id) {
-        const next = conversations.find((c) => c.id !== id);
-        syncCurrentIdWithStorage(next?.id ?? null);
-      }
+      if (currentId === id) syncCurrentIdWithStorage(null);
     },
-    [currentId, conversations, syncCurrentIdWithStorage],
+    [currentId, syncCurrentIdWithStorage],
   );
 
-  /* ────────── FOLDER ────────── */
+  /** 7. 폴더 할당 */
   const assignToFolder = async (
     conversationId: string,
     folderId: string | null,
@@ -175,11 +125,13 @@ export default function useConversations() {
     );
   };
 
+  /* ────────── expose ────────── */
   return {
     /* state */
     conversations,
     isLoadingConversations,
     currentId,
+    pendingFirstMsg,
 
     /* actions */
     loadConversations,
@@ -189,7 +141,7 @@ export default function useConversations() {
     deleteConversation,
     assignToFolder,
     selectConversation: syncCurrentIdWithStorage,
-    pendingFirstMsg, // ChatScreenContainer 로 노출
     clearPendingFirstMsg: () => setPendingFirstMsg(null),
+    finalizeNewConversation,
   };
 }

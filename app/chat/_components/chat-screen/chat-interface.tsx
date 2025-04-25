@@ -27,6 +27,7 @@ interface ChatInterfaceProps {
   isNewChat?: boolean; // 새 대화 여부
   initialMessage?: string | null;
   onInitialHandled?: () => void;
+  finalizeNewConversation: (realId: string) => void;
 }
 
 const ChatInterface = ({
@@ -36,17 +37,9 @@ const ChatInterface = ({
   isNewChat = false,
   initialMessage,
   onInitialHandled,
+  finalizeNewConversation,
 }: ChatInterfaceProps) => {
-  const [messages, setMessages] = useState<ClientMessage[]>(() =>
-    initialMessage
-      ? [] // 첫 메시지를 곧바로 보내므로 비워 둠
-      : [
-          {
-            role: MessageRole.ASSISTANT,
-            content: "안녕하세요! 무엇을 도와드릴까요?",
-          },
-        ],
-  );
+  const [messages, setMessages] = useState<ClientMessage[]>(() => []);
   const [isLoading, setIsLoading] = useState(false);
   const [editingConversationTitle, setEditingConversationTitle] =
     useState(false);
@@ -59,34 +52,16 @@ const ChatInterface = ({
   const titleInputRef = useRef<HTMLInputElement>(null);
   const folderMenuRef = useRef<HTMLDivElement>(null);
 
-  // 메세지 리스트가 있으면 메세지 전송
+  const sentInitial = useRef(false); //  전송했는지 여부
+
+  /* 메세지 리스트가 있으면 메세지 전송 */
   useEffect(() => {
-    if (initialMessage && messages.length !== 0) {
-      console.log("여기가 호출되면 안됨");
-      // 메세지 전송
+    if (initialMessage && isNewChat && !sentInitial.current) {
+      sentInitial.current = true;
       handleSendMessage(initialMessage);
-
-      // 버퍼 비우기
-      onInitialHandled?.();
+      onInitialHandled?.(); // 버퍼 비우기
     }
-  }, [initialMessage, messages]);
-
-  const sentInitial = useRef(false);
-
-  useEffect(() => {
-    if (initialMessage && !sentInitial.current) {
-      setMessages([{ role: MessageRole.USER, content: initialMessage }]);
-      handleSendMessage(initialMessage);
-      onInitialHandled?.();
-      sentInitial.current = true; // 다시는 실행 안 됨
-    }
-  }, [initialMessage]);
-  // 버퍼에 메시지가 있으면 메세지 리스트 업데이트
-  // useEffect(() => {
-  //   if (initialMessage) {
-  //     setMessages([{ role: MessageRole.USER, content: initialMessage }]);
-  //   }
-  // }, [initialMessage]);
+  }, [initialMessage, isNewChat]);
 
   // 폴더 목록 불러오기
   const loadFolders = async () => {
@@ -105,12 +80,6 @@ const ChatInterface = ({
     try {
       // "new" 대화인 경우 API 호출하지 않음
       if (id === "new" || isNewChat) {
-        setMessages([
-          {
-            role: MessageRole.ASSISTANT,
-            content: "안녕하세요! 무엇을 도와드릴까요?",
-          },
-        ]);
         setNewTitle("새 대화");
         setCurrentFolderId(null);
         setIsLoading(false);
@@ -303,160 +272,95 @@ const ChatInterface = ({
 
   // 메시지 전송 처리
   const handleSendMessage = async (content: string) => {
-    console.log("📌📌📌📌📌📌📌", typeof content, content);
     if (!content.trim() || isLoading) return;
 
-    // 사용자 메시지 추가
-    const userMessage: ClientMessage = {
-      role: MessageRole.USER,
-      content,
-    };
-
+    /* 1️⃣ 사용자 메시지 즉시 UI에 추가 */
+    const userMessage: ClientMessage = { role: MessageRole.USER, content };
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
-    setCurrentAssistantMessage(""); // 어시스턴트 응답 초기화
+    setCurrentAssistantMessage("");
 
     try {
-      // 스트리밍 API 호출
+      /* 2️⃣ 서버 스트리밍 호출 */
       const stream = await conversationApi.sendStreamingMessage(
         content,
         conversationId,
       );
+      if (!stream) throw new Error("스트리밍 응답을 받을 수 없습니다.");
 
-      if (!stream) {
-        throw new Error("스트리밍 응답을 받을 수 없습니다.");
-      }
+      let realId: string | null = null;
+      let full = "";
 
-      let responseConversationId: string | null = null;
-      let fullContent = "";
-
-      // 스트림 처리를 위한 reader 설정
       const reader = stream.getReader();
       const decoder = new TextDecoder();
 
-      // 첫 청크에서 content 값이 있을 수 있도록 약간 지연
-      setCurrentAssistantMessage(" ");
-
+      /* 3️⃣ 스트림 읽기 */
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        // 청크 디코딩
         const chunk = decoder.decode(value, { stream: true });
-
-        // SSE 형식 처리 (data: {...} 형식의 라인들)
         const lines = chunk
           .split("\n\n")
-          .filter((line) => line.trim().startsWith("data:"));
+          .filter((l) => l.trim().startsWith("data:"));
 
-        for (const line of lines) {
-          const dataContent = line.replace("data: ", "").trim();
+        for (const l of lines) {
+          const data = l.replace("data: ", "").trim();
+          if (data === "[DONE]") continue;
 
-          // 스트림 종료 신호 확인
-          if (dataContent === "[DONE]") {
+          const parsed = JSON.parse(data);
+
+          if (parsed.error) throw new Error(parsed.error);
+
+          /* 새 대화라면 첫 청크에 conversation_id 만 옴 */
+          if (parsed.conversation_id && !realId) {
+            realId = parsed.conversation_id;
             continue;
           }
 
-          try {
-            const parsedData = JSON.parse(dataContent);
-
-            // 오류 메시지 처리
-            if (parsedData.error) {
-              throw new Error(parsedData.error);
-            }
-
-            // 첫 번째 청크가 conversation_id인 경우 (새 대화)
-            if (parsedData.conversation_id && !responseConversationId) {
-              responseConversationId = parsedData.conversation_id;
-              continue;
-            }
-
-            // 일반 텍스트 청크 처리
-            if (parsedData.content) {
-              fullContent += parsedData.content;
-              setCurrentAssistantMessage(fullContent);
-            }
-          } catch (error) {
-            console.error("스트림 데이터 파싱 오류:", error);
+          if (parsed.content) {
+            full += parsed.content;
+            setCurrentAssistantMessage(full); // 실시간 타이핑
           }
         }
       }
 
-      // 새 대화인 경우 ID 처리
-      let currentConversationId = conversationId;
-      if (
-        (!conversationId || conversationId === "new") &&
-        responseConversationId
-      ) {
-        currentConversationId = responseConversationId;
-
-        // 부모 컴포넌트에 새 대화 ID 알림 (새 대화 생성 시)
-        const title =
-          content.length > 30 ? `${content.substring(0, 27)}...` : content;
-
-        if (typeof onUpdateConversation === "function") {
-          // 대화 목록에 즉시 추가되도록 필요한 정보 전달
-          onUpdateConversation(conversationId, {
-            id: responseConversationId,
-            title: title,
-            preview: content,
-            lastUpdated: new Date(),
-          });
-        }
-
-        // 새 ID로 폴더 목록 로드
-        loadFolders();
-      }
-
-      // 완성된 응답 메시지 추가
+      /* 4️⃣ 완성된 답변 메시지 push */
       setMessages((prev) => [
         ...prev,
         {
           role: MessageRole.ASSISTANT,
-          content: fullContent,
+          content: full,
           created_at: new Date().toISOString(),
         },
       ]);
 
-      // 제목과 미리보기 업데이트 처리
-      if (messages.length <= 1 && content.length > 0) {
-        // 첫 메시지인 경우
+      /* 5️⃣ 새 대화인 경우: 스트림이 끝난 뒤 단 한 번 ID 전환 */
+      let finalId = conversationId;
+      if ((conversationId === "new" || !conversationId) && realId) {
+        finalId = realId;
+
         const title =
-          content.length > 30 ? `${content.substring(0, 27)}...` : content;
+          content.length > 30 ? `${content.slice(0, 27)}…` : content;
 
-        try {
-          // "new" 대화가 아닌 경우에만 제목 업데이트 API 호출 (이미 위에서 새 대화 생성 시 처리됨)
-          if (conversationId !== "new" && !isNewChat) {
-            await conversationApi.updateConversation(
-              currentConversationId,
-              title,
-            );
-          }
-
-          // 새 대화가 아닌 경우 로컬 상태 업데이트
-          if (conversationId !== "new") {
-            onUpdateConversation(currentConversationId, {
-              title,
-              preview: content,
-              lastUpdated: new Date(),
-            });
-          }
-
-          setNewTitle(title);
-        } catch (err) {
-          console.error("대화 제목 자동 업데이트 실패:", err);
-        }
-      } else {
-        // 기존 대화의 미리보기 업데이트
-        onUpdateConversation(currentConversationId, {
+        onUpdateConversation("new", {
+          id: realId,
+          title,
           preview: content,
           lastUpdated: new Date(),
         });
-      }
-    } catch (error) {
-      console.error("메시지 전송 오류:", error);
 
-      // 오류 메시지 표시
+        /* 상위 훅에 알려서 currentId 교체 → 컴포넌트 재사용 */
+        finalizeNewConversation?.(realId);
+      }
+
+      /* 6️⃣ 미리보기·타이틀 업데이트 */
+      onUpdateConversation(finalId, {
+        preview: content,
+        lastUpdated: new Date(),
+      });
+    } catch (err) {
+      console.error(err);
       setMessages((prev) => [
         ...prev,
         {
@@ -466,7 +370,7 @@ const ChatInterface = ({
       ]);
     } finally {
       setIsLoading(false);
-      setCurrentAssistantMessage(""); // 스트리밍 완료 후 초기화
+      setCurrentAssistantMessage("");
     }
   };
 
@@ -474,13 +378,13 @@ const ChatInterface = ({
   const currentFolder = folders.find((folder) => folder.id === currentFolderId);
 
   return (
-    <main className="relative transition-all duration-350 mx-auto flex flex-col">
+    <main className="relative h-[calc(100vh-67px)] overflow-hidden transition-all duration-350 mx-auto flex flex-col">
       {/* 채팅 메시지 영역 - 스크롤 가능 영역 */}
       <div
         ref={chatContainerRef}
         className="flex overflow-y-auto tab:px-8 web:px-0 px-4 h-full flex-col"
       >
-        <div className="max-w-[680px] mx-auto">
+        <div className="max-w-[680px] w-full mx-auto">
           <div
             aria-hidden="true"
             data-edge="true"
