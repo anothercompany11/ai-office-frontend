@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import RenameFolderModal from "./_components/rename-folder-modal";
+import TwoButtonModal from "./_components/two-button-modal";
 
 // 폴더 내부 대화 타입
 interface Conversation {
@@ -142,7 +143,8 @@ export default function FolderItem({
   activeId,
 }: FolderItemProps) {
   const [isRenaming, setIsRenaming] = useState(false);
-  const [showRenameModal, setShowRenameModal] = useState(false); // 폴더 이름 변경 모달 노출 여부
+  const [showRenameModal, setShowRenameModal] = useState(false); // 이름 변경 모달 노출 여부
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // 삭제 모달 노출 여부
   const [newName, setNewName] = useState(folder.name);
   const [showMenu, setShowMenu] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -187,12 +189,11 @@ export default function FolderItem({
     setIsRenaming(false);
   };
 
+  // 폴더 삭제 핸들러
   const handleDeleteFolder = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm("이 프로젝트를 삭제하시겠습니까?")) {
-      onDeleteFolder(folder.id);
-    }
     setShowMenu(false);
+    setShowDeleteModal(true);
   };
 
   const handleStartRenaming = (e: React.MouseEvent) => {
@@ -353,7 +354,7 @@ export default function FolderItem({
             </ul>
           )}
       </motion.div>
-      {/* ───────── 폴더 이름 변경 모달 ───────── */}
+      {/* ───────── 이름 변경 모달 ───────── */}
       <RenameFolderModal
         isOpen={showRenameModal}
         defaultName={folder.name}
@@ -361,6 +362,17 @@ export default function FolderItem({
         onConfirm={(newName) => {
           onRenameFolder(folder.id, newName);
           setShowRenameModal(false);
+        }}
+      />
+
+      {/* ───────── 삭제 확인 모달 ───────── */}
+      <TwoButtonModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="정말 삭제하시나요?"
+        onConfirm={() => {
+          onDeleteFolder(folder.id);
+          setShowDeleteModal(false);
         }}
       />
     </div>
