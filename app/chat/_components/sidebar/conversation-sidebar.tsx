@@ -23,6 +23,7 @@ import ConversationsArea from "./conversation-area";
 import ConversationItem from "./conversation-item";
 import DragOverlayContent from "./drag-overlay-content";
 import { ConversationFolder } from "./folder-item";
+import CreateFolderModal from "./_components/create-folder-modal";
 
 const groupTitles: Record<TimeGroup, string> = {
   today: "오늘",
@@ -50,9 +51,10 @@ export default function ConversationSidebar({
   /* ---------- state & ref ---------- */
   const router = useRouter();
   const [folders, setFolders] = useState<ConversationFolder[]>([]);
-  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
-  const [newFolderName, setNewFolderName] = useState("");
-  const newFolderInputRef = useRef<HTMLInputElement>(null);
+  // const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  // const [newFolderName, setNewFolderName] = useState("");
+  // const newFolderInputRef = useRef<HTMLInputElement>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [convState, setConvState] = useState<Conversation[]>([]);
@@ -167,8 +169,7 @@ export default function ConversationSidebar({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setIsCreatingFolder(true);
-                setTimeout(() => newFolderInputRef.current?.focus());
+                setShowCreateModal(true);
               }}
               className=""
             >
@@ -194,25 +195,6 @@ export default function ConversationSidebar({
             />
           )}
 
-          {isCreatingFolder && (
-            <div className="px-3 py-2 flex items-center">
-              <input
-                ref={newFolderInputRef}
-                value={newFolderName}
-                onChange={(e) => setNewFolderName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    folderApi.createFolder(newFolderName).then(loadFolders);
-                    setIsCreatingFolder(false);
-                    setNewFolderName("");
-                  }
-                  if (e.key === "Escape") setIsCreatingFolder(false);
-                }}
-                className="flex-1 px-2 py-1.5 border rounded text-sm"
-                placeholder="프로젝트 이름"
-              />
-            </div>
-          )}
           <div className="border-t border-line my-4" />
           {/* Conversations */}
           <header className="flex justify-between items-center py-[8.5px]">
@@ -253,6 +235,14 @@ export default function ConversationSidebar({
           )}
         </aside>
       </div>
+      <CreateFolderModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onConfirm={(name) => {
+          folderApi.createFolder(name).then(loadFolders);
+          setShowCreateModal(false);
+        }}
+      />
 
       <DragOverlay>
         {activeId && (
