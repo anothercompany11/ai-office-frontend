@@ -1,7 +1,13 @@
 "use client";
 import { useDraggable } from "@dnd-kit/core";
-import { Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2 } from "lucide-react";
 import { Conversation } from "../types";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useState } from "react";
 
 interface Props {
   conversation: Conversation;
@@ -18,6 +24,7 @@ export default function ConversationItem({
   onSelect,
   onDelete,
 }: Props) {
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: conversation.id,
   });
@@ -43,26 +50,53 @@ export default function ConversationItem({
         style={style}
         {...listeners}
         {...attributes}
-        className={`group rounded-lg hover:bg-[#eeeff1] `}
+        className={`group rounded-lg hover:bg-[#eeeff1] ${
+          isPopoverOpen ? "bg-[#eeeff1]" : ""
+        }`}
       >
-        <a
-          className="flex items-center px-2 py-3 cursor-pointer"
-          onClick={() => onSelect(conversation.id)}
+        <div
+          className="flex items-center justify-between px-2 cursor-pointer"
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest("button")) {
+              return;
+            }
+            onSelect(conversation.id);
+          }}
         >
           <span
-            className={`grow overflow-hidden whitespace-nowrap text-body-s text-label-strong`}
+            className={`grow overflow-hidden whitespace-nowrap text-body-s text-label-strong py-3`}
             title={conversation.title}
           >
             {conversation.title}
           </span>
-          <button
-            onClick={(e) => onDelete(e, conversation.id)}
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-gray-500 hover:text-red-600 rounded-full hover:bg-gray-100"
-            title="대화 삭제"
-          >
-            <Trash2 size={12} />
-          </button>
-        </a>
+          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+            <PopoverTrigger asChild>
+              <button
+                className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 text-label-alternative ${
+                  isPopoverOpen ? "opacity-100" : ""
+                }`}
+                aria-label="대화 메뉴"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <MoreHorizontal size={18} />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="absolute w-[140px] p-2 space-y-3 border border-line bg-white rounded-lg top-[-25px] left-[-10px]">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(e, conversation.id);
+                }}
+                className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
+              >
+                <span className="text-body-s text-status-error">삭제하기</span>
+                <Trash2 size={18} className="text-status-error" />
+              </button>
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
     </li>
   );

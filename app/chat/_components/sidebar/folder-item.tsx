@@ -106,13 +106,12 @@ function FolderConversationItem({
             className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 text-label-alternative ${
               isPopoverOpen ? "opacity-100" : ""
             }`}
-            title="대화 메뉴"
             aria-label="대화 메뉴"
           >
             <MoreHorizontal size={18} />
           </button>
         </PopoverTrigger>
-        <PopoverContent className="absolute w-[140px] p-2 space-y-3 border border-line bg-white rounded-lg top-[-20px] left-[-10px]">
+        <PopoverContent className="absolute w-[140px] p-2 space-y-3 border border-line bg-white rounded-lg top-[-25px] left-[-10px]">
           <button
             onClick={(e) => {
               if ((e.target as HTMLElement).closest("button")) {
@@ -290,7 +289,6 @@ export default function FolderItem({
                   className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 ${
                     isPopoverOpen ? "opacity-100" : ""
                   }`}
-                  title="폴더 메뉴"
                   aria-label="폴더 메뉴"
                 >
                   <MoreHorizontal
@@ -299,7 +297,7 @@ export default function FolderItem({
                   />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="absolute w-[140px] p-2 space-y-3 border border-line bg-white rounded-lg top-[-20px] left-[-10px]">
+              <PopoverContent className="absolute w-[140px] p-2 space-y-3 border border-line bg-white rounded-lg top-[-25px] left-[-10px]">
                 <button
                   onClick={handleStartRenaming}
                   className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
