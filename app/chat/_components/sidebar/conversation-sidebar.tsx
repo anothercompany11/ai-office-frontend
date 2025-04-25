@@ -178,7 +178,7 @@ export default function ConversationSidebar({
               }}
               className=""
             >
-              <Plus size={10} />
+              <Plus size={14} />
             </button>
           </header>
 
@@ -219,13 +219,13 @@ export default function ConversationSidebar({
               />
             </div>
           )}
-          <div className="border-t border-line" />
+          <div className="border-t border-line my-4" />
           {/* Conversations */}
-          <header
-            className="flex items-center text-title-xs py-[8.5px]"
-            onClick={() => setShowConversations(!showConversations)}
-          >
-            <span>지난 대화</span>
+          <header className="flex justify-between items-center py-[8.5px]">
+            <span className="text-title-xs">지난 대화</span>
+            <button onClick={onNewConversation}>
+              <Plus size={14} />
+            </button>
           </header>
 
           {showConversations && (
@@ -258,22 +258,6 @@ export default function ConversationSidebar({
             </ConversationsArea>
           )}
         </aside>
-
-        {/* footer */}
-        <footer className="border-t border-gray-200 p-4">
-          <button
-            onClick={onNewConversation}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
-          >
-            <Plus size={16} />새 대화
-          </button>
-          <button
-            onClick={() => authApi.logout().then(() => router.push("/auth"))}
-            className="w-full mt-2 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg text-sm"
-          >
-            로그아웃
-          </button>
-        </footer>
       </div>
 
       <DragOverlay>

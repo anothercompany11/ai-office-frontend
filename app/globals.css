@@ -27,6 +27,7 @@
 
   --line: #eeeff1;
   --line-alternative: #f9fafa;
+  --line-strong: #d6d7dc;
 
   --status-error: #e82929;
 
@@ -34,11 +35,6 @@
   --component-strong: #d6d7dc;
   --component-dimmer: rgba(0, 0, 0, 0.7);
   --component-alternative: #f4f4f6;
-}
-
-@theme {
-  --breakpoint-*: initial;
-  --breakpoint-web: 641px;
 }
 
 @layer utilities {
@@ -61,6 +57,13 @@
   }
 
   /* ========== Typography ========== */
+  .text-title-l {
+    font-size: 18px;
+    line-height: 150%;
+    letter-spacing: -0.3%;
+    font-weight: 700;
+  }
+
   .text-title-m {
     font-size: 16px;
     line-height: 150%;
@@ -231,6 +234,9 @@
   }
   .bg-line-alternative {
     background-color: var(--line-alternative);
+  }
+  .border-line-strong {
+    border-color: var(--line-strong);
   }
 
   /* ========== Status ========== */
