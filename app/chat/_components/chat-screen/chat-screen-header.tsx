@@ -94,7 +94,7 @@ const ChatScreenHeader = () => {
           >
             <DialogHeader>
               <p className="text-title-s text-label-assistive">
-                AI오피스 프롬프트 가이드{" "}
+                AI오피스 프롬프트 가이드
               </p>
               <DialogTitle className="font-hakgyo-ansim">
                 AI 어떻게 활용하면 좋을까요?

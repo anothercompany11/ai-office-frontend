@@ -104,8 +104,8 @@ export default function ConversationItem({
       <TwoButtonModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={(e: React.MouseEvent) => {
-          onDelete(e, conversation.id);
+        onConfirm={() => {
+          onDelete({} as React.MouseEvent, conversation.id);
           setIsDeleteModalOpen(false);
         }}
         title="정말 삭제하시나요?"
