@@ -25,13 +25,13 @@ export default function useConversations() {
   }, []);
 
   /* ────────── actions ────────── */
-  /** 1. 빈 방 시작 (사이드바 ‘+’ 버튼 등) */
+  /** 1. 사이드바의 '+' 버튼 -> 빈 채팅 화면 렌더링 트리거 */
   const startBlankConversation = () => {
     setPendingFirstMsg(null);
-    syncCurrentIdWithStorage("new");
+    syncCurrentIdWithStorage(null); // currentId를 null로 해서 EmptyChatScreen 렌더링
   };
 
-  /** 2. EmptyChatScreen에서 첫 질문과 함께 새 방 생성 */
+  /** 2. 빈 채팅 화면에서 대화 시작 */
   const createNewConversation = (firstMsg: string) => {
     setCurrentId("new");
     setPendingFirstMsg(firstMsg);
