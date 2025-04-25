@@ -25,6 +25,7 @@ export default function ChatPage() {
     pendingFirstMsg,
     clearPendingFirstMsg,
     assignToFolder,
+    finalizeNewConversation,
   } = useConversations();
 
   // 로그인 유무에 따른 처리
@@ -58,6 +59,7 @@ export default function ChatPage() {
         assignToFolder={assignToFolder}
         pendingFirstMsg={pendingFirstMsg}
         clearPendingFirstMsg={clearPendingFirstMsg}
+        finalizeNewConversation={finalizeNewConversation}
       />
     </div>
   );
