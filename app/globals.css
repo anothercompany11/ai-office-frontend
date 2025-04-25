@@ -283,8 +283,7 @@
 
 @theme {
   --breakpoint-*: initial;
-  --breakpoint-tab: 600px;
-  --breakpoint-web: 1200px;
+  --breakpoint-web: 650px;
 }
 
 /* 인풋 자동완성 시 배경색상 */
