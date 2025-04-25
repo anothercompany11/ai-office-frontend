@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ConversationSidebar from "./_components/sidebar/conversation-sidebar";
 import useConversations from "@/hooks/use-conversation";
 import { useAuth } from "../context/AuthContext";
 import ChatScreenContainer from "./_components/chat-screen/chat-screen-container";
+import ChatHeader from "./_components/chat-header/chat-header";
 
 export default function ChatPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   // 채팅 관리 훅
   const {
@@ -50,8 +52,14 @@ export default function ChatPage() {
         onSelectConversation={selectConversation}
         onNewConversation={startBlankConversation}
         onDeleteConversation={deleteConversation}
+        isSidebarVisible={isSidebarVisible}
+        setIsSidebarVisible={setIsSidebarVisible}
       />
 
+      {/* <ChatHeader
+          isSidebarVisible={isSidebarVisible}
+          setIsSidebarVisible={setIsSidebarVisible}
+        /> */}
       <ChatScreenContainer
         currentId={currentId}
         createNewConversation={createNewConversation}
@@ -60,6 +68,8 @@ export default function ChatPage() {
         pendingFirstMsg={pendingFirstMsg}
         clearPendingFirstMsg={clearPendingFirstMsg}
         finalizeNewConversation={finalizeNewConversation}
+        isSidebarVisible={isSidebarVisible}
+        setIsSidebarVisible={setIsSidebarVisible}
       />
     </div>
   );

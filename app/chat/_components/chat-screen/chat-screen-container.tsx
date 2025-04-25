@@ -13,6 +13,8 @@ interface ChatScreenContainerProps {
   pendingFirstMsg: string | null;
   clearPendingFirstMsg: () => void;
   finalizeNewConversation: (realId: string) => void;
+  isSidebarVisible: boolean;
+  setIsSidebarVisible: (visible: boolean) => void;
 }
 
 const ChatScreenContainer = ({
@@ -23,10 +25,15 @@ const ChatScreenContainer = ({
   pendingFirstMsg,
   clearPendingFirstMsg,
   finalizeNewConversation,
+  isSidebarVisible,
+  setIsSidebarVisible,
 }: ChatScreenContainerProps) => {
   return (
     <div className="flex flex-col w-full bg-line-alternative">
-      <ChatHeader />
+      <ChatHeader
+        isSidebarVisible={isSidebarVisible}
+        setIsSidebarVisible={setIsSidebarVisible}
+      />
 
       {/* 대화가 선택된 경우 */}
       {currentId ? (

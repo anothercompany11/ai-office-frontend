@@ -1,4 +1,4 @@
-import { CircleHelp } from "lucide-react";
+import { CircleHelp, ChevronsRight } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -14,10 +14,25 @@ import {
 } from "@/components/ui/dialog";
 import SwipeGuideBox from "../guide/swipe-guide-box";
 
-const ChatHeader = () => {
+interface Props {
+  isSidebarVisible: boolean;
+  setIsSidebarVisible: (visible: boolean) => void;
+}
+
+const ChatHeader = ({ isSidebarVisible, setIsSidebarVisible }: Props) => {
   return (
     <div className="py-5 px-8 flex justify-between items-center">
-      <p className="text-body-l font-hakgyo-ansim">Chat AI 오피스</p>
+      <div className="flex items-center gap-4">
+        {!isSidebarVisible && (
+          <button
+            onClick={() => setIsSidebarVisible(true)}
+            className="flex items-center justify-center"
+          >
+            <ChevronsRight className="size-6 text-primary" />
+          </button>
+        )}
+        <p className="text-body-l font-hakgyo-ansim">Chat AI 오피스</p>
+      </div>
 
       <div className="hidden web:block">
         <Popover>
@@ -47,7 +62,9 @@ const ChatHeader = () => {
               <p className="text-title-s text-label-assistive">
                 AI오피스 프롬프트 가이드{" "}
               </p>
-              <DialogTitle>AI 어떻게 활용하면 좋을까요?</DialogTitle>
+              <DialogTitle className="font-hakgyo-ansim">
+                AI 어떻게 활용하면 좋을까요?
+              </DialogTitle>
             </DialogHeader>
 
             <SwipeGuideBox />

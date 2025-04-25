@@ -44,6 +44,8 @@ interface Props {
   onSelectConversation: (id: string) => void;
   onNewConversation: () => void;
   onDeleteConversation: (id: string) => void;
+  isSidebarVisible: boolean;
+  setIsSidebarVisible: (visible: boolean) => void;
 }
 
 export default function ConversationSidebar({
@@ -52,6 +54,8 @@ export default function ConversationSidebar({
   onSelectConversation,
   onNewConversation,
   onDeleteConversation,
+  isSidebarVisible,
+  setIsSidebarVisible,
 }: Props) {
   /* ---------- state & ref ---------- */
   const router = useRouter();
@@ -154,7 +158,11 @@ export default function ConversationSidebar({
       // onDragOver={handleDragOver}
       modifiers={[restrictToWindowEdges]}
     >
-      <div className="h-full flex flex-col w-[280px] min-w-[280px] flex-shrink-0 px-4">
+      <div
+        className={`${
+          isSidebarVisible ? "web:flex" : "web:hidden"
+        } hidden h-full flex-col w-[280px] min-w-[280px] flex-shrink-0 px-4`}
+      >
         <div className="flex items-center justify-between py-[21.5px]">
           <Image
             src="/svg/logo.svg"
@@ -162,7 +170,7 @@ export default function ConversationSidebar({
             width={97.45}
             height={18.21}
           />
-          <button>
+          <button onClick={() => setIsSidebarVisible(false)}>
             <ChevronsLeft size={24} className="text-component" />
           </button>
         </div>
