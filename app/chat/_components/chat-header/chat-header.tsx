@@ -22,16 +22,31 @@ interface Props {
 const ChatHeader = ({ isSidebarVisible, setIsSidebarVisible }: Props) => {
   return (
     <div className="py-5 px-8 flex justify-between items-center">
-      <div className="flex items-center gap-4">
-        {!isSidebarVisible && (
+      <div className="flex items-center">
+        <div className="hidden web:block">
+          {!isSidebarVisible && (
+            <button
+              onClick={() => setIsSidebarVisible(true)}
+              className="flex items-center justify-center mr-4"
+            >
+              <ChevronsRight className="size-6 text-component" />
+            </button>
+          )}
+        </div>
+        <div className="block web:hidden">
           <button
             onClick={() => setIsSidebarVisible(true)}
             className="flex items-center justify-center"
           >
-            <ChevronsRight className="size-6 text-primary" />
+            <ChevronsRight className="size-6 text-component" />
           </button>
-        )}
-        <p className="text-body-l font-hakgyo-ansim">Chat AI 오피스</p>
+        </div>
+        <p className="text-body-l font-hakgyo-ansim block web:hidden absolute left-1/2 -translate-x-1/2">
+          Chat AI 오피스
+        </p>
+        <p className="text-body-l font-hakgyo-ansim hidden web:block">
+          Chat AI 오피스
+        </p>
       </div>
 
       <div className="hidden web:block">

@@ -23,7 +23,7 @@ import {
   TimeGroup,
 } from "../types";
 
-import FolderList from "./folder-list"; // 기존 파일 그대로 사용
+import FolderList from "./folder-list";
 import { useGroupedConversations } from "@/hooks/use-groupped-conversation";
 import ConversationsArea from "./conversation-area";
 import ConversationItem from "./conversation-item";
@@ -48,7 +48,7 @@ interface Props {
   setIsSidebarVisible: (visible: boolean) => void;
 }
 
-export default function ConversationSidebar({
+export default function ConversationMobSidebar({
   conversations,
   currentConversationId,
   onSelectConversation,
@@ -154,14 +154,12 @@ export default function ConversationSidebar({
       sensors={sensors}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      // onDragCancel={handleDragCancel}
-      // onDragOver={handleDragOver}
       modifiers={[restrictToWindowEdges]}
     >
       <div
         className={`${
-          isSidebarVisible ? "web:flex" : "web:hidden"
-        } hidden h-full flex-col w-[280px] min-w-[280px] flex-shrink-0 px-4`}
+          isSidebarVisible ? "flex" : "hidden"
+        } fixed inset-0 z-50 h-full flex-col w-[280px] min-w-[280px] flex-shrink-0 px-4 bg-white`}
       >
         <div className="flex items-center justify-between py-[21.5px]">
           <Image
@@ -184,7 +182,6 @@ export default function ConversationSidebar({
                 setIsCreatingFolder(true);
                 setTimeout(() => newFolderInputRef.current?.focus());
               }}
-              className=""
             >
               <Plus size={14} />
             </button>
@@ -228,7 +225,6 @@ export default function ConversationSidebar({
             </div>
           )}
           <div className="border-t border-line my-4" />
-          {/* Conversations */}
           <header className="flex justify-between items-center py-[8.5px]">
             <span className="text-title-xs">지난 대화</span>
             <button onClick={onNewConversation}>

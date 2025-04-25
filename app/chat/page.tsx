@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ConversationSidebar from "./_components/sidebar/conversation-sidebar";
+import ConversationMobSidebar from "./_components/sidebar/conversation-mob-sidebar";
 import useConversations from "@/hooks/use-conversation";
 import { useAuth } from "../context/AuthContext";
 import ChatScreenContainer from "./_components/chat-screen/chat-screen-container";
@@ -46,15 +47,28 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-screen bg-white">
-      <ConversationSidebar
-        conversations={conversations}
-        currentConversationId={currentId}
-        onSelectConversation={selectConversation}
-        onNewConversation={startBlankConversation}
-        onDeleteConversation={deleteConversation}
-        isSidebarVisible={isSidebarVisible}
-        setIsSidebarVisible={setIsSidebarVisible}
-      />
+      <div className="hidden web:block">
+        <ConversationSidebar
+          conversations={conversations}
+          currentConversationId={currentId}
+          onSelectConversation={selectConversation}
+          onNewConversation={startBlankConversation}
+          onDeleteConversation={deleteConversation}
+          isSidebarVisible={isSidebarVisible}
+          setIsSidebarVisible={setIsSidebarVisible}
+        />
+      </div>
+      <div className="block web:hidden">
+        <ConversationMobSidebar
+          conversations={conversations}
+          currentConversationId={currentId}
+          onSelectConversation={selectConversation}
+          onNewConversation={startBlankConversation}
+          onDeleteConversation={deleteConversation}
+          isSidebarVisible={isSidebarVisible}
+          setIsSidebarVisible={setIsSidebarVisible}
+        />
+      </div>
 
       {/* <ChatHeader
           isSidebarVisible={isSidebarVisible}
