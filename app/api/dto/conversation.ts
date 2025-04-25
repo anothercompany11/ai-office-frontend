@@ -32,6 +32,7 @@ export interface ClientMessage {
   role: MessageRole;
   content: string;
   created_at?: string;
+  streaming?: boolean; // todo: 삭제
 }
 
 export interface CreateConversationRequest {

@@ -274,14 +274,21 @@ const ChatInterface = ({
   const handleSendMessage = async (content: string) => {
     if (!content.trim() || isLoading) return;
 
-    /* 1️⃣ 사용자 메시지 즉시 UI에 추가 */
+    /* 1. 사용자 메시지 즉시 UI에 추가 */
     const userMessage: ClientMessage = { role: MessageRole.USER, content };
-    setMessages((prev) => [...prev, userMessage]);
+
+    /* 2. 로딩용 어시스턴트 말풍선 바로 push */
+    const loadingMsg: ClientMessage = {
+      id: "loading-" + Date.now(), // 임시 ID
+      role: MessageRole.ASSISTANT,
+      content: "", // 내용은 스트림에서 채움
+      streaming: true,
+    };
+    setMessages((prev) => [...prev, userMessage, loadingMsg]);
     setIsLoading(true);
-    setCurrentAssistantMessage("");
 
     try {
-      /* 2️⃣ 서버 스트리밍 호출 */
+      /* 3. 스트리밍 호출 */
       const stream = await conversationApi.sendStreamingMessage(
         content,
         conversationId,
@@ -294,7 +301,6 @@ const ChatInterface = ({
       const reader = stream.getReader();
       const decoder = new TextDecoder();
 
-      /* 3️⃣ 스트림 읽기 */
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -309,10 +315,8 @@ const ChatInterface = ({
           if (data === "[DONE]") continue;
 
           const parsed = JSON.parse(data);
-
           if (parsed.error) throw new Error(parsed.error);
 
-          /* 새 대화라면 첫 청크에 conversation_id 만 옴 */
           if (parsed.conversation_id && !realId) {
             realId = parsed.conversation_id;
             continue;
@@ -320,22 +324,32 @@ const ChatInterface = ({
 
           if (parsed.content) {
             full += parsed.content;
-            setCurrentAssistantMessage(full); // 실시간 타이핑
+
+            /* 3-1. 로딩 말풍선 내용 실시간 업데이트 */
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === loadingMsg.id ? { ...m, content: full } : m,
+              ),
+            );
           }
         }
       }
 
-      /* 4️⃣ 완성된 답변 메시지 push */
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: MessageRole.ASSISTANT,
-          content: full,
-          created_at: new Date().toISOString(),
-        },
-      ]);
+      /* 4. 로딩 말풍선 확정 → streaming 플래그 제거 */
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === loadingMsg.id
+            ? {
+                ...m,
+                content: full,
+                streaming: false,
+                created_at: new Date().toISOString(),
+              }
+            : m,
+        ),
+      );
 
-      /* 5️⃣ 새 대화인 경우: 스트림이 끝난 뒤 단 한 번 ID 전환 */
+      /* 5. 새 대화인 경우: 스트림이 끝난 뒤 단 한 번 ID 전환 */
       let finalId = conversationId;
       if ((conversationId === "new" || !conversationId) && realId) {
         finalId = realId;
@@ -354,7 +368,7 @@ const ChatInterface = ({
         finalizeNewConversation?.(realId);
       }
 
-      /* 6️⃣ 미리보기·타이틀 업데이트 */
+      /* 6. 미리보기·타이틀 업데이트 */
       onUpdateConversation(finalId, {
         preview: content,
         lastUpdated: new Date(),
@@ -397,16 +411,9 @@ const ChatInterface = ({
                 role={message.role}
                 content={message.content}
                 timestamp={message.created_at}
+                streaming={message.streaming}
               />
             ))}
-
-            {isLoading && (
-              <ChatMessage
-                role={MessageRole.ASSISTANT}
-                content={currentAssistantMessage}
-                isStreaming={true}
-              />
-            )}
           </div>
           <div
             aria-hidden="true"
