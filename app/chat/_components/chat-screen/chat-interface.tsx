@@ -44,10 +44,10 @@ const ChatInterface = ({
   const [editingConversationTitle, setEditingConversationTitle] =
     useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [folders, setFolders] = useState<Folder[]>([]);
+  // const [folders, setFolders] = useState<Folder[]>([]);
+  // const [currentAssistantMessage, setCurrentAssistantMessage] = useState("");
   const [showFolderOptions, setShowFolderOptions] = useState(false);
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
-  const [currentAssistantMessage, setCurrentAssistantMessage] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const folderMenuRef = useRef<HTMLDivElement>(null);
@@ -63,17 +63,28 @@ const ChatInterface = ({
     }
   }, [initialMessage, isNewChat]);
 
+  /** 폴더 관련 내용 주석처리 **/
+
   // 폴더 목록 불러오기
-  const loadFolders = async () => {
-    try {
-      const response = await folderApi.getFolders();
-      if (response.status === "success" && Array.isArray(response.data)) {
-        setFolders(response.data);
-      }
-    } catch (error) {
-      console.error("폴더 목록 로드 오류:", error);
-    }
-  };
+  // const loadFolders = async () => {
+  //   try {
+  //     const response = await folderApi.getFolders();
+  //     if (response.status === "success" && Array.isArray(response.data)) {
+  //       setFolders(response.data);
+  //     }
+  //   } catch (error) {
+  //     console.error("폴더 목록 로드 오류:", error);
+  //   }
+  // };
+
+
+  // 초기 로드
+  // useEffect(() => {
+  //   // "new" 대화인 경우 폴더 목록 로드하지 않음
+  //   if (conversationId !== "new" && !isNewChat) {
+  //     loadFolders();
+  //   }
+  // }, [conversationId, isNewChat]);
 
   // 메시지 불러오기
   const loadConversationMessages = async (id: string) => {
@@ -150,13 +161,6 @@ const ChatInterface = ({
     }
   };
 
-  // 초기 로드
-  useEffect(() => {
-    // "new" 대화인 경우 폴더 목록 로드하지 않음
-    if (conversationId !== "new" && !isNewChat) {
-      loadFolders();
-    }
-  }, [conversationId, isNewChat]);
 
   // 대화 ID가 변경될 때마다 메시지 로드
   useEffect(() => {
@@ -384,12 +388,11 @@ const ChatInterface = ({
       ]);
     } finally {
       setIsLoading(false);
-      setCurrentAssistantMessage("");
+      // 폴더 관련 상태 주석처리
+      // setCurrentAssistantMessage("");
     }
   };
 
-  // 현재 폴더 찾기
-  const currentFolder = folders.find((folder) => folder.id === currentFolderId);
 
   return (
     <main className="relative h-[calc(100vh-67px)] overflow-hidden transition-all duration-350 mx-auto flex flex-col">
