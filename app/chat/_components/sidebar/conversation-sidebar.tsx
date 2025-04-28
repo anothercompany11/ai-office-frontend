@@ -156,8 +156,8 @@ export default function ConversationSidebar({
     >
       <div
         className={`${
-          isSidebarVisible ? "web:flex" : "web:hidden"
-        } hidden h-full flex-col w-[280px] min-w-[280px] flex-shrink-0 px-4`}
+          isSidebarVisible ? "translate-x-0" : "-translate-x-full"
+        } fixed inset-0 z-50 h-full flex-col w-[280px] flex-shrink-0 px-4 bg-white transition-transform duration-300 ease-in-out`}
       >
         <div className="flex items-center justify-between py-[21.5px]">
           <Image
@@ -172,8 +172,8 @@ export default function ConversationSidebar({
         </div>
         {/* Folders */}
         <aside className="flex-1 overflow-auto">
-          <header className="flex justify-between items-center px-2 py-[8.5px]">
-            <span className="text-xs">라이브러리</span>
+          <header className="flex justify-between items-center py-[8.5px]">
+            <span className="text-title-xs">라이브러리</span>
             <button
               onClick={(e) => {
                 e.stopPropagation();

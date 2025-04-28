@@ -174,8 +174,8 @@ export default function ConversationMobSidebar({
         </div>
         {/* Folders */}
         <aside className="flex-1 overflow-auto">
-          <header className="flex justify-between items-center px-2 py-[8.5px]">
-            <span className="text-xs">라이브러리</span>
+          <header className="flex justify-between items-center py-[8.5px]">
+            <span className="text-title-xs">라이브러리</span>
             <button
               onClick={(e) => {
                 e.stopPropagation();
