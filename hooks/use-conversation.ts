@@ -2,9 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { conversationApi } from "@/app/api";
-import { ClientConversation } from "@/app/api/dto";
-
-export type Conversation = ClientConversation;
+import { Conversation } from "@/app/chat/_components/types";
 
 /**
  * 채팅 리스트와 관련된 모든 상태·행동 관리 훅
@@ -125,7 +123,6 @@ export default function useConversations() {
     );
   };
 
-  /* ────────── expose ────────── */
   return {
     /* state */
     conversations,
