@@ -88,10 +88,7 @@ const ChatScreenHeader = () => {
               <CircleHelp className="size-6 text-primary" />
             </button>
           </DialogTrigger>
-          <DialogContent
-            xPosition="out"
-            className="mobile-guide-dialog-content max-w-[328px]"
-          >
+          <DialogContent xPosition="out" className="max-w-[328px]">
             <DialogHeader>
               <p className="text-title-s text-label-assistive">
                 AI오피스 프롬프트 가이드

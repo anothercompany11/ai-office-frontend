@@ -25,7 +25,7 @@ interface FolderListProps {
   onSelectConversation: (conversationId: string) => void;
   onRenameFolder: (folderId: string, newName: string) => void;
   onDeleteFolder: (folderId: string) => void;
-  // onCreateFolder: () => void;
+  onCreateFolder: () => void;
   onDeleteConversation?: (id: string) => void;
   activeId?: string | null;
 }
@@ -36,7 +36,7 @@ export default function FolderList({
   onSelectConversation,
   onRenameFolder,
   onDeleteFolder,
-  // onCreateFolder,
+  onCreateFolder,
   onDeleteConversation,
   activeId,
 }: FolderListProps) {

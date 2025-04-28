@@ -22,6 +22,7 @@ export const useGetCurrentDevice = () => {
 
   if (width < 600) {
     return "mob";
-  }
-  return "web";
+  } else if (width < 1025) {
+    return "tab";
+  } else return "web";
 };
