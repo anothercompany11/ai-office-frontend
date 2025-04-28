@@ -424,7 +424,7 @@ const ChatInterface = ({
       </div>
 
       {/* 채팅 입력 영역 - 고정 위치 */}
-      <div className="w-full sticky max-w-[680px] tab:px-4 web:px-0 bg-line-alternative mx-auto mt-5 bottom-0 z-10">
+      <div className="w-full sticky max-w-[680px] px-4 web:px-0 bg-line-alternative mx-auto mt-5 bottom-0 z-10">
         <div className="tab:pb-10 tab:px-0 web:pb-20 mx-auto">
           <ChatInput onSend={handleSendMessage} disabled={isLoading} />
         </div>

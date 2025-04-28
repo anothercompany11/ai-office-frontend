@@ -1,6 +1,3 @@
-import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
-import GuideBox from "../guide/guide-box";
-import SwipeGuideBox from "../guide/swipe-guide-box";
 import ChatInput from "./chat-input";
 
 const EmptyChatScreen = ({
@@ -8,13 +5,15 @@ const EmptyChatScreen = ({
 }: {
   createNewConversation: (firstMsg: string) => void;
 }) => {
-  const isMob = useGetCurrentDevice() === "mob";
   return (
-    <div className="h-full flex flex-col justify-between px-5 pt-10 tab:pt-20">
-      <div className=" h-full tab:block flex items-center">
-        {isMob ? <SwipeGuideBox /> : <GuideBox />}
+    <div className="h-full flex-col relative web:gap-10 flex items-center  justify-center px-5">
+      <div className="flex flex-col gap-2 text-center pb-[116px] web:pb-0">
+        <p className="text-title-s text-label-natural">AI 오피스</p>
+        <p className="text-[24px] text-label-strong font-hakgyo-ansim">
+          지금 어떤 생각을 하고 있으신가요?
+        </p>
       </div>
-      <div className="w-full sticky max-w-[680px] tab:px-4 web:px-0 bg-line-alternative mx-auto mt-5 bottom-0 z-10">
+      <div className="w-full web:mt-0 absolute web:relative pb-4 web:pb-0 max-w-[680px] px-4 web:px-0 bg-line-alternative mx-auto bottom-0 z-10">
         <div className="tab:pb-10 tab:px-0 web:pb-20 mx-auto">
           <ChatInput onSend={createNewConversation} />
         </div>

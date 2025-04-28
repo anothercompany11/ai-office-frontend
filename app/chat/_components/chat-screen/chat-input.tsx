@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUp, CircleArrowUp, Send, StopCircle } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface ChatInputProps {
@@ -35,32 +35,45 @@ const ChatInput = ({ onSend, disabled = false }: ChatInputProps) => {
     }
   };
 
+  const isDisabled = !message.trim() || disabled;
   return (
-    <div className="relative bg-white rounded-t-[20px] tab:rounded-[20px] shadow-[0_0_10px_rgba(0,0,0,0.05)]">
-      <form onSubmit={handleSubmit} className="flex relative">
-        <textarea
-          ref={textareaRef}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="무엇을 도와드릴까요?"
-          className="w-full resize-none text-body-2 focus-visible:outline-none py-6 px-6"
-          rows={1}
-          style={{ maxHeight: "200px" }}
-          disabled={disabled}
-        />
+    <div className="flex flex-col gap-3 web:gap-6">
+      <div className="relative bg-white rounded-lg tab:rounded-[20px] shadow-[0px_16px_14px_0px_rgba(0,0,0,0.1)]">
+        <form onSubmit={handleSubmit} className="flex relative">
+          <textarea
+            ref={textareaRef}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="무엇을 도와드릴까요?"
+            className="w-full resize-none text-body-2 focus-visible:outline-none py-6 px-6"
+            rows={1}
+            maxLength={150}
+            disabled={disabled}
+          />
 
-        <div className="absolute right-0 bottom-0 mr-[26px] mb-5 tab:mb-4">
-          <button
-            type="submit"
-            className="flex items-center justify-center rounded-full bg-component-alternative size-8 tab:size-10"
-            disabled={!message.trim() || disabled}
-          >
-            <ArrowUp className="size-6 text-white" />
-            <span className="sr-only">전송</span>
-          </button>
-        </div>
-      </form>
+          <div className="absolute right-0 bottom-0 mr-[26px] mb-5 tab:mb-4">
+            <button
+              type="submit"
+              className={`flex disabled:cursor-auto items-center justify-center rounded-full size-8 tab:size-10 ${
+                isDisabled ? "bg-component-alternative" : "bg-label-strong"
+              }`}
+              disabled={isDisabled}
+            >
+              <ArrowUp className="size-6 text-white" />
+              <span className="sr-only">전송</span>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div className="px-3 text-label-natural hidden tab:flex text-body-s justify-between">
+        <p>AI는 실수할 수 있습니다.</p>
+        <p>{`남은 횟수 : 0/5`}</p>
+      </div>
+      <div className="flex tab:hidden px-3 text-label-natural text-caption justify-between">
+        <p>AI는 실수할 수 있습니다.</p>
+        <p>{`남은 횟수 : 0/5`}</p>
+      </div>
     </div>
   );
 };

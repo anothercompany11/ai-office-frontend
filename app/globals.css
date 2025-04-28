@@ -101,6 +101,13 @@
     font-weight: 400;
   }
 
+  .text-title-s {
+    font-size: 14px;
+    line-height: 150%;
+    letter-spacing: 0%;
+    font-weight: 700;
+  }
+
   .text-subtitle-l {
     font-size: 18px;
     line-height: 150%;
@@ -187,6 +194,9 @@
   /* ========== Label Colors ========== */
   .text-label-strong {
     color: var(--label-strong);
+  }
+  .bg-label-strong {
+    background-color: var(--label-strong);
   }
   .text-label {
     color: var(--label);
