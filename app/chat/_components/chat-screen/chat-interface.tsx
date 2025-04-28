@@ -2,7 +2,7 @@
 
 import { conversationApi } from "@/app/api/conversation";
 import { ClientConversation, ClientMessage } from "@/app/api/dto/conversation";
-import { folderApi } from "@/app/api/folder";
+// import { folderApi } from "@/app/api/folder";
 import { MessageRole } from "@/types";
 import { useEffect, useRef, useState } from "react";
 import ChatInput from "./chat-input";
