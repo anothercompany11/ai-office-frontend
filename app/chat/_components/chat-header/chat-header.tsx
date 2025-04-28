@@ -21,7 +21,7 @@ interface Props {
 
 const ChatHeader = ({ isSidebarVisible, setIsSidebarVisible }: Props) => {
   return (
-    <div className="py-5 px-8 flex justify-between items-center">
+    <div className="px-4 py-3 tab:py-5 tab:px-8 flex justify-between items-center">
       <div className="flex items-center">
         <div className="hidden web:block">
           {!isSidebarVisible && (
