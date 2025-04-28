@@ -37,7 +37,7 @@ export const conversationApi = {
   // 대화 생성
   async createConversation(
     title: string = "새 대화",
-    folderId?: string
+    folderId?: string,
   ): Promise<ApiResponse<Conversation>> {
     try {
       const request: CreateConversationRequest = { title };
@@ -47,7 +47,7 @@ export const conversationApi = {
 
       return await post<Conversation, CreateConversationRequest>(
         "/conversations",
-        request
+        request,
       );
     } catch (error) {
       console.error("대화 생성 오류:", error);
@@ -58,7 +58,7 @@ export const conversationApi = {
   // 대화 정보 업데이트
   async updateConversation(
     id: string,
-    titleOrData: string | UpdateConversationRequest
+    titleOrData: string | UpdateConversationRequest,
   ): Promise<ApiResponse<Conversation>> {
     try {
       let updateData: UpdateConversationRequest;
@@ -71,7 +71,7 @@ export const conversationApi = {
 
       return await put<Conversation, UpdateConversationRequest>(
         `/conversations/${id}`,
-        updateData
+        updateData,
       );
     } catch (error) {
       console.error("대화 업데이트 오류:", error);
@@ -92,7 +92,7 @@ export const conversationApi = {
   // 메시지 전송
   async sendMessage(
     content: string,
-    conversationId?: string
+    conversationId?: string,
   ): Promise<ApiResponse<MessageResponse>> {
     try {
       const request: SendMessageRequest = {
@@ -114,7 +114,7 @@ export const conversationApi = {
   // 스트리밍 메시지 전송
   async sendStreamingMessage(
     content: string,
-    conversationId?: string
+    conversationId?: string,
   ): Promise<ReadableStream<Uint8Array> | null> {
     try {
       const request: SendMessageRequest = {
@@ -133,7 +133,7 @@ export const conversationApi = {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
           },
           body: JSON.stringify(request),
-        }
+        },
       );
 
       if (!response.ok) {

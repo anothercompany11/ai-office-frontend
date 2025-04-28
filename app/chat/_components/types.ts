@@ -2,12 +2,13 @@
 export interface Conversation {
   id: string;
   title: string;
-  lastMessage?: string;
-  timestamp?: string;
   preview?: string;
+  created_at?: string;
+  updated_at?: string;
+  folder_id?: string;
+
   lastUpdated?: Date;
-  folderId?: string;
-  folder_id?: string; // API와의 호환성을 위한 속성
+  lastMessage?: string;
 }
 
 export interface Folder {

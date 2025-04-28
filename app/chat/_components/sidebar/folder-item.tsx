@@ -14,8 +14,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import RenameFolderModal from "./_components/rename-folder-modal";
-import TwoButtonModal from "./_components/two-button-modal";
+import RenameFolderModal from "./rename-folder-modal";
+import TwoButtonModal from "./two-button-modal";
 
 // 폴더 내부 대화 타입
 interface Conversation {

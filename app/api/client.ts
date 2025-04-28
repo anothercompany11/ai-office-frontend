@@ -72,7 +72,7 @@ export const CSRFTokenService = {
 // API 요청 헤더 생성
 export const createHeaders = (
   needsAuth: boolean = true,
-  contentType: boolean = true
+  contentType: boolean = true,
 ): HeadersInit => {
   const headers: HeadersInit = {};
 
@@ -147,7 +147,7 @@ export const refreshToken = async (): Promise<boolean> => {
 // API 요청 기본 함수
 export async function apiRequest<T = any>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
   try {
     // 쿠키 전송을 위한 credentials 추가
@@ -267,7 +267,7 @@ export async function apiRequest<T = any>(
 
 export async function get<T = any>(
   endpoint: string,
-  needsAuth: boolean = true
+  needsAuth: boolean = true,
 ): Promise<ApiResponse<T>> {
   return apiRequest<T>(endpoint, {
     method: "GET",
@@ -280,7 +280,7 @@ export async function post<T = any, U = any>(
   endpoint: string,
   body?: U,
   needsAuth: boolean = true,
-  additionalHeaders: HeadersInit = {}
+  additionalHeaders: HeadersInit = {},
 ): Promise<ApiResponse<T>> {
   const headers = {
     ...createHeaders(needsAuth),
@@ -298,7 +298,7 @@ export async function post<T = any, U = any>(
 export async function put<T = any, U = any>(
   endpoint: string,
   body?: U,
-  needsAuth: boolean = true
+  needsAuth: boolean = true,
 ): Promise<ApiResponse<T>> {
   return apiRequest<T>(endpoint, {
     method: "PUT",
@@ -310,7 +310,7 @@ export async function put<T = any, U = any>(
 
 export async function del<T = any>(
   endpoint: string,
-  needsAuth: boolean = true
+  needsAuth: boolean = true,
 ): Promise<ApiResponse<T>> {
   return apiRequest<T>(endpoint, {
     method: "DELETE",

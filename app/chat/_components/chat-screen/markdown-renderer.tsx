@@ -1,4 +1,6 @@
-import { cn } from "@/app/lib/utils";
+import { cn, formatLatex } from "@/app/lib/utils";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import { Check, Copy } from "lucide-react";
 import React, { useState } from "react";
 import type { Components } from "react-markdown";
@@ -235,7 +237,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
   return (
     <div className="markdown prose dark:prose-invert w-full break-words dark">
-      <ReactMarkdown
+      {/* <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[
           rehypeRaw,
@@ -248,6 +250,21 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         skipHtml={false}
       >
         {content}
+      </ReactMarkdown> */}
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[
+          rehypeRaw,
+          [
+            rehypeExternalLinks,
+            { target: "_blank", rel: ["noopener", "noreferrer"] },
+          ],
+          rehypeKatex,
+        ]}
+        components={components}
+        skipHtml={false}
+      >
+        {formatLatex(content)}
       </ReactMarkdown>
     </div>
   );

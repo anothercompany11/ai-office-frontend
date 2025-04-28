@@ -8,7 +8,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useState } from "react";
-import TwoButtonModal from "./_components/two-button-modal";
+import TwoButtonModal from "./two-button-modal";
 
 interface Props {
   conversation: Conversation;

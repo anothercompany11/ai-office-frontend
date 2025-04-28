@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "katex/dist/katex.min.css";
 
 :root {
   --font-pretendard: "Pretendard", sans-serif;
@@ -328,16 +329,4 @@ input:-webkit-autofill:active {
   width: 21px !important;
   height: 8px !important;
   border-radius: 50px !important;
-}
-
-/* Mobile Guide Dialog Swiper Styles */
-.mobile-guide-dialog-content .mobile-guide-swiper {
-  padding-bottom: 45px;
-}
-
-.mobile-guide-dialog-content
-  .mobile-guide-swiper
-  .swiper-pagination-bullet-active
-  .mobile-guide-dialog-content {
-  overflow: visible;
 }

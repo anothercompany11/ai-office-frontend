@@ -38,13 +38,13 @@ export const folderApi = {
   // 폴더 생성
   async createFolder(
     name: string,
-    is_default: boolean = false
+    is_default: boolean = false,
   ): Promise<ApiResponse<Folder>> {
     try {
       const request: CreateFolderRequest = { name, is_default };
       const response = await post<Folder, CreateFolderRequest>(
         "/folders",
-        request
+        request,
       );
       console.log("폴더 생성 응답:", response); // 디버깅용 로그
       return response;
@@ -58,7 +58,7 @@ export const folderApi = {
   async updateFolder(
     id: string,
     name: string,
-    is_default?: boolean
+    is_default?: boolean,
   ): Promise<ApiResponse<Folder>> {
     try {
       const updateData: UpdateFolderRequest = { name };
@@ -68,7 +68,7 @@ export const folderApi = {
 
       return await put<Folder, UpdateFolderRequest>(
         `/folders/${id}`,
-        updateData
+        updateData,
       );
     } catch (error) {
       console.error("폴더 업데이트 오류:", error);

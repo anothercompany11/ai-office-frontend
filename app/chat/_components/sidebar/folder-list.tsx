@@ -1,5 +1,6 @@
 import { useState } from "react";
 import FolderItem from "./folder-item";
+import { FolderPlusIcon } from "lucide-react";
 
 // 폴더 관련 타입 정의
 interface Conversation {
@@ -25,7 +26,7 @@ interface FolderListProps {
   onSelectConversation: (conversationId: string) => void;
   onRenameFolder: (folderId: string, newName: string) => void;
   onDeleteFolder: (folderId: string) => void;
-  // onCreateFolder: () => void;
+  onCreateFolder: () => void;
   onDeleteConversation?: (id: string) => void;
   activeId?: string | null;
 }
@@ -36,7 +37,7 @@ export default function FolderList({
   onSelectConversation,
   onRenameFolder,
   onDeleteFolder,
-  // onCreateFolder,
+  onCreateFolder,
   onDeleteConversation,
   activeId,
 }: FolderListProps) {
@@ -74,9 +75,13 @@ export default function FolderList({
   return (
     <ul aria-labelledby="folders-heading" className="flex flex-col">
       {folders.length === 0 ? (
-        <div className="px-3 py-2 text-sm text-gray-500 italic">
-          프로젝트가 없습니다
-        </div>
+        <button
+          onClick={onCreateFolder}
+          className="py-2 tab:py-3 px-2 items-center flex gap-2 text-body-s"
+        >
+          <FolderPlusIcon size={18} />
+          <span>새 폴더</span>
+        </button>
       ) : (
         folders.map((folder) => (
           <FolderItem

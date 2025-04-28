@@ -21,7 +21,7 @@ export const authApi = {
       const response = await post<TokenResponse, LoginRequest>(
         "/auth/login",
         { code },
-        false
+        false,
       );
 
       if (response.status === "success" && response.data?.access_token) {
@@ -88,7 +88,7 @@ export const authApi = {
       const refreshRequest: RefreshTokenRequest = { csrf_token: csrfToken };
       const response = await post<TokenResponse, RefreshTokenRequest>(
         "/auth/refresh-token",
-        refreshRequest
+        refreshRequest,
       );
 
       if (response.status === "success" && response.data?.access_token) {
@@ -148,7 +148,7 @@ export const authApi = {
           .map(function (c) {
             return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
           })
-          .join("")
+          .join(""),
       );
 
       return JSON.parse(jsonPayload) as UserTokenData;

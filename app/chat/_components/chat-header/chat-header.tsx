@@ -72,7 +72,7 @@ const ChatHeader = ({ isSidebarVisible, setIsSidebarVisible }: Props) => {
               <CircleHelp className="size-6 text-primary" />
             </button>
           </DialogTrigger>
-          <DialogContent className="mobile-guide-dialog-content">
+          <DialogContent>
             <DialogHeader>
               <p className="text-title-s text-label-assistive">
                 AI오피스 프롬프트 가이드{" "}
