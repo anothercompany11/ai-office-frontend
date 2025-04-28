@@ -12,16 +12,12 @@ import TwoButtonModal from "./two-button-modal";
 
 interface Props {
   conversation: Conversation;
-  isActive: boolean;
-  isCurrent: boolean;
   onSelect: (id: string) => void;
   onDelete: (e: React.MouseEvent, id: string) => void;
 }
 
 export default function ConversationItem({
   conversation,
-  isActive,
-  isCurrent,
   onSelect,
   onDelete,
 }: Props) {
@@ -58,12 +54,7 @@ export default function ConversationItem({
       >
         <div
           className="flex items-center justify-between px-2 cursor-pointer"
-          onClick={(e) => {
-            if ((e.target as HTMLElement).closest("button")) {
-              return;
-            }
-            onSelect(conversation.id);
-          }}
+          onClick={() => onSelect(conversation.id)}
         >
           <span
             className={`grow overflow-hidden whitespace-nowrap text-body-s text-label-strong py-3`}

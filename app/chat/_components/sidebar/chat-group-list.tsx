@@ -22,15 +22,12 @@ export const groupTitles: Record<TimeGroup, string> = {
 interface Props {
   groups: GroupedConversations; // useGroupedConversations 결과
   currentConversationId: string | null; // 현재 열린 대화
-  activeId: string | null; // 드래그 중인 ID
   onSelect: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
 export default function ChatGroupList({
   groups,
-  currentConversationId,
-  activeId,
   onSelect,
   onDelete,
 }: Props) {
@@ -50,8 +47,6 @@ export default function ChatGroupList({
                   <ConversationItem
                     key={c.id}
                     conversation={c}
-                    isActive={activeId === c.id}
-                    isCurrent={currentConversationId === c.id}
                     onSelect={onSelect}
                     onDelete={(e) => {
                       onDelete(c.id);

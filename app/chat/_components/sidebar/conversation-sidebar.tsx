@@ -55,6 +55,14 @@ export default function ConversationSidebar({
     if (isMobile) setIsSidebarVisible(false);
   };
 
+  // 사이드바 닫기 핸들러
+  const handleCloseSidebar = () => setIsSidebarVisible(false)
+
+  // 대화방 선택 핸들러
+  const handleSelectChat = (id: string) => {
+    onSelectConversation(id);
+    isMobile && handleCloseSidebar();
+  }
   return (
     <DndContext
       sensors={sensors}
@@ -84,8 +92,7 @@ export default function ConversationSidebar({
         <ChatGroupList
           groups={grouped}
           currentConversationId={currentConversationId ?? null}
-          activeId={activeId}
-          onSelect={onSelectConversation}
+          onSelect={handleSelectChat}
           onDelete={onDeleteConversation}
         />
       </SidebarLayout>
@@ -100,7 +107,7 @@ export default function ConversationSidebar({
       {isMobile && isSidebarVisible && (
         <div
           className="fixed inset-0 z-40 bg-black/40 transition-opacity duration-300"
-          onClick={() => setIsSidebarVisible(false)}
+          onClick={handleCloseSidebar}
         />
       )}
     </DndContext>
