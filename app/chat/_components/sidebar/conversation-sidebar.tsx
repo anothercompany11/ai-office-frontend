@@ -1,38 +1,21 @@
 "use client";
 
-import {
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
-import { ChevronsLeft, Plus } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { folderApi } from "@/app/api";
-import { conversationApi } from "@/app/api/conversation";
-import { Conversation, Folder, TimeGroup } from "../types";
-import FolderList from "./folder-list";
-import ConversationsArea from "./conversation-area";
-import ConversationItem from "./conversation-item";
-import DragOverlayContent from "./drag-overlay-content";
-import { ConversationFolder } from "./folder-item";
-import CreateFolderModal from "./_components/create-folder-modal";
-import { useGroupedConversations } from "@/hooks/use-groupped-conversation";
-import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
+import { useState } from "react";
 
-const groupTitles: Record<TimeGroup, string> = {
-  today: "오늘",
-  yesterday: "어제",
-  previous7Days: "이전 7일",
-  previous30Days: "이전 30일",
-  older: "이전 기록",
-};
+import { useGroupedConversations } from "@/hooks/use-groupped-conversation";
+import DragOverlayContent from "./drag-overlay-content";
+import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
+import useFolders from "@/hooks/use-folder";
+import { useDnDSensors, useDragHighlight } from "@/hooks/use-dnd";
+import SidebarLayout from "./sidebar-layout";
+import FolderHeader from "../folder/folder-header";
+import FolderList from "./folder-list";
+import SidebarChatHeader from "./side-bar-chat-header";
+import CreateFolderModal from "./create-folder-modal";
+import ChatGroupList from "./chat-group-list";
+import { Conversation } from "../types";
 
 interface Props {
   conversations: Conversation[];
@@ -54,190 +37,71 @@ export default function ConversationSidebar({
   setIsSidebarVisible,
 }: Props) {
   const isMobile = useGetCurrentDevice() !== "web";
+  const { folders, create, rename, remove } = useFolders(conversations);
+  const grouped = useGroupedConversations(
+    conversations.filter((c) => !c.folder_id),
+  );
 
-  const [folders, setFolders] = useState<ConversationFolder[]>([]);
-  const [convState, setConvState] = useState<Conversation[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  // DnD 센서와 훅
+  const sensors = useDnDSensors();
+  const { activeId, onDragStart, onDragEnd } = useDragHighlight();
+
+  // 새 대화 생성 모달 노출 여부
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // DnD 센서
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: { delay: 100, tolerance: 5 },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 250, tolerance: 5 },
-    }),
-  );
-
-  useEffect(() => {
-    setConvState(conversations.filter((c) => c.id !== "new"));
-  }, [conversations]);
-
-  useEffect(() => {
-    loadFolders();
-  }, [convState]);
-
-  const loadFolders = async () => {
-    const res = await folderApi.getFolders();
-    if (res.status !== "success" || !res.data) return;
-    const enhanced = res.data.map((f: Folder) => ({
-      ...f,
-      conversations: convState
-        .filter((c) => c.folder_id === f.id)
-        .map(({ id, title, preview }) => ({ id, title, preview })),
-    }));
-    setFolders(enhanced);
-  };
-
-  const grouped = useGroupedConversations(
-    convState.filter((c) => !c.folder_id),
-  );
-
-  const handleDragStart = ({ active }: DragStartEvent) => {
-    setActiveId(active.id as string);
-    document.body.style.overflow = "hidden";
-  };
-
-  const handleDragEnd = async ({ active, over }: DragEndEvent) => {
-    document.body.style.overflow = "";
-    if (!active || !over) return setActiveId(null);
-
-    const dragId = active.id as string;
-    const overId = over.id as string;
-    const dragged = convState.find((c) => c.id === dragId);
-    if (!dragged) return setActiveId(null);
-
-    const fromFolder = dragged.folder_id;
-    if (overId.startsWith("folder-")) {
-      const toFolder = overId.replace("folder-", "");
-      if (fromFolder === toFolder) return setActiveId(null);
-      await conversationApi.updateConversation(dragId, { folder_id: toFolder });
-      setConvState((prev) =>
-        prev.map((c) => (c.id === dragId ? { ...c, folder_id: toFolder } : c)),
-      );
-    } else if (overId === "conversations-area" && fromFolder) {
-      await conversationApi.updateConversation(dragId, { folder_id: null });
-      setConvState((prev) =>
-        prev.map((c) => (c.id === dragId ? { ...c, folder_id: undefined } : c)),
-      );
-    }
-    setActiveId(null);
-  };
-
-  // 폴더 생성
-  const createFolder = async (name: string) => {
-    if (!name.trim()) return;
-    await folderApi.createFolder(name.trim());
-    await loadFolders();
+  // 새 대화 생성 핸들러
+  const handleNewChat = () => {
+    onNewConversation();
+    if (isMobile) setIsSidebarVisible(false);
   };
 
   return (
     <DndContext
       sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
       modifiers={[restrictToWindowEdges]}
     >
-      {/* Sidebar */}
-      <div
-        className={`${
-          isSidebarVisible ? "translate-x-0" : "-translate-x-full"
-        } fixed inset-0 z-50 h-full flex flex-col w-[280px] px-4 bg-white transition-transform duration-300 ease-in-out`}
+      <SidebarLayout
+        isVisible={isSidebarVisible}
+        onClose={() => setIsSidebarVisible(false)}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between py-[21.5px]">
-          <Image src="/svg/logo.svg" alt="logo" width={97.45} height={18.21} />
-          <button onClick={() => setIsSidebarVisible(false)}>
-            <ChevronsLeft size={24} className="text-component" />
-          </button>
-        </div>
+        <FolderHeader onNew={() => setShowCreateModal(true)} />
+        <FolderList
+          folders={folders}
+          currentConversationId={currentConversationId ?? null}
+          activeId={activeId}
+          onSelectConversation={onSelectConversation}
+          onRenameFolder={rename}
+          onDeleteFolder={remove}
+          onCreateFolder={() => setShowCreateModal(true)}
+          onDeleteConversation={onDeleteConversation}
+        />
 
-        {/* Content */}
-        <aside className="flex-1 overflow-auto">
-          {/* ---- Folders ---- */}
-          <header className="flex justify-between items-center py-[8.5px]">
-            <span className="text-title-xs">라이브러리</span>
-            <button onClick={() => setShowCreateModal(true)}>
-              <Plus size={14} />
-            </button>
-          </header>
+        <div className="border-t border-line my-4" />
 
-          <FolderList
-            folders={folders}
-            currentConversationId={currentConversationId ?? null}
-            onCreateFolder={() => setShowCreateModal(true)}
-            onSelectConversation={onSelectConversation}
-            onRenameFolder={(id, n) =>
-              folderApi.updateFolder(id, n).then(loadFolders)
-            }
-            onDeleteFolder={(id) =>
-              folderApi
-                .deleteFolder(id)
-                .then(() =>
-                  setFolders((prev) => prev.filter((f) => f.id !== id)),
-                )
-            }
-            onDeleteConversation={onDeleteConversation}
-            activeId={activeId}
-          />
-
-          <div className="border-t border-line my-4" />
-
-          {/* ---- Conversations ---- */}
-          <header className="flex justify-between items-center py-[8.5px]">
-            <span className="text-title-xs">지난 대화</span>
-            <button onClick={onNewConversation}>
-              <Plus size={14} />
-            </button>
-          </header>
-
-          <ConversationsArea id="conversations-area">
-            {Object.entries(grouped).map(
-              ([k, v]) =>
-                v.length > 0 && (
-                  <section
-                    key={k}
-                    className="mt-5 first:mt-0 last:mb-5 text-body-s"
-                  >
-                    <h3 className="pb-1">{groupTitles[k as TimeGroup]}</h3>
-                    <ol>
-                      {v.map((c: Conversation) => (
-                        <ConversationItem
-                          key={c.id}
-                          conversation={c}
-                          isActive={activeId === c.id}
-                          isCurrent={currentConversationId === c.id}
-                          onSelect={() => {
-                            onSelectConversation(c.id);
-                            if (isMobile) setIsSidebarVisible(false);
-                          }}
-                          onDelete={(e) => {
-                            onDeleteConversation(c.id);
-                          }}
-                        />
-                      ))}
-                    </ol>
-                  </section>
-                ),
-            )}
-          </ConversationsArea>
-        </aside>
-      </div>
+        <SidebarChatHeader onNew={handleNewChat} />
+        <ChatGroupList
+          groups={grouped}
+          currentConversationId={currentConversationId ?? null}
+          activeId={activeId}
+          onSelect={onSelectConversation}
+          onDelete={onDeleteConversation}
+        />
+      </SidebarLayout>
 
       <CreateFolderModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onConfirm={(name) => {
-          createFolder(name);
+          create(name);
           setShowCreateModal(false);
         }}
       />
 
-      {/* DnD overlay */}
       <DragOverlay>
         {activeId && (
-          <DragOverlayContent id={activeId} conversations={convState} />
+          <DragOverlayContent id={activeId} conversations={conversations} />
         )}
       </DragOverlay>
 
