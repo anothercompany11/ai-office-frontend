@@ -43,7 +43,7 @@ export default function ChatGroupList({
               key={key}
               className="mt-5 first:mt-0 last:mb-5 text-body-s"
             >
-              <h3 className="pb-1">{groupTitles[key]}</h3>
+              <h3 className="pb-1 text-caption">{groupTitles[key]}</h3>
 
               <ol>
                 {list.map((c) => (
