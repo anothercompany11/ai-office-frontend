@@ -3,15 +3,14 @@
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { useState } from "react";
-
 import { useGroupedConversations } from "@/hooks/use-groupped-conversation";
 import DragOverlayContent from "./drag-overlay-content";
 import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
 import useFolders from "@/hooks/use-folder";
 import { useDnDSensors, useDragHighlight } from "@/hooks/use-dnd";
 import SidebarLayout from "./sidebar-layout";
-import FolderHeader from "../folder/folder-header";
-import FolderList from "./folder-list";
+// import FolderHeader from "../folder/folder-header";
+// import FolderList from "./folder-list";
 import SidebarChatHeader from "./side-bar-chat-header";
 import CreateFolderModal from "./create-folder-modal";
 import ChatGroupList from "./chat-group-list";
@@ -66,7 +65,7 @@ export default function ConversationSidebar({
         isVisible={isSidebarVisible}
         onClose={() => setIsSidebarVisible(false)}
       >
-        <FolderHeader onNew={() => setShowCreateModal(true)} />
+        {/* <FolderHeader onNew={() => setShowCreateModal(true)} />
         <FolderList
           folders={folders}
           currentConversationId={currentConversationId ?? null}
@@ -78,7 +77,7 @@ export default function ConversationSidebar({
           onDeleteConversation={onDeleteConversation}
         />
 
-        <div className="border-t border-line my-4" />
+        <div className="border-t border-line my-4" /> */}
 
         <SidebarChatHeader onNew={handleNewChat} />
         <ChatGroupList
