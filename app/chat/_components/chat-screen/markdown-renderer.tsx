@@ -1,3 +1,4 @@
+import { cn } from "@/app/lib/utils";
 import { Check, Copy } from "lucide-react";
 import React, { useState } from "react";
 import type { Components } from "react-markdown";
@@ -10,6 +11,7 @@ import remarkGfm from "remark-gfm";
 
 interface MarkdownRendererProps {
   content: string;
+  isMob?: boolean;
 }
 
 // code 컴포넌트를 위한 타입 정의
@@ -55,7 +57,10 @@ const CopyButton = ({ code }: { code: string }) => {
   );
 };
 
-const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
+const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
+  content,
+  isMob,
+}) => {
   const components: Components = {
     h1: ({ node, ...props }: any) => (
       <h1 className="text-2xl font-bold mt-6 mb-4" {...props} />
@@ -67,10 +72,16 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       <h3 className="text-lg font-bold mt-4 mb-2" {...props} />
     ),
     h4: ({ node, ...props }: any) => (
-      <h4 className="text-base font-bold mt-3 mb-2" {...props} />
+      <h4 className="font-bold mt-3 mb-2" {...props} />
     ),
     p: ({ node, ...props }: any) => (
-      <p className="my-2 text-base leading-relaxed" {...props} />
+      <p
+        className={cn(
+          `my-2 text-body-s web:text-body-m leading-relaxed`,
+          isMob ? "text-body-s" : "text-body-m",
+        )}
+        {...props}
+      />
     ),
     ul: ({ node, ...props }: any) => (
       <ul className="list-disc ml-6 my-2" {...props} />
@@ -78,7 +89,15 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     ol: ({ node, ...props }: any) => (
       <ol className="list-decimal ml-6 my-2" {...props} />
     ),
-    li: ({ node, ...props }: any) => <li className="my-1" {...props} />,
+    li: ({ node, ...props }: any) => (
+      <li
+        className={cn(
+          `my-1 text-body-s web:text-body-m`,
+          isMob ? "text-body-s" : "text-body-m",
+        )}
+        {...props}
+      />
+    ),
     blockquote: ({ node, ...props }: any) => (
       <blockquote
         className="border-l-4 border-gray-300 pl-4 italic my-3"

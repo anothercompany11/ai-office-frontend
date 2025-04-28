@@ -16,14 +16,19 @@ import { useEffect, useRef, useState } from "react";
 import { folderApi } from "@/app/api";
 import { conversationApi } from "@/app/api/conversation";
 import Image from "next/image";
-import { Conversation, TimeGroup } from "../types";
+import {
+  Conversation,
+  Folder,
+  GroupedConversations,
+  TimeGroup,
+} from "../types";
+
 import FolderList from "./folder-list";
 import { useGroupedConversations } from "@/hooks/use-groupped-conversation";
 import ConversationsArea from "./conversation-area";
 import ConversationItem from "./conversation-item";
 import DragOverlayContent from "./drag-overlay-content";
 import { ConversationFolder } from "./folder-item";
-import CreateFolderModal from "./_components/create-folder-modal";
 
 const groupTitles: Record<TimeGroup, string> = {
   today: "오늘",
@@ -43,7 +48,7 @@ interface Props {
   setIsSidebarVisible: (visible: boolean) => void;
 }
 
-export default function ConversationSidebar({
+export default function ConversationMobSidebar({
   conversations,
   currentConversationId,
   onSelectConversation,
@@ -55,10 +60,9 @@ export default function ConversationSidebar({
   /* ---------- state & ref ---------- */
   const router = useRouter();
   const [folders, setFolders] = useState<ConversationFolder[]>([]);
-  // const [isCreatingFolder, setIsCreatingFolder] = useState(false);
-  // const [newFolderName, setNewFolderName] = useState("");
-  // const newFolderInputRef = useRef<HTMLInputElement>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+  const newFolderInputRef = useRef<HTMLInputElement>(null);
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [convState, setConvState] = useState<Conversation[]>([]);
@@ -150,14 +154,12 @@ export default function ConversationSidebar({
       sensors={sensors}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      // onDragCancel={handleDragCancel}
-      // onDragOver={handleDragOver}
       modifiers={[restrictToWindowEdges]}
     >
       <div
         className={`${
-          isSidebarVisible ? "web:flex" : "web:hidden"
-        } hidden h-full flex-col w-[280px] min-w-[280px] flex-shrink-0 px-4`}
+          isSidebarVisible ? "translate-x-0" : "-translate-x-full"
+        } fixed inset-0 z-50 h-full flex-col w-[280px] min-w-[280px] flex-shrink-0 px-4 bg-white transition-transform duration-300 ease-in-out`}
       >
         <div className="flex items-center justify-between py-[21.5px]">
           <Image
@@ -177,9 +179,9 @@ export default function ConversationSidebar({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setShowCreateModal(true);
+                setIsCreatingFolder(true);
+                setTimeout(() => newFolderInputRef.current?.focus());
               }}
-              className=""
             >
               <Plus size={14} />
             </button>
@@ -203,8 +205,26 @@ export default function ConversationSidebar({
             />
           )}
 
+          {isCreatingFolder && (
+            <div className="px-3 py-2 flex items-center">
+              <input
+                ref={newFolderInputRef}
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    folderApi.createFolder(newFolderName).then(loadFolders);
+                    setIsCreatingFolder(false);
+                    setNewFolderName("");
+                  }
+                  if (e.key === "Escape") setIsCreatingFolder(false);
+                }}
+                className="flex-1 px-2 py-1.5 border rounded text-sm"
+                placeholder="프로젝트 이름"
+              />
+            </div>
+          )}
           <div className="border-t border-line my-4" />
-          {/* Conversations */}
           <header className="flex justify-between items-center py-[8.5px]">
             <span className="text-title-xs">지난 대화</span>
             <button onClick={onNewConversation}>
@@ -243,20 +263,19 @@ export default function ConversationSidebar({
           )}
         </aside>
       </div>
-      <CreateFolderModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onConfirm={(name) => {
-          folderApi.createFolder(name).then(loadFolders);
-          setShowCreateModal(false);
-        }}
-      />
 
       <DragOverlay>
         {activeId && (
           <DragOverlayContent id={activeId} conversations={convState} />
         )}
       </DragOverlay>
+
+      {isSidebarVisible && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 transition-opacity duration-300"
+          onClick={() => setIsSidebarVisible(false)}
+        />
+      )}
     </DndContext>
   );
 }

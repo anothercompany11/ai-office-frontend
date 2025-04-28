@@ -1,15 +1,21 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Check,
-  FolderIcon,
-  FolderOpen,
+  FolderClosed,
   MoreHorizontal,
   Pencil,
   Trash2,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import RenameFolderModal from "./_components/rename-folder-modal";
+import TwoButtonModal from "./_components/two-button-modal";
 
 // 폴더 내부 대화 타입
 interface Conversation {
@@ -56,6 +62,7 @@ function FolderConversationItem({
   onSelect: (id: string) => void;
   onDelete: (e: React.MouseEvent, id: string) => void;
 }) {
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: conversation.id,
   });
@@ -81,25 +88,45 @@ function FolderConversationItem({
       style={style}
       {...listeners}
       {...attributes}
-      className={`flex items-center justify-between px-2 py-1 text-sm rounded-lg cursor-pointer hover:bg-gray-50 group ${
-        isCurrentConversation ? "text-blue-600 font-medium" : "text-gray-700"
-      } ${isActive ? "opacity-90" : ""}`}
+      className={`flex items-center justify-between px-2 text-body-s rounded-lg cursor-pointer hover:bg-[#EEEFF1] group ${
+        isPopoverOpen ? "bg-[#EEEFF1]" : ""
+      }`}
       onClick={(e) => {
+        if ((e.target as HTMLElement).closest("button")) {
+          return;
+        }
         e.stopPropagation();
         onSelect(conversation.id);
       }}
     >
-      <span className="truncate">{conversation.title}</span>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete(e, conversation.id);
-        }}
-        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-gray-500 hover:text-red-600 rounded-full hover:bg-gray-100"
-        title="대화 삭제"
-      >
-        <Trash2 size={12} />
-      </button>
+      <span className="py-3 truncate">{conversation.title}</span>
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <PopoverTrigger asChild>
+          <button
+            className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 text-label-alternative ${
+              isPopoverOpen ? "opacity-100" : ""
+            }`}
+            aria-label="대화 메뉴"
+          >
+            <MoreHorizontal size={18} />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="absolute w-[140px] p-2 space-y-3 border border-line bg-white rounded-lg top-[-25px] left-[-10px]">
+          <button
+            onClick={(e) => {
+              if ((e.target as HTMLElement).closest("button")) {
+                return;
+              }
+              e.stopPropagation();
+              onDelete(e, conversation.id);
+            }}
+            className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
+          >
+            <span className="text-body-s text-status-error">삭제하기</span>
+            <Trash2 size={18} className="text-status-error" />
+          </button>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
@@ -116,8 +143,11 @@ export default function FolderItem({
   activeId,
 }: FolderItemProps) {
   const [isRenaming, setIsRenaming] = useState(false);
+  const [showRenameModal, setShowRenameModal] = useState(false); // 이름 변경 모달 노출 여부
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // 삭제 모달 노출 여부
   const [newName, setNewName] = useState(folder.name);
   const [showMenu, setShowMenu] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const renameInputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -159,17 +189,16 @@ export default function FolderItem({
     setIsRenaming(false);
   };
 
+  // 폴더 삭제 핸들러
   const handleDeleteFolder = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm("이 프로젝트를 삭제하시겠습니까?")) {
-      onDeleteFolder(folder.id);
-    }
     setShowMenu(false);
+    setShowDeleteModal(true);
   };
 
   const handleStartRenaming = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsRenaming(true);
+    setShowRenameModal(true);
     setShowMenu(false);
   };
 
@@ -190,23 +219,24 @@ export default function FolderItem({
   };
 
   return (
-    <div className="mb-2">
+    <div>
       <div
         ref={setNodeRef}
-        className={`flex items-center px-2 py-1 cursor-pointer rounded-lg hover:bg-gray-50 group ${
-          isOver ? "bg-gray-100 border border-dashed border-gray-400" : ""
+        className={`flex items-center px-[13.5px] cursor-pointer rounded-lg hover:bg-[#F9FAFA] group ${
+          isPopoverOpen ? "bg-[#F9FAFA]" : ""
+        } ${
+          isOver
+            ? "bg-background-alternative border border-dashed border-gray-400"
+            : ""
         }`}
         onClick={() => toggleFolder(folder.id)}
       >
-        <div className="flex items-center gap-1 flex-grow overflow-hidden">
-          {isExpanded ? (
-            <FolderOpen size={16} className="text-gray-500" />
-          ) : (
-            <FolderIcon size={16} className="text-gray-500" />
-          )}
+        <div className="flex items-center gap-[9px] flex-grow overflow-hidden py-3">
+          <FolderClosed size={16} />
+
           {isRenaming ? (
             <div
-              className="flex-grow px-1"
+              className="flex-grow px-1 "
               onClick={(e) => e.stopPropagation()}
             >
               <input
@@ -243,7 +273,7 @@ export default function FolderItem({
               </div>
             </div>
           ) : (
-            <span className="ml-1 text-sm text-gray-700 truncate">
+            <span className="text-body-s text-label-strong truncate">
               {folder.name}
               {folder.is_default && (
                 <span className="ml-1 text-xs text-gray-500">(기본)</span>
@@ -253,78 +283,98 @@ export default function FolderItem({
         </div>
         {!isRenaming && (
           <div className="relative" ref={menuRef}>
-            <button
-              onClick={toggleMenu}
-              className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-              title="폴더 메뉴"
-              aria-label="폴더 메뉴"
-            >
-              <MoreHorizontal size={16} />
-            </button>
-            <AnimatePresence>
-              {showMenu && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                  transition={{ duration: 0.1, ease: "easeOut" }}
-                  className="absolute right-0 top-full mt-1 w-32 bg-white shadow-lg rounded-md py-1 z-10 border border-gray-200"
-                  onClick={(e) => e.stopPropagation()}
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  onClick={toggleMenu}
+                  className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 ${
+                    isPopoverOpen ? "opacity-100" : ""
+                  }`}
+                  aria-label="폴더 메뉴"
                 >
+                  <MoreHorizontal
+                    size={18}
+                    className="text-label-alternative"
+                  />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="absolute w-[140px] p-2 space-y-3 border border-line bg-white rounded-lg top-[-25px] left-[-10px]">
+                <button
+                  onClick={handleStartRenaming}
+                  className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
+                >
+                  <span className="text-body-s text-label-strong">
+                    이름 변경하기
+                  </span>
+                  <Pencil size={14} />
+                </button>
+                {!folder.is_default && (
                   <button
-                    onClick={handleStartRenaming}
-                    className="flex items-center w-full px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={handleDeleteFolder}
+                    className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
                   >
-                    <Pencil size={14} className="mr-2" />
-                    이름 변경
+                    <span className="text-body-s text-status-error">
+                      삭제하기
+                    </span>
+                    <Trash2 size={18} className="text-status-error" />
                   </button>
-                  {!folder.is_default && (
-                    <button
-                      onClick={handleDeleteFolder}
-                      className="flex items-center w-full px-3 py-1.5 text-sm text-red-600 hover:bg-gray-100"
-                    >
-                      <Trash2 size={14} className="mr-2" />
-                      삭제
-                    </button>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                )}
+              </PopoverContent>
+            </Popover>
           </div>
         )}
       </div>
 
-      <AnimatePresence>
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={{ height: "auto", opacity: 1 }}
+        exit={{ height: 0, opacity: 0 }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
+        className="overflow-hidden"
+      >
         {isExpanded &&
           folder.conversations &&
           folder.conversations.length > 0 && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="overflow-hidden"
-            >
-              <ul className="mt-1 ml-6 space-y-1">
-                {folder.conversations.map((conversation: Conversation) => (
-                  <li key={conversation.id}>
-                    <FolderConversationItem
-                      conversation={conversation}
-                      isCurrentConversation={
-                        currentConversationId === conversation.id
-                      }
-                      isActive={activeId === conversation.id}
-                      onSelect={onSelectConversation}
-                      onDelete={(e) =>
-                        handleDeleteConversation(e, conversation.id)
-                      }
-                    />
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
+            <ul className="space-y-1 ml-8">
+              {folder.conversations.map((conversation: Conversation) => (
+                <li key={conversation.id}>
+                  <FolderConversationItem
+                    conversation={conversation}
+                    isCurrentConversation={
+                      currentConversationId === conversation.id
+                    }
+                    isActive={activeId === conversation.id}
+                    onSelect={onSelectConversation}
+                    onDelete={(e) =>
+                      handleDeleteConversation(e, conversation.id)
+                    }
+                  />
+                </li>
+              ))}
+            </ul>
           )}
-      </AnimatePresence>
+      </motion.div>
+      {/* ───────── 이름 변경 모달 ───────── */}
+      <RenameFolderModal
+        isOpen={showRenameModal}
+        defaultName={folder.name}
+        onClose={() => setShowRenameModal(false)}
+        onConfirm={(newName) => {
+          onRenameFolder(folder.id, newName);
+          setShowRenameModal(false);
+        }}
+      />
+
+      {/* ───────── 삭제 확인 모달 ───────── */}
+      <TwoButtonModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="정말 삭제하시나요?"
+        onConfirm={() => {
+          onDeleteFolder(folder.id);
+          setShowDeleteModal(false);
+        }}
+      />
     </div>
   );
 }

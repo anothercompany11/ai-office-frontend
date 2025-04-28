@@ -21,17 +21,20 @@
   --label-alternative: #a7a9b4;
   --label-assistive: #c8c9d0;
 
-  --background-natural: #f4f4f6;
+  --background-natural: #eeeff1;
   --background-alternative: #f9fafa;
   --background: #ffffff;
 
   --line: #eeeff1;
   --line-alternative: #f9fafa;
+  --line-strong: #d6d7dc;
 
   --status-error: #e82929;
 
+  --component: #a7a9b4;
   --component-strong: #d6d7dc;
   --component-dimmer: rgba(0, 0, 0, 0.7);
+  --component-alternative: #f4f4f6;
 }
 
 @layer utilities {
@@ -54,6 +57,13 @@
   }
 
   /* ========== Typography ========== */
+  .text-title-l {
+    font-size: 18px;
+    line-height: 150%;
+    letter-spacing: -0.3%;
+    font-weight: 700;
+  }
+
   .text-title-m {
     font-size: 16px;
     line-height: 150%;
@@ -190,6 +200,14 @@
     color: var(--label-assistive);
   }
 
+  /* ========== Component Colors ========== */
+  .text-component-alternative {
+    color: var(--component-alternative);
+  }
+  .bg-component-alternative {
+    background-color: var(--component-alternative);
+  }
+
   /* ========== Background ========== */
   .bg-background {
     background-color: var(--background);
@@ -217,6 +235,9 @@
   .bg-line-alternative {
     background-color: var(--line-alternative);
   }
+  .border-line-strong {
+    border-color: var(--line-strong);
+  }
 
   /* ========== Status ========== */
   .text-status-error {
@@ -230,8 +251,11 @@
   }
 
   /* ========== Component ========== */
-  .bg-component-strong {
-    background-color: var(--component-strong);
+  .text-component {
+    color: var(--component);
+  }
+  .text-component-strong {
+    color: var(--component-strong);
   }
 
   .bg-component-dimmer {
@@ -276,6 +300,12 @@
   }
 }
 
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-tab: 650px;
+  --breakpoint-web: 1024px;
+}
+
 /* 인풋 자동완성 시 배경색상 */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -283,4 +313,31 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   box-shadow: 0 0 0px 1000px #fff inset !important;
   -webkit-text-fill-color: #000 !important;
+}
+
+/* Swiper Pagination Styles */
+.swiper-pagination-bullet {
+  background-color: #a7a9b4 !important;
+  width: 8px !important;
+  height: 8px !important;
+  opacity: 1 !important;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #58ffbf !important;
+  width: 21px !important;
+  height: 8px !important;
+  border-radius: 50px !important;
+}
+
+/* Mobile Guide Dialog Swiper Styles */
+.mobile-guide-dialog-content .mobile-guide-swiper {
+  padding-bottom: 45px;
+}
+
+.mobile-guide-dialog-content
+  .mobile-guide-swiper
+  .swiper-pagination-bullet-active
+  .mobile-guide-dialog-content {
+  overflow: visible;
 }

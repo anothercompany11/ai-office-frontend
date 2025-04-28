@@ -10,11 +10,13 @@ export type Conversation = ClientConversation;
  * 채팅 리스트와 관련된 모든 상태·행동 관리 훅
  */
 export default function useConversations() {
+  /* ────────── state ────────── */
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
   const [currentId, setCurrentId] = useState<string | null>(null);
+  const [pendingFirstMsg, setPendingFirstMsg] = useState<string | null>(null);
 
-  /* 유틸 */
+  /* ────────── utils ────────── */
   const syncCurrentIdWithStorage = useCallback((id: string | null) => {
     setCurrentId(id);
     id
@@ -22,7 +24,20 @@ export default function useConversations() {
       : localStorage.removeItem("currentConversationId");
   }, []);
 
-  /* ────────── READ ────────── */
+  /* ────────── actions ────────── */
+  /** 1. 사이드바의 '+' 버튼 -> 빈 채팅 화면 렌더링 트리거 */
+  const startBlankConversation = () => {
+    setPendingFirstMsg(null);
+    syncCurrentIdWithStorage(null); // currentId를 null로 해서 EmptyChatScreen 렌더링
+  };
+
+  /** 2. 빈 채팅 화면에서 대화 시작 */
+  const createNewConversation = (firstMsg: string) => {
+    setCurrentId("new");
+    setPendingFirstMsg(firstMsg);
+  };
+
+  /** 3. 목록 불러오기 */
   const loadConversations = useCallback(async () => {
     try {
       setIsLoadingConversations(true);
@@ -36,32 +51,23 @@ export default function useConversations() {
         lastUpdated: new Date(c.updated_at),
       }));
 
-      const savedId = localStorage.getItem("currentConversationId");
       setConversations(formatted);
-
-      /** 로컬에 저장된 ID 우선, 없으면 첫 번째 대화 */
-      if (
-        savedId &&
-        savedId !== "new" &&
-        formatted.some((c) => c.id === savedId)
-      ) {
-        syncCurrentIdWithStorage(savedId);
-      } else if (formatted.length > 0 && !currentId) {
-        syncCurrentIdWithStorage(formatted[0].id);
-      }
     } finally {
       setIsLoadingConversations(false);
     }
-  }, [currentId, syncCurrentIdWithStorage]);
+  }, []);
 
-  /* ────────── CREATE ────────── */
-  const createNewConversation = () => syncCurrentIdWithStorage("new");
+  /** 4. 스트리밍 종료 후 ‘new’ → 실제 ID 확정 */
+  const finalizeNewConversation = useCallback(
+    (realId: string) => syncCurrentIdWithStorage(realId),
+    [syncCurrentIdWithStorage],
+  );
 
-  /* ────────── UPDATE ────────── */
+  /** 5. 대화 정보 업데이트(제목·미리보기 등) */
   const updateConversation = useCallback(
     (id: string, data: Partial<Conversation>) => {
       setConversations((prev) => {
-        // 새로 받은 실제 ID가 기존에 없다면 prepend
+        /* 새 ID가 아직 목록에 없으면 prepend */
         if (data.id && !prev.some((c) => c.id === data.id)) {
           const newConv: Conversation = {
             id: data.id,
@@ -73,25 +79,21 @@ export default function useConversations() {
           return [newConv, ...prev];
         }
 
-        // 기존 대화 업데이트
+        /* 기존 항목 업데이트 */
         return prev.map((c) =>
           c.id === id
-            ? {
-                ...c,
-                ...data,
-                lastUpdated: data.lastUpdated || new Date(),
-              }
+            ? { ...c, ...data, lastUpdated: data.lastUpdated || new Date() }
             : c,
         );
       });
 
-      // "new" → 실제 ID로 전환
-      if (id === "new" && data.id) syncCurrentIdWithStorage(data.id);
+      /* ⚠️ 여기서는 currentId를 바꾸지 않는다!
+         실제 ID 전환은 finalizeNewConversation에서만 수행 */
     },
-    [syncCurrentIdWithStorage],
+    [],
   );
 
-  /* ────────── DELETE ────────── */
+  /** 6. 대화 삭제 */
   const deleteConversation = useCallback(
     async (id: string) => {
       const res = await conversationApi.deleteConversation(id);
@@ -99,15 +101,12 @@ export default function useConversations() {
 
       setConversations((prev) => prev.filter((c) => c.id !== id));
 
-      if (currentId === id) {
-        const next = conversations.find((c) => c.id !== id);
-        syncCurrentIdWithStorage(next?.id ?? null);
-      }
+      if (currentId === id) syncCurrentIdWithStorage(null);
     },
-    [currentId, conversations, syncCurrentIdWithStorage],
+    [currentId, syncCurrentIdWithStorage],
   );
 
-  /* ────────── FOLDER ────────── */
+  /** 7. 폴더 할당 */
   const assignToFolder = async (
     conversationId: string,
     folderId: string | null,
@@ -126,18 +125,23 @@ export default function useConversations() {
     );
   };
 
+  /* ────────── expose ────────── */
   return {
     /* state */
     conversations,
     isLoadingConversations,
     currentId,
+    pendingFirstMsg,
 
     /* actions */
     loadConversations,
+    startBlankConversation,
     createNewConversation,
     updateConversation,
     deleteConversation,
     assignToFolder,
     selectConversation: syncCurrentIdWithStorage,
+    clearPendingFirstMsg: () => setPendingFirstMsg(null),
+    finalizeNewConversation,
   };
 }
