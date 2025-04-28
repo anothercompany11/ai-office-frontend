@@ -156,8 +156,8 @@ export default function ConversationSidebar({
     >
       <div
         className={`${
-          isSidebarVisible ? "web:flex" : "web:hidden"
-        } hidden h-full flex-col w-[280px] min-w-[280px] flex-shrink-0 px-4`}
+          isSidebarVisible ? "translate-x-0" : "-translate-x-full"
+        } fixed inset-0 z-50 h-full flex-col w-[280px] flex-shrink-0 px-4 bg-white transition-transform duration-300 ease-in-out`}
       >
         <div className="flex items-center justify-between py-[21.5px]">
           <Image
