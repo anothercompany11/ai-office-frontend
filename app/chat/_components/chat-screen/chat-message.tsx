@@ -57,7 +57,7 @@ const ChatMessage = ({
               unoptimized
             />
 
-            <div className="break-words px-4 rounded-lg whitespace-normal border border-line bg-white">
+            <div className="break-words py-2 px-4 rounded-lg whitespace-normal border border-line bg-white">
               <div className="markdown prose w-full break-words">
                 {/* 1) 스트리밍 중이면서 아직 텍스트가 없으면 점 애니메이션 */}
                 {streaming && !content && TypingDots}
