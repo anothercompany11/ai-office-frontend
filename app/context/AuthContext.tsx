@@ -16,6 +16,7 @@ interface AuthContextType extends AuthState {
   login: (code: string) => Promise<boolean>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<boolean>;
+  incrementPromptCount: (user: User) => void;
 }
 
 // 인증 컨텍스트 생성
@@ -29,11 +30,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // 요청 횟수 증가 핸들러
+  const incrementPromptCount = () => {
+    setUser((prev) =>
+      prev ? { ...prev, prompt_count: prev.prompt_count + 1 } : prev,
+    );
+  };
+
   const loadUserInfo = async () => {
     try {
       setIsLoading(true);
       const token = authApi.getAccessToken();
-      console.log("AuthContext - 현재 토큰:", token);
 
       if (token) {
         try {
@@ -164,6 +171,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     refreshSession,
+    incrementPromptCount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

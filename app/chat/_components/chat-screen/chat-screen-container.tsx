@@ -1,8 +1,10 @@
+import { User } from "@/app/api/dto";
 import ChatHeader from "../chat-header/chat-header";
 import ChatInterface from "./chat-interface";
 import EmptyChatScreen from "./empty-chat-screen";
 
 interface ChatScreenContainerProps {
+  user: User; // 사용자 정보
   currentId: string | null; // 현재 선택된 대화 ID (없을 수 있으므로 null 허용)
   createNewConversation: (firstMsg: string) => void; // 새 대화 생성 함수
   updateConversation: (id: string, data: Partial<any>) => void; // 대화 정보 업데이트
@@ -18,6 +20,7 @@ interface ChatScreenContainerProps {
 }
 
 const ChatScreenContainer = ({
+  user,
   currentId,
   createNewConversation,
   updateConversation,
@@ -39,10 +42,10 @@ const ChatScreenContainer = ({
       {currentId ? (
         <div className="h-[calc(100vh-67px)] overflow-y-auto">
           <ChatInterface
+            user={user}
             key={currentId}
             conversationId={currentId}
             onUpdateConversation={updateConversation}
-            onAssignToFolder={assignToFolder}
             isNewChat={currentId === "new"}
             initialMessage={pendingFirstMsg}
             onInitialHandled={clearPendingFirstMsg}
@@ -51,7 +54,10 @@ const ChatScreenContainer = ({
         </div>
       ) : (
         /* 대화가 없을 경우 표시할 빈 화면 상태 */
-        <EmptyChatScreen createNewConversation={createNewConversation} />
+        <EmptyChatScreen
+          user={user}
+          createNewConversation={createNewConversation}
+        />
       )}
     </div>
   );

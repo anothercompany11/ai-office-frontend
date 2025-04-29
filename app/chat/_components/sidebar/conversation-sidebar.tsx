@@ -3,17 +3,16 @@
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { useState } from "react";
-
 import { useGroupedConversations } from "@/hooks/use-groupped-conversation";
 import DragOverlayContent from "./drag-overlay-content";
 import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
-import useFolders from "@/hooks/use-folder";
 import { useDnDSensors, useDragHighlight } from "@/hooks/use-dnd";
 import SidebarLayout from "./sidebar-layout";
-import FolderHeader from "../folder/folder-header";
-import FolderList from "./folder-list";
+// import useFolders from "@/hooks/use-folder";
+// import FolderHeader from "../folder/folder-header";
+// import FolderList from "./folder-list";
+// import CreateFolderModal from "./create-folder-modal";
 import SidebarChatHeader from "./side-bar-chat-header";
-import CreateFolderModal from "./create-folder-modal";
 import ChatGroupList from "./chat-group-list";
 import { Conversation } from "../types";
 
@@ -37,10 +36,11 @@ export default function ConversationSidebar({
   setIsSidebarVisible,
 }: Props) {
   const isMobile = useGetCurrentDevice() !== "web";
-  const { folders, create, rename, remove } = useFolders(conversations);
   const grouped = useGroupedConversations(
     conversations.filter((c) => !c.folder_id),
   );
+  /** 폴더 관련 주석 처리 */
+  // const { folders, create, rename, remove } = useFolders(conversations);
 
   // DnD 센서와 훅
   const sensors = useDnDSensors();
@@ -55,6 +55,14 @@ export default function ConversationSidebar({
     if (isMobile) setIsSidebarVisible(false);
   };
 
+  // 사이드바 닫기 핸들러
+  const handleCloseSidebar = () => setIsSidebarVisible(false);
+
+  // 대화방 선택 핸들러
+  const handleSelectChat = (id: string) => {
+    onSelectConversation(id);
+    isMobile && handleCloseSidebar();
+  };
   return (
     <DndContext
       sensors={sensors}
@@ -66,7 +74,7 @@ export default function ConversationSidebar({
         isVisible={isSidebarVisible}
         onClose={() => setIsSidebarVisible(false)}
       >
-        <FolderHeader onNew={() => setShowCreateModal(true)} />
+        {/* <FolderHeader onNew={() => setShowCreateModal(true)} />
         <FolderList
           folders={folders}
           currentConversationId={currentConversationId ?? null}
@@ -78,26 +86,16 @@ export default function ConversationSidebar({
           onDeleteConversation={onDeleteConversation}
         />
 
-        <div className="border-t border-line my-4" />
+        <div className="border-t border-line my-4" /> */}
 
         <SidebarChatHeader onNew={handleNewChat} />
         <ChatGroupList
           groups={grouped}
           currentConversationId={currentConversationId ?? null}
-          activeId={activeId}
-          onSelect={onSelectConversation}
+          onSelect={handleSelectChat}
           onDelete={onDeleteConversation}
         />
       </SidebarLayout>
-
-      <CreateFolderModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onConfirm={(name) => {
-          create(name);
-          setShowCreateModal(false);
-        }}
-      />
 
       <DragOverlay>
         {activeId && (
@@ -109,7 +107,7 @@ export default function ConversationSidebar({
       {isMobile && isSidebarVisible && (
         <div
           className="fixed inset-0 z-40 bg-black/40 transition-opacity duration-300"
-          onClick={() => setIsSidebarVisible(false)}
+          onClick={handleCloseSidebar}
         />
       )}
     </DndContext>

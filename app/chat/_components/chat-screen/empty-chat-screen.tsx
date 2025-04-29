@@ -1,9 +1,12 @@
+import { User } from "@/app/api/dto";
 import ChatInput from "./chat-input";
 
 const EmptyChatScreen = ({
   createNewConversation,
+  user,
 }: {
   createNewConversation: (firstMsg: string) => void;
+  user: User;
 }) => {
   return (
     <div className="h-full flex-col relative web:gap-10 flex items-center  justify-center px-5">
@@ -15,7 +18,7 @@ const EmptyChatScreen = ({
       </div>
       <div className="w-full web:mt-0 absolute web:relative pb-4 web:pb-0 max-w-[680px] px-4 web:px-0 bg-line-alternative mx-auto bottom-0 z-10">
         <div className="tab:pb-10 tab:px-0 web:pb-20 mx-auto">
-          <ChatInput onSend={createNewConversation} />
+          <ChatInput user={user} onSend={createNewConversation} />
         </div>
       </div>
     </div>
