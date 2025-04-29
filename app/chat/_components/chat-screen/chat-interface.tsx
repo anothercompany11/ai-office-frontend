@@ -2,52 +2,37 @@
 
 import { conversationApi } from "@/app/api/conversation";
 import { ClientConversation, ClientMessage } from "@/app/api/dto/conversation";
-// import { folderApi } from "@/app/api/folder";
 import { MessageRole } from "@/types";
 import { useEffect, useRef, useState } from "react";
 import ChatInput from "./chat-input";
 import ChatMessage from "./chat-message";
-
-// 폴더 타입 정의
-interface Folder {
-  id: string;
-  name: string;
-  is_default: boolean;
-  created_at: string;
-  updated_at: string;
-}
+import { User } from "@/app/api/dto";
 
 interface ChatInterfaceProps {
   conversationId: string;
   onUpdateConversation: (id: string, data: Partial<ClientConversation>) => void;
-  onAssignToFolder: (
-    conversationId: string,
-    folderId: string | null,
-  ) => Promise<void>;
   isNewChat?: boolean; // 새 대화 여부
   initialMessage?: string | null;
   onInitialHandled?: () => void;
   finalizeNewConversation: (realId: string) => void;
+  user: User;
 }
 
 const ChatInterface = ({
   conversationId,
   onUpdateConversation,
-  onAssignToFolder,
   isNewChat = false,
   initialMessage,
   onInitialHandled,
   finalizeNewConversation,
+  user,
 }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<ClientMessage[]>(() => []);
   const [isLoading, setIsLoading] = useState(false);
   const [editingConversationTitle, setEditingConversationTitle] =
     useState(false);
   const [newTitle, setNewTitle] = useState("");
-  // const [folders, setFolders] = useState<Folder[]>([]);
-  // const [currentAssistantMessage, setCurrentAssistantMessage] = useState("");
   const [showFolderOptions, setShowFolderOptions] = useState(false);
-  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const folderMenuRef = useRef<HTMLDivElement>(null);
@@ -63,36 +48,12 @@ const ChatInterface = ({
     }
   }, [initialMessage, isNewChat]);
 
-  /** 폴더 관련 내용 주석처리 **/
-
-  // 폴더 목록 불러오기
-  // const loadFolders = async () => {
-  //   try {
-  //     const response = await folderApi.getFolders();
-  //     if (response.status === "success" && Array.isArray(response.data)) {
-  //       setFolders(response.data);
-  //     }
-  //   } catch (error) {
-  //     console.error("폴더 목록 로드 오류:", error);
-  //   }
-  // };
-
-
-  // 초기 로드
-  // useEffect(() => {
-  //   // "new" 대화인 경우 폴더 목록 로드하지 않음
-  //   if (conversationId !== "new" && !isNewChat) {
-  //     loadFolders();
-  //   }
-  // }, [conversationId, isNewChat]);
-
   // 메시지 불러오기
   const loadConversationMessages = async (id: string) => {
     try {
       // "new" 대화인 경우 API 호출하지 않음
       if (id === "new" || isNewChat) {
         setNewTitle("새 대화");
-        setCurrentFolderId(null);
         setIsLoading(false);
         return;
       }
@@ -118,7 +79,6 @@ const ChatInterface = ({
 
           // 대화의 제목과 폴더 ID 설정
           setNewTitle(conversation.title || "새 대화");
-          setCurrentFolderId(conversation.folder_id || null);
 
           // 부모 컴포넌트에 대화 정보 업데이트
           if (conversation.title && conversation.title.trim() !== "") {
@@ -160,7 +120,6 @@ const ChatInterface = ({
       setIsLoading(false);
     }
   };
-
 
   // 대화 ID가 변경될 때마다 메시지 로드
   useEffect(() => {
@@ -249,43 +208,23 @@ const ChatInterface = ({
     }
   };
 
-  // 폴더 옵션 토글
-  const toggleFolderOptions = () => {
-    setShowFolderOptions(!showFolderOptions);
-  };
-
-  // 폴더에 대화 할당
-  const assignToFolder = async (folderId: string | null) => {
-    try {
-      setIsLoading(true);
-
-      // 폴더 할당/제거 API 호출
-      await onAssignToFolder(conversationId, folderId);
-
-      // 현재 폴더 ID 상태 업데이트
-      setCurrentFolderId(folderId);
-
-      // 폴더 옵션 메뉴 닫기
-      setShowFolderOptions(false);
-    } catch (error) {
-      console.error("대화를 폴더에 할당하는 중 오류 발생:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // 메시지 전송 처리
   const handleSendMessage = async (content: string) => {
     if (!content.trim() || isLoading) return;
 
     /* 1. 사용자 메시지 즉시 UI에 추가 */
-    const userMessage: ClientMessage = { role: MessageRole.USER, content };
+    const userMessage: ClientMessage = {
+      role: MessageRole.USER,
+      content,
+      id: "user-" + Date.now(),
+      created_at: new Date().toISOString(),
+    };
 
     /* 2. 로딩용 어시스턴트 말풍선 바로 push */
     const loadingMsg: ClientMessage = {
-      id: "loading-" + Date.now(), // 임시 ID
+      id: "loading-" + Date.now(),
       role: MessageRole.ASSISTANT,
-      content: "", // 내용은 스트림에서 채움
+      content: "",
       streaming: true,
     };
     setMessages((prev) => [...prev, userMessage, loadingMsg]);
@@ -319,7 +258,12 @@ const ChatInterface = ({
           if (data === "[DONE]") continue;
 
           const parsed = JSON.parse(data);
-          if (parsed.error) throw new Error(parsed.error);
+          if (parsed.error) {
+            console.error(parsed, parsed.err);
+            const PROMPT_COUNT_ERR = "채팅 허용 횟수를 초과했습니다.";
+            if (parsed.error === PROMPT_COUNT_ERR) return;
+            throw new Error(parsed.error);
+          }
 
           if (parsed.conversation_id && !realId) {
             realId = parsed.conversation_id;
@@ -393,7 +337,6 @@ const ChatInterface = ({
     }
   };
 
-
   return (
     <main className="relative h-[calc(100vh-67px)] overflow-hidden transition-all duration-350 mx-auto flex flex-col">
       {/* 채팅 메시지 영역 - 스크롤 가능 영역 */}
@@ -429,7 +372,11 @@ const ChatInterface = ({
       {/* 채팅 입력 영역 - 고정 위치 */}
       <div className="w-full sticky max-w-[680px] px-4 web:px-0 bg-line-alternative mx-auto mt-5 bottom-0 z-10">
         <div className="tab:pb-10 tab:px-0 web:pb-20 mx-auto">
-          <ChatInput onSend={handleSendMessage} disabled={isLoading} />
+          <ChatInput
+            user={user}
+            onSend={handleSendMessage}
+            disabled={isLoading}
+          />
         </div>
       </div>
     </main>

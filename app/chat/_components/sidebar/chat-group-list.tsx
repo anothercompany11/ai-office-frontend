@@ -26,11 +26,7 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
-export default function ChatGroupList({
-  groups,
-  onSelect,
-  onDelete,
-}: Props) {
+export default function ChatGroupList({ groups, onSelect, onDelete }: Props) {
   return (
     <div id="conversations-area" className="pb-4">
       {(Object.entries(groups) as [TimeGroup, Conversation[]][]).map(

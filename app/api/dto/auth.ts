@@ -5,6 +5,9 @@ export interface User {
   is_expired: boolean;
   created_at: Date;
   expires_at?: Date;
+  is_limit_reached: boolean; // 요청 초과 여부
+  prompt_count: number; // 요청 시도 횟수
+  prompt_limit: number; // 최대 시도 가능 횟수
 }
 
 export interface LoginRequest {

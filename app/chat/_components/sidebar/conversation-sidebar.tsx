@@ -56,13 +56,13 @@ export default function ConversationSidebar({
   };
 
   // 사이드바 닫기 핸들러
-  const handleCloseSidebar = () => setIsSidebarVisible(false)
+  const handleCloseSidebar = () => setIsSidebarVisible(false);
 
   // 대화방 선택 핸들러
   const handleSelectChat = (id: string) => {
     onSelectConversation(id);
     isMobile && handleCloseSidebar();
-  }
+  };
   return (
     <DndContext
       sensors={sensors}
