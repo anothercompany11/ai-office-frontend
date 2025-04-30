@@ -1,11 +1,7 @@
 import localFont from "next/font/local";
 import { AuthProvider } from "./context/AuthContext";
 import "./globals.css";
-
-export const metadata = {
-  title: "AI Office",
-  description: "AI Office Frontend",
-};
+import { Metadata } from "next";
 
 const hakgyoAnsim = localFont({
   src: [
@@ -53,6 +49,16 @@ const pretendard = localFont({
   ],
   variable: "--font-pretendard",
 });
+
+export const metadata: Metadata = {
+  title: "AI 오피스",
+  description: "AI 오피스",
+  icons: {
+    icon: "/favicon.ico",      
+    shortcut: "/favicon.ico",  
+  },
+
+};
 
 export default function RootLayout({
   children,
