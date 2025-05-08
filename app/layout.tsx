@@ -54,10 +54,9 @@ export const metadata: Metadata = {
   title: "AI 오피스",
   description: "AI 오피스",
   icons: {
-    icon: "/favicon.ico",      
-    shortcut: "/favicon.ico",  
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
   },
-
 };
 
 export default function RootLayout({
