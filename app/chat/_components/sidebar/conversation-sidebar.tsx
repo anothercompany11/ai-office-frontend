@@ -15,6 +15,7 @@ import SidebarLayout from "./sidebar-layout";
 import SidebarChatHeader from "./side-bar-chat-header";
 import ChatGroupList from "./chat-group-list";
 import { Conversation } from "../types";
+import LogoutButton from "@/app/auth/_components/logout-button";
 
 interface Props {
   conversations: Conversation[];
@@ -95,6 +96,7 @@ export default function ConversationSidebar({
           onSelect={handleSelectChat}
           onDelete={onDeleteConversation}
         />
+        <LogoutButton />
       </SidebarLayout>
 
       <DragOverlay>

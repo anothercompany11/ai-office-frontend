@@ -46,7 +46,7 @@ export const authApi = {
   },
 
   // 로그아웃
-  async logout(): Promise<ApiResponse<boolean>> {
+  async logout(onSuccess?: () => void): Promise<ApiResponse<boolean>> {
     try {
       // 백엔드에 로그아웃 요청
       const response = await post<boolean, void>("/auth/logout");
@@ -69,6 +69,8 @@ export const authApi = {
         code: "LOGOUT_ERROR",
         message: "로그아웃 중 오류가 발생했습니다.",
       };
+    } finally {
+      onSuccess?.();
     }
   },
 
