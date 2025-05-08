@@ -156,9 +156,6 @@ export async function apiRequest<T = any>(
     const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
     const responseData = await response.json();
 
-    // 서버 응답 로깅 (디버깅용)
-    console.log(`API 응답 (${endpoint}):`, responseData);
-
     // 401 에러 처리
     if (
       responseData.status === "error" &&

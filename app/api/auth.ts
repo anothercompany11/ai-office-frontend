@@ -163,7 +163,6 @@ export const authApi = {
   // 로그인 상태 확인
   isLoggedIn(): boolean {
     const token = TokenService.getToken();
-    console.log("authApi.isLoggedIn - 토큰 존재 여부:", !!token); // 디버깅용 로그
     return !!token;
   },
 

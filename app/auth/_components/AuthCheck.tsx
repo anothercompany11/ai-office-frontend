@@ -19,16 +19,13 @@ const AuthCheck = ({ children }: AuthCheckProps) => {
       // 클라이언트 사이드에서만 실행
       if (typeof window !== "undefined") {
         const isLoggedIn = authApi.isLoggedIn();
-        console.log("AuthCheck - isLoggedIn:", isLoggedIn); // 디버깅용 로그
 
         if (!isLoggedIn) {
-          console.log("AuthCheck - 로그인되지 않음, /auth로 이동"); // 디버깅용 로그
           router.push("/auth");
         } else {
           // 토큰이 있더라도 유효한지 확인
           try {
             const userResponse = await authApi.getUserInfo();
-            console.log("AuthCheck - getUserInfo 응답:", userResponse); // 디버깅용 로그
 
             if (
               userResponse.status === "error" &&
@@ -65,7 +62,6 @@ const AuthCheck = ({ children }: AuthCheckProps) => {
 
     // 401 에러 이벤트 처리
     const handleUnauthorized = async () => {
-      console.log("AuthCheck - 401 에러 이벤트 발생"); // 디버깅용 로그
       const refreshed = await refreshSession();
       if (!refreshed) {
         await authApi.logout();
