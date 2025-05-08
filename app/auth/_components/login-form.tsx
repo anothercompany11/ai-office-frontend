@@ -54,7 +54,6 @@ const LoginForm = () => {
         const storedToken = authApi.getAccessToken();
 
         if (storedToken) {
-          console.log("토큰 저장 완료, /chat으로 이동합니다");
           window.location.href = "/chat";
         } else {
           setError("토큰 저장에 실패했습니다.");

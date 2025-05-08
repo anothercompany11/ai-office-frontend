@@ -46,7 +46,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
           // API에서 사용자 정보 가져오기 시도
           const userResponse = await authApi.getUserInfo();
-          console.log("AuthContext - 사용자 정보 응답:", userResponse);
 
           if (userResponse.status === "success" && userResponse.data) {
             setUser(userResponse.data);
@@ -101,10 +100,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const result = await refreshToken();
       if (result) {
-        console.log("토큰 갱신 성공");
         return true;
       }
-      console.log("토큰 갱신 실패");
       return false;
     } catch (error) {
       console.error("토큰 갱신 중 오류 발생:", error);

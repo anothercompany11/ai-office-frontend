@@ -12,7 +12,6 @@ export const folderApi = {
   async getFolders(): Promise<ApiResponse<Folder[]>> {
     try {
       const response = await get<Folder[]>("/folders");
-      console.log("폴더 API 응답:", response); // 디버깅용 로그
       return response;
     } catch (error) {
       console.error("폴더 목록 조회 오류:", error);
@@ -46,7 +45,6 @@ export const folderApi = {
         "/folders",
         request,
       );
-      console.log("폴더 생성 응답:", response); // 디버깅용 로그
       return response;
     } catch (error) {
       console.error("폴더 생성 오류:", error);
