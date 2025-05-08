@@ -79,11 +79,11 @@ const ChatInput = ({ onSend, disabled = false, user }: ChatInputProps) => {
       </div>
       <div className="px-3 text-label-natural hidden tab:flex text-body-s justify-between">
         <p>AI는 실수할 수 있습니다.</p>
-        <p>{`남은 횟수 : ${user.prompt_count}/${user.prompt_limit}`}</p>
+        <p>{`사용 / 가능 횟수 : ${user.prompt_count}/${user.prompt_limit}`}</p>
       </div>
       <div className="flex tab:hidden px-3 text-label-natural text-caption justify-between">
         <p>AI는 실수할 수 있습니다.</p>
-        <p>{`남은 횟수 : ${user.prompt_count}/${user.prompt_limit}`}</p>
+        <p>{`사용 / 가능 횟수 : ${user.prompt_count}/${user.prompt_limit}`}</p>
       </div>
     </div>
   );
