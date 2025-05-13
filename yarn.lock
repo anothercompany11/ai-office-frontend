@@ -1163,6 +1163,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-katex@npm:^3":
+  version: 3.0.4
+  resolution: "@types/react-katex@npm:3.0.4"
+  dependencies:
+    "@types/react": "npm:*"
+  checksum: 10c0/919d5752eb5ea8e5eb72dde1cb2f2b3e0b0d7e74e463eb95a8da4a3a12478223b92e78c0b1bece53ce9e5404aa1a0ac63955ef1a4e00829080ad41808ee82538
+  languageName: node
+  linkType: hard
+
 "@types/react-syntax-highlighter@npm:15.5.13":
   version: 15.5.13
   resolution: "@types/react-syntax-highlighter@npm:15.5.13"
@@ -1247,6 +1256,7 @@ __metadata:
     "@types/node": "npm:^22.13.17"
     "@types/react": "npm:^19.1.1"
     "@types/react-dom": "npm:^19.1.2"
+    "@types/react-katex": "npm:^3"
     "@types/react-syntax-highlighter": "npm:15.5.13"
     "@types/tailwindcss": "npm:^3.1.0"
     add: "npm:^2.0.6"
@@ -1262,6 +1272,7 @@ __metadata:
     react: "npm:^19.1.0"
     react-dom: "npm:^19.1.0"
     react-hook-form: "npm:^7.55.0"
+    react-katex: "npm:^3.1.0"
     react-markdown: "npm:^10.1.0"
     react-syntax-highlighter: "npm:15.5.0"
     rehype-external-links: "npm:^3.0.0"
@@ -2960,6 +2971,18 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18 || ^19
   checksum: 10c0/9cff0da58d8223dd14e01ac83688e3546edc42cfa557974b6f2f09922ee051e4713fd53abb69c7a815bf3600142a14186b977d69d438da32f63475a8ecf6b452
+  languageName: node
+  linkType: hard
+
+"react-katex@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "react-katex@npm:3.1.0"
+  dependencies:
+    katex: "npm:^0.16.0"
+  peerDependencies:
+    prop-types: ^15.8.1
+    react: ">=15.3.2 <20"
+  checksum: 10c0/a61eb2c19a2dc384ad5864a27af66f40c504643f984150f4e270373df88293c2586779b53b2ee7ee4e75076f3c5284b36f425bbc1021d164ccb2997d11d8678f
   languageName: node
   linkType: hard
 
