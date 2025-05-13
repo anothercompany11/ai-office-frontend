@@ -3,6 +3,7 @@
 import { User } from "@/app/api/dto";
 import { useAuth } from "@/app/context/AuthContext";
 import { ArrowUp } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 interface ChatInputProps {
@@ -16,6 +17,7 @@ const ChatInput = ({ onSend, disabled = false, user }: ChatInputProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { incrementPromptCount } = useAuth(); // 요청 횟수 증가 핸들러
   const is_limit_reached = user.prompt_count === user.prompt_limit; // 요청 횟수 초과 여부
+  const remainingCount = user.prompt_limit - user.prompt_count;
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -77,14 +79,18 @@ const ChatInput = ({ onSend, disabled = false, user }: ChatInputProps) => {
           </div>
         </form>
       </div>
-      <div className="px-3 text-label-natural hidden tab:flex text-body-s justify-between">
-        <p>AI는 실수할 수 있습니다.</p>
-        <p>{`사용 / 가능 횟수 : ${user.prompt_count}/${user.prompt_limit}`}</p>
+      <div className="px-3 text-label-natural items-center flex justify-between">
+        <p className="text-caption tab:hidden">AI는 실수할 수 있습니다.</p>
+        <p className="text-body-s tab:block hidden">AI는 실수할 수 있습니다.</p>
+        <div className="flex gap-1 items-center">
+          <Image src={"/svg/token.svg"} alt="대화 토큰" width={28} height={28} className="size-[28px]"/>
+          <p className="flex gap-1 items-center">
+            <span className="text-label-alternative text-caption">x</span>
+            <span className="text-body-l">{remainingCount}</span>
+          </p>
+        </div>
       </div>
-      <div className="flex tab:hidden px-3 text-label-natural text-caption justify-between">
-        <p>AI는 실수할 수 있습니다.</p>
-        <p>{`사용 / 가능 횟수 : ${user.prompt_count}/${user.prompt_limit}`}</p>
-      </div>
+   
     </div>
   );
 };
