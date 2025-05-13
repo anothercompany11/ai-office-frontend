@@ -39,7 +39,7 @@ const ChatMessage = ({
         {isUser ? (
           <p
             className={cn(
-              "bg-background-natural py-2 px-4 ml-auto max-w-[70%] text-label-strong rounded-[20px]",
+              "bg-background-natural break-words py-2 px-4 ml-auto max-w-[70%] text-label-strong rounded-[20px]",
               isMob ? "text-body-s" : "text-body-m",
             )}
           >
