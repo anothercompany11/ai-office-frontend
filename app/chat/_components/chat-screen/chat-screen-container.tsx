@@ -40,7 +40,7 @@ const ChatScreenContainer = ({
 
       {/* 대화가 선택된 경우 */}
       {currentId ? (
-        <div className="h-[calc(100vh-67px)] overflow-y-auto">
+        <div className="h-[calc(100vh-67px)] overflow-y-auto mt-12 tab:mt-0">
           <ChatInterface
             user={user}
             key={currentId}
