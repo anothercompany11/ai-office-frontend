@@ -51,7 +51,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex web:h-[100vh] h-[100dvh] bg-white">
       <ConversationSidebar
         conversations={conversations}
         currentConversationId={currentId}
