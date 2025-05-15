@@ -33,7 +33,7 @@ const ChatHeader = ({ isSidebarVisible, setIsSidebarVisible }: Props) => {
             </button>
           )}
         </div>
-        <div className="block web:hidden">
+        <div className="block relative z-50 web:hidden">
           <button
             onClick={() => setIsSidebarVisible(true)}
             className="flex items-center justify-center"
