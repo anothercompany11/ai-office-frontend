@@ -99,7 +99,10 @@ export function formatLatex(src: string) {
     src
       // 블록 수식 변환
       .replace(/\\\[\s*([\s\S]+?)\s*\\\]/g, (_, exp) => `$$${exp}$$`)
-      // 인라인 수식 변환
-      .replace(/\\\(\s*([^$]+?)\s*\\\)/g, (_, exp) => `$${exp}$`)
+      // 인라인 수식 변환 - 공백과 특수문자를 더 정확하게 처리
+      .replace(/\\\(\s*([\s\S]+?)\s*\\\)/g, (_, exp) => `$${exp}$`)
+      // 테이블 내 수식 처리를 위한 추가 변환
+      .replace(/\\\\\(/g, "\\(")
+      .replace(/\\\\\)/g, "\\)")
   );
 }

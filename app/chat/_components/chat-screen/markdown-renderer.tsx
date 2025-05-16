@@ -224,7 +224,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
       <th className="px-3 py-2 text-left font-medium border border-gray-300 bg-gray-50" {...props} />
     ),
     td: ({ node, ...props }: any) => (
-      <td className="px-3 py-2 border border-gray-300" {...props} />
+      <td className="px-3 py-2 border border-gray-300 katex-cell" {...props} />
     ),
     strong: ({ node, ...props }: any) => (
       <strong className="font-bold" {...props} />
@@ -237,20 +237,18 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
   return (
     <div className="markdown prose dark:prose-invert w-full break-words dark">
-      {/* <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[
-          rehypeRaw,
-          [
-            rehypeExternalLinks,
-            { target: "_blank", rel: ["noopener", "noreferrer"] },
-          ],
-        ]}
-        components={components}
-        skipHtml={false}
-      >
-        {content}
-      </ReactMarkdown> */}
+      <style jsx global>{`
+        .katex-cell .katex {
+          font-size: 1em;
+          line-height: 1.4;
+          display: inline-flex;
+          align-items: center;
+        }
+        .katex-display {
+          overflow-x: auto;
+          max-width: 100%;
+        }
+      `}</style>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[
