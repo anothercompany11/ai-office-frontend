@@ -40,6 +40,8 @@ interface FolderItemProps {
   onDeleteFolder: (folderId: string) => void;
   onDeleteConversation?: (id: string) => void;
   activeId?: string | null;
+  isHovered?: boolean;
+  folderPrefix?: string;
 }
 
 // 폴더 내부 대화 항목 컴포넌트 - 드래그 가능하게 수정
@@ -139,6 +141,8 @@ export default function FolderItem({
   onDeleteFolder,
   onDeleteConversation,
   activeId,
+  isHovered = false,
+  folderPrefix = "folder-",
 }: FolderItemProps) {
   const router = useRouter();
   const [isRenaming, setIsRenaming] = useState(false);
@@ -152,7 +156,7 @@ export default function FolderItem({
 
   // 폴더를 드롭 영역으로 설정
   const { setNodeRef, isOver } = useDroppable({
-    id: `folder-${folder.id}`,
+    id: `${folderPrefix}${folder.id}`,
   });
 
   useEffect(() => {
@@ -236,7 +240,7 @@ export default function FolderItem({
         className={`flex items-center px-[13.5px] cursor-pointer rounded-lg hover:bg-[#F9FAFA] group ${
           isPopoverOpen ? "bg-[#F9FAFA]" : ""
         } ${
-          isOver
+          isOver || isHovered
             ? "bg-background-alternative border border-dashed border-gray-400"
             : ""
         }`}

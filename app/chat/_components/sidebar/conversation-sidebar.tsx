@@ -47,7 +47,15 @@ export default function ConversationSidebar({
 
   // DnD 센서와 훅
   const sensors = useDnDSensors();
-  const { activeId, onDragStart, onDragEnd } = useDragHighlight();
+  const { 
+    activeId, 
+    hoveredFolderId, 
+    onDragStart, 
+    onDragOver, 
+    onDragEnd,
+    FOLDER_PREFIX,
+    CONVERSATION_PREFIX 
+  } = useDragHighlight();
 
   // 새 대화 생성 모달 노출 여부
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -81,6 +89,7 @@ export default function ConversationSidebar({
     <DndContext
       sensors={sensors}
       onDragStart={onDragStart}
+      onDragOver={onDragOver}
       onDragEnd={onDragEnd}
       modifiers={[restrictToWindowEdges]}
     >
@@ -90,6 +99,8 @@ export default function ConversationSidebar({
           folders={folders}
           currentConversationId={currentConversationId ?? null}
           activeId={activeId}
+          hoveredFolderId={hoveredFolderId}
+          folderPrefix={FOLDER_PREFIX}
           onSelectConversation={handleSelectChat}
           onRenameFolder={rename}
           onDeleteFolder={remove}
@@ -110,13 +121,18 @@ export default function ConversationSidebar({
           currentConversationId={currentConversationId ?? null}
           onSelect={handleSelectChat}
           onDelete={onDeleteConversation}
+          conversationPrefix={CONVERSATION_PREFIX}
+          activeId={activeId}
         />
         <LogoutButton />
       </SidebarLayout>
 
       <DragOverlay>
         {activeId && (
-          <DragOverlayContent id={activeId} conversations={conversations} />
+          <DragOverlayContent 
+            id={activeId} 
+            conversations={conversations} 
+          />
         )}
       </DragOverlay>
 
