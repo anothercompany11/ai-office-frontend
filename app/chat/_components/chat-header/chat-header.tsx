@@ -19,7 +19,7 @@ import { useSidebar } from "@/app/context/SidebarContext";
 
 const ChatHeader = () => {
   const { isSidebarVisible, setIsSidebarVisible } = useSidebar();
-  
+
   return (
     <div className="px-4 py-3 z-10 fixed top-0 inset-x-0 tab:relative tab:py-5 tab:px-8 flex justify-between items-center">
       <div className="flex items-center">

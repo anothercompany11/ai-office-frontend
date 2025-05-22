@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import ConversationSidebar from "./_components/sidebar/conversation-sidebar";
 import { useEffect, useState } from "react";
 import { LoadIcon } from "../shared/loading";
@@ -6,8 +6,13 @@ import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { SidebarProvider } from "../context/SidebarContext";
 import { ConversationProvider, useConversations } from "../context/ConversationContext";
+import { ProjectProvider } from "../context/ProjectContext";
 
-export default function ChatLayout({ children }: { children: React.ReactNode }) {
+export default function ChatLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
 
@@ -26,7 +31,11 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <ConversationProvider>
-      <ConversationWrapper children={children} />
+      <ProjectProvider>
+        <SidebarProvider>
+          <ConversationWrapper children={children} />
+        </SidebarProvider>
+      </ProjectProvider>
     </ConversationProvider>
   );
 }
@@ -42,19 +51,19 @@ function ConversationWrapper({ children }: { children: React.ReactNode }) {
     startBlankConversation,
     deleteConversation,
   } = useConversations();
-  
+
   const [initialLoaded, setInitialLoaded] = useState(false);
-  
+
   // 최초 로드 여부 업데이트
   useEffect(() => {
     if (!isLoadingConversations) setInitialLoaded(true);
   }, [isLoadingConversations]);
-  
+
   // 대화 목록 로드
   useEffect(() => {
     loadConversations();
   }, [loadConversations]);
-  
+
   if (!initialLoaded && isLoadingConversations) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -62,21 +71,19 @@ function ConversationWrapper({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  
+
   return (
-    <SidebarProvider>
-      <div className="flex web:h-[100vh] h-[100dvh]">
-        <ConversationSidebar
-          conversations={conversations}
-          currentConversationId={currentId}
-          onSelectConversation={selectConversation}
-          onNewConversation={startBlankConversation}
-          onDeleteConversation={deleteConversation}
-        />
-        <main className="w-full">
-          {children}
-        </main>
-      </div>
-    </SidebarProvider>
+    <div className="flex web:h-[100vh] h-[100dvh]">
+      <ConversationSidebar
+        conversations={conversations}
+        currentConversationId={currentId}
+        onSelectConversation={selectConversation}
+        onNewConversation={startBlankConversation}
+        onDeleteConversation={deleteConversation}
+      />
+      <main className="w-full">
+        {children}
+      </main>
+    </div>
   );
 }

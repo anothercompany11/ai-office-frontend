@@ -214,14 +214,20 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
     ),
     table: ({ node, ...props }: any) => (
       <div className="overflow-x-auto w-full my-2">
-        <table className="min-w-full border-collapse border border-gray-300 text-sm" {...props} />
+        <table
+          className="min-w-full border-collapse border border-gray-300 text-sm"
+          {...props}
+        />
       </div>
     ),
     thead: ({ node, ...props }: any) => <thead {...props} />,
     tbody: ({ node, ...props }: any) => <tbody {...props} />,
     tr: ({ node, ...props }: any) => <tr {...props} />,
     th: ({ node, ...props }: any) => (
-      <th className="px-3 py-2 text-left font-medium border border-gray-300 bg-gray-50" {...props} />
+      <th
+        className="px-3 py-2 text-left font-medium border border-gray-300 bg-gray-50"
+        {...props}
+      />
     ),
     td: ({ node, ...props }: any) => (
       <td className="px-3 py-2 border border-gray-300 katex-cell" {...props} />

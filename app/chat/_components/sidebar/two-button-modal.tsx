@@ -16,7 +16,7 @@ export default function TwoButtonModal({
   onConfirm,
   title,
   description,
-  confirmButtonText
+  confirmButtonText,
 }: Props) {
   const isMob = useGetCurrentDevice() === "mob";
   return (

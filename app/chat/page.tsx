@@ -7,7 +7,7 @@ import { useConversations } from "../context/ConversationContext";
 
 export default function ChatPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
-  
+
   const {
     currentId,
     createNewConversation,

@@ -4,13 +4,9 @@ import { ChevronsLeftIcon } from "lucide-react";
 import Image from "next/image";
 import { useSidebar } from "@/app/context/SidebarContext";
 
-const SidebarLayout = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+const SidebarLayout = ({ children }: { children: React.ReactNode }) => {
   const { isSidebarVisible, setIsSidebarVisible } = useSidebar();
-  
+
   return (
     <div
       className={`${

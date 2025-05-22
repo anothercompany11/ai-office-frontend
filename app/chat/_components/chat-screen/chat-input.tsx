@@ -83,14 +83,19 @@ const ChatInput = ({ onSend, disabled = false, user }: ChatInputProps) => {
         <p className="text-caption tab:hidden">AI는 실수할 수 있습니다.</p>
         <p className="text-body-s tab:block hidden">AI는 실수할 수 있습니다.</p>
         <div className="flex gap-1 items-center">
-          <Image src={"/svg/token.svg"} alt="대화 토큰" width={28} height={28} className="size-[28px]"/>
+          <Image
+            src={"/svg/token.svg"}
+            alt="대화 토큰"
+            width={28}
+            height={28}
+            className="size-[28px]"
+          />
           <p className="flex gap-1 items-center">
             <span className="text-label-alternative text-caption">x</span>
             <span className="text-body-l">{remainingCount}</span>
           </p>
         </div>
       </div>
-   
     </div>
   );
 };
