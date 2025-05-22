@@ -10,7 +10,7 @@ import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
 import { useDnDSensors, useDragHighlight } from "@/hooks/use-dnd";
 import SidebarLayout from "./sidebar-layout";
 import useFolders from "@/hooks/use-folder";
-import FolderHeader from "../folder/folder-header";
+import FolderHeader from "../project/project-header";
 import FolderList from "./folder-list";
 import CreateFolderModal from "./create-folder-modal";
 import SidebarChatHeader from "./side-bar-chat-header";
@@ -19,6 +19,7 @@ import { Conversation } from "../types";
 import LogoutButton from "@/app/auth/_components/logout-button";
 import { useSidebar } from "@/app/context/SidebarContext";
 import { useConversations } from "@/app/context/ConversationContext";
+import { useProject } from "@/app/context/ProjectContext";
 
 interface Props {
   conversations: Conversation[];
@@ -37,6 +38,7 @@ export default function ConversationSidebar({
   const isMobile = useGetCurrentDevice() !== "web";
   const { isSidebarVisible, setIsSidebarVisible } = useSidebar();
   const { selectConversation } = useConversations();
+  const { resetCurrentProject } = useProject();
   const grouped = useGroupedConversations(
     conversations.filter((c) => !c.folder_id),
   );
@@ -60,6 +62,7 @@ export default function ConversationSidebar({
   const handleNewChat = () => {
     onNewConversation();
     router.push("/chat"); // 빈 채팅 페이지로 이동
+    resetCurrentProject(); // 프로젝트 컨텍스트 초기화
     if (isMobile) setIsSidebarVisible(false);
   };
 
@@ -69,7 +72,8 @@ export default function ConversationSidebar({
   // 대화방 선택 핸들러 - URL 형식 변경
   const handleSelectChat = (id: string) => {
     selectConversation(id);
-    router.push(`/chat/${id}`); // 새로운 URL 형식
+    router.push(`/chat/${id}`); // 새로운 URL 형식, 프로젝트 ID 없음
+    resetCurrentProject(); // 프로젝트 컨텍스트 초기화
     isMobile && handleCloseSidebar();
   };
 

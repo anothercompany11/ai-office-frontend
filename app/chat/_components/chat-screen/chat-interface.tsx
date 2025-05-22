@@ -16,6 +16,7 @@ interface ChatInterfaceProps {
   onInitialHandled?: () => void;
   finalizeNewConversation: (realId: string) => void;
   user: User;
+  projectId?: string; // 프로젝트 ID
 }
 
 const ChatInterface = ({
@@ -26,6 +27,7 @@ const ChatInterface = ({
   onInitialHandled,
   finalizeNewConversation,
   user,
+  projectId,
 }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<ClientMessage[]>(() => []);
   const [isLoading, setIsLoading] = useState(false);
@@ -235,6 +237,7 @@ const ChatInterface = ({
       const stream = await conversationApi.sendStreamingMessage(
         content,
         conversationId,
+        projectId // 프로젝트 ID(폴더 ID) 전달
       );
       if (!stream) throw new Error("스트리밍 응답을 받을 수 없습니다.");
 

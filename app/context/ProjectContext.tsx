@@ -20,6 +20,7 @@ interface ProjectContextType {
   createFolder: (name: string) => Promise<void>;
   updateFolder: (id: string, name: string) => Promise<void>;
   deleteFolder: (id: string) => Promise<void>;
+  resetCurrentProject: () => void;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -30,6 +31,11 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     null,
   );
   const [isLoading, setIsLoading] = useState(false);
+
+  // 현재 프로젝트 초기화 함수
+  const resetCurrentProject = useCallback(() => {
+    setCurrentProject(null);
+  }, []);
 
   // 모든 폴더 목록 로드
   const loadFolders = useCallback(async () => {
@@ -140,6 +146,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         createFolder,
         updateFolder,
         deleteFolder,
+        resetCurrentProject
       }}
     >
       {children}

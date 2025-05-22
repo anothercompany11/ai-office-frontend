@@ -93,12 +93,17 @@ export const conversationApi = {
   async sendMessage(
     content: string,
     conversationId?: string,
+    folderId?: string,
   ): Promise<ApiResponse<MessageResponse>> {
     try {
       const request: SendMessageRequest = {
         message: content,
         conversation_id: conversationId,
       };
+
+      if (folderId) {
+        request.folder_id = folderId;
+      }
 
       return await post<MessageResponse, SendMessageRequest>("/chat", request);
     } catch (error) {
@@ -115,12 +120,17 @@ export const conversationApi = {
   async sendStreamingMessage(
     content: string,
     conversationId?: string,
+    folderId?: string,
   ): Promise<ReadableStream<Uint8Array> | null> {
     try {
       const request: SendMessageRequest = {
         message: content,
         conversation_id: conversationId === "new" ? undefined : conversationId,
       };
+
+      if (folderId) {
+        request.folder_id = folderId;
+      }
 
       const response = await fetch(
         `${

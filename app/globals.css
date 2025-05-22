@@ -58,6 +58,13 @@
   }
 
   /* ========== Typography ========== */
+  .text-title-xl {
+    font-size: 24px;
+    line-height: 150%;
+    letter-spacing: -0.3%;
+    font-weight: 700;
+  }
+
   .text-title-l {
     font-size: 18px;
     line-height: 150%;
