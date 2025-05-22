@@ -26,9 +26,9 @@ const EmptyChatScreen = ({
         <p className="text-title-s text-label-natural">
           {isProjectPage ? currentProject?.name : "AI 오피스"}
         </p>
-        <p className="text-[24px] text-label-strong font-hakgyo-ansim">
+        <p className="text-[24px] web:whitespace-normal text-label-strong font-hakgyo-ansim">
           {isProjectPage
-            ? `이 프로젝트의 새로운 질문을 입력해주세요`
+            ? `이 프로젝트의\n새로운 질문을 입력해주세요`
             : "지금 어떤 생각을 하고 있으신가요?"}
         </p>
       </div>
