@@ -1,17 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import useConversations from "@/hooks/use-conversation";
 import { useAuth } from "../context/AuthContext";
 import ChatScreenContainer from "./_components/chat-screen/chat-screen-container";
 import { LoadIcon } from "../shared/loading";
-import { useSidebar } from "../context/SidebarContext";
+import { useConversations } from "../context/ConversationContext";
 
 export default function ChatPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
-  const { isSidebarVisible } = useSidebar();
   
-  // 채팅 관리 훅
   const {
     currentId,
     createNewConversation,
@@ -21,8 +17,6 @@ export default function ChatPage() {
     assignToFolder,
     finalizeNewConversation,
   } = useConversations();
-
-  console.log("현재 사이드바 상태:", isSidebarVisible);
 
   if (isAuthLoading || !user) {
     return (
