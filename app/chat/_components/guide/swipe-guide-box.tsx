@@ -10,7 +10,8 @@ const SwipeGuideBox = () => {
       title: `📝 사용 방법`,
       items: [
         {
-          description: "궁금한 내용을 채팅창에 입력하면\n바로 답을 받을 수 있어요.",
+          description:
+            "궁금한 내용을 채팅창에 입력하면\n바로 답을 받을 수 있어요.",
         },
         {
           description: "사람과 대화하듯 편하게 질문하세요.",
@@ -33,7 +34,8 @@ const SwipeGuideBox = () => {
           description: "코인이 다 떨어지면 더 이상 질문할 수 없어요.",
         },
         {
-          description: "코인을 획득하려면 수업시간의 미션들을 통해 획득할 수 있어요.",
+          description:
+            "코인을 획득하려면 수업시간의 미션들을 통해 획득할 수 있어요.",
         },
       ],
     },
@@ -70,7 +72,9 @@ const SwipeGuideBox = () => {
                     key={itemIndex}
                     className="p-3 space-y-1 bg-background-alternative rounded-lg"
                   >
-                    <p className="text-body-s break-words text-label">{item.description}</p>
+                    <p className="text-body-s break-words text-label">
+                      {item.description}
+                    </p>
                   </div>
                 ))}
               </div>
