@@ -47,14 +47,14 @@ export default function ConversationSidebar({
 
   // DnD 센서와 훅
   const sensors = useDnDSensors();
-  const { 
-    activeId, 
-    hoveredFolderId, 
-    onDragStart, 
-    onDragOver, 
+  const {
+    activeId,
+    hoveredFolderId,
+    onDragStart,
+    onDragOver,
     onDragEnd,
     FOLDER_PREFIX,
-    CONVERSATION_PREFIX 
+    CONVERSATION_PREFIX,
   } = useDragHighlight();
 
   // 새 대화 생성 모달 노출 여부
@@ -129,10 +129,7 @@ export default function ConversationSidebar({
 
       <DragOverlay>
         {activeId && (
-          <DragOverlayContent 
-            id={activeId} 
-            conversations={conversations} 
-          />
+          <DragOverlayContent id={activeId} conversations={conversations} />
         )}
       </DragOverlay>
 

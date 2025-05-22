@@ -7,8 +7,8 @@ import { useAuth } from "@/app/context/AuthContext";
 import { LoadIcon } from "@/app/shared/loading";
 import { useProject } from "@/app/context/ProjectContext";
 import { FolderClosed } from "lucide-react";
-import ProjectConversationCard from "../../_components/project/project-conversation-card";
 import EmptyProjectCard from "../../_components/project/empty-project-card";
+import ProjectDashboard from "../../_components/project/project-dashboard";
 
 export default function ProjectPage() {
   const params = useParams();
@@ -23,12 +23,7 @@ export default function ProjectPage() {
       getProjectDetail(projectId);
     }
   }, [projectId, getProjectDetail]);
-
-  // 대화 선택 핸들러
-  const handleSelectConversation = (conversationId: string) => {
-    router.push(`/chat/${conversationId}`);
-  };
-
+  ``;
   // 로딩 상태
   if (isLoading || !user) {
     return (
@@ -60,28 +55,12 @@ export default function ProjectPage() {
   return (
     <div className="relative h-full bg-background-alternative flex flex-col">
       <ChatHeader />
-      <div className="max-w-[680px] bg-white rounded-md p-5 mx-auto w-full">
-        <h2 className="text-title-xl text-label-strong">
-          {currentProject.name}
-        </h2>
-
-        <div className="flex-1 overflow-y-auto pb-8">
-          <div className="mt-4">
-            {currentProject.conversations.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {currentProject.conversations.map((conv) => (
-                  <ProjectConversationCard
-                    key={conv.id}
-                    conversation={conv}
-                    onSelect={handleSelectConversation}
-                  />
-                ))}
-              </div>
-            ) : (
-              <EmptyProjectCard projectId={currentProject.id} />
-            )}
-          </div>
-        </div>
+      <div className="max-w-[680px] bg-white rounded-md p-6 mx-auto w-full">
+        {currentProject.conversations.length > 0 ? (
+          <ProjectDashboard currentProject={currentProject} />
+        ) : (
+          <EmptyProjectCard projectId={currentProject.id} />
+        )}
       </div>
     </div>
   );

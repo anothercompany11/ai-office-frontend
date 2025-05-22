@@ -28,12 +28,12 @@ interface Props {
   conversationPrefix?: string;
 }
 
-export default function ChatGroupList({ 
-  groups, 
-  onSelect, 
+export default function ChatGroupList({
+  groups,
+  onSelect,
   onDelete,
   activeId,
-  conversationPrefix = "conversation-"
+  conversationPrefix = "conversation-",
 }: Props) {
   return (
     <div id="conversations-area" className="pb-4">

@@ -33,7 +33,7 @@ export default function useConversations() {
   const createNewConversation = (firstMsg: string) => {
     // 메시지가 비어있는지 확인
     if (!firstMsg || !firstMsg.trim()) return;
-    
+
     // 대화 시작 상태로 설정
     setCurrentId("new");
     // 전체 메시지를 저장

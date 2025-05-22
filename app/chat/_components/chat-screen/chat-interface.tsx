@@ -46,12 +46,12 @@ const ChatInterface = ({
     if (initialMessage && isNewChat && !sentInitial.current) {
       // 초기 메시지가 있고 새 채팅인 경우에만 실행
       sentInitial.current = true;
-      
+
       // 트리밍한 메시지를 전송
       if (initialMessage.trim()) {
         handleSendMessage(initialMessage);
       }
-      
+
       onInitialHandled?.(); // 버퍼 비우기
     }
   }, [initialMessage, isNewChat]);

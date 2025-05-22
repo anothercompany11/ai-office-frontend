@@ -40,13 +40,13 @@ export function useDragHighlight() {
   const onDragOver = ({ active, over }: DragOverEvent) => {
     // 대화가 폴더 위에 드래그되고 있는지 확인
     if (
-      over && 
-      typeof over.id === 'string' &&
+      over &&
+      typeof over.id === "string" &&
       over.id.startsWith(FOLDER_PREFIX) &&
-      typeof active.id === 'string' &&
+      typeof active.id === "string" &&
       active.id.startsWith(CONVERSATION_PREFIX)
     ) {
-      const folderId = over.id.replace(FOLDER_PREFIX, '');
+      const folderId = over.id.replace(FOLDER_PREFIX, "");
       setHoveredFolderId(folderId);
     } else {
       setHoveredFolderId(null);
@@ -61,32 +61,34 @@ export function useDragHighlight() {
 
     // 드래그 앤 드롭 처리
     if (
-      over && 
-      typeof over.id === 'string' &&
+      over &&
+      typeof over.id === "string" &&
       over.id.startsWith(FOLDER_PREFIX) &&
-      typeof active.id === 'string' &&
+      typeof active.id === "string" &&
       active.id.startsWith(CONVERSATION_PREFIX)
     ) {
-      const folderId = over.id.replace(FOLDER_PREFIX, '');
-      const conversationId = active.id.replace(CONVERSATION_PREFIX, '');
-      
+      const folderId = over.id.replace(FOLDER_PREFIX, "");
+      const conversationId = active.id.replace(CONVERSATION_PREFIX, "");
+
       // 대화를 폴더에 할당
       try {
         await assignToFolder(conversationId, folderId);
-        console.log(`대화 ${conversationId}를 폴더 ${folderId}에 할당했습니다.`);
+        console.log(
+          `대화 ${conversationId}를 폴더 ${folderId}에 할당했습니다.`,
+        );
       } catch (error) {
-        console.error('대화 폴더 할당 실패:', error);
+        console.error("대화 폴더 할당 실패:", error);
       }
     }
   };
 
-  return { 
-    activeId, 
-    hoveredFolderId, 
-    onDragStart, 
-    onDragOver, 
+  return {
+    activeId,
+    hoveredFolderId,
+    onDragStart,
+    onDragOver,
     onDragEnd,
     FOLDER_PREFIX,
-    CONVERSATION_PREFIX
+    CONVERSATION_PREFIX,
   };
 }

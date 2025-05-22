@@ -1,6 +1,7 @@
 "use client";
 
 import { FolderDetail } from "@/app/api/dto/folder";
+import { MessageSquare } from "lucide-react";
 
 interface ProjectConversationCardProps {
   conversation: FolderDetail["conversations"][0];
@@ -12,19 +13,16 @@ export default function ProjectConversationCard({
   onSelect,
 }: ProjectConversationCardProps) {
   return (
-    <div
-      className="p-4 rounded-lg border border-line hover:bg-background-alternative transition-colors cursor-pointer"
-      onClick={() => onSelect(conversation.id)}
-    >
-      <p className="text-body-l text-label-strong truncate">
-        {conversation.title || "제목 없음"}
-      </p>
-      <p className="text-body-s text-label-assistive mt-1">
-        {new Date(conversation.updated_at).toLocaleDateString("ko-KR")}
-      </p>
-      <p className="text-xs text-gray-500 mt-2 truncate">
-        {conversation.preview}
-      </p>
-    </div>
+    <button className="p-4 border-b border-line flex gap-3 items-center" onClick={() => onSelect(conversation.id)}>
+      <MessageSquare size={24} className="text-label-alternative" />
+      <div className="flex flex-col gap-1">
+        <p className="text-body-m text-label-strong truncate">
+          {conversation.title || "제목 없음"}
+        </p>
+        <p className="text-body-s text-label-assistive mt-1">
+          {new Date(conversation.updated_at).toLocaleDateString("ko-KR")}
+        </p>
+      </div>
+    </button>
   );
 }

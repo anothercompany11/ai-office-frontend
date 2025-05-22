@@ -22,10 +22,18 @@ export default function useFolders(conversations: Conversation[]) {
   const create = (name: string) => folderApi.createFolder(name).then(refresh);
   const rename = (id: string, name: string) =>
     folderApi.updateFolder(id, name).then(refresh);
+  const updateInstruction = (id: string, instruction: string) =>
+    folderApi
+      .updateFolder(
+        id,
+        folders.find((f) => f.id === id)?.name || "",
+        instruction,
+      )
+      .then(refresh);
   const remove = (id: string) =>
     folderApi
       .deleteFolder(id)
       .then(() => setFolders((f) => f.filter((x) => x.id !== id)));
 
-  return { folders, create, rename, remove, refresh };
+  return { folders, create, rename, updateInstruction, remove, refresh };
 }

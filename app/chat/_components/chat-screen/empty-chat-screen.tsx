@@ -13,7 +13,7 @@ const EmptyChatScreen = ({
 }) => {
   const { currentProject } = useProject();
   const isProjectPage = !!projectId;
-  
+
   // 메시지 전송 핸들러
   const handleSendMessage = (content: string) => {
     // 메시지가 잘리지 않도록 전체 메시지 전달

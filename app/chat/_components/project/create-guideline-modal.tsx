@@ -7,29 +7,29 @@ import { useEffect, useState, useRef } from "react";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (name: string) => void;
+  onConfirm: (guideline: string) => void;
 }
 
-export default function CreateFolderModal({
+export default function CreateGuidelineModal({
   isOpen,
   onClose,
   onConfirm,
 }: Props) {
-  const [name, setName] = useState("");
+  const [guideline, setGuideline] = useState("");
   const isSubmitting = useRef(false);
 
   useEffect(() => {
     if (isOpen) {
-      setName("");
+      setGuideline("");
       isSubmitting.current = false;
     }
   }, [isOpen]);
 
   const handleSubmit = () => {
-    if (isSubmitting.current || !name.trim()) return;
+    if (isSubmitting.current || !guideline.trim()) return;
 
     isSubmitting.current = true;
-    onConfirm(name.trim());
+    onConfirm(guideline.trim());
     onClose();
   };
 
@@ -43,21 +43,30 @@ export default function CreateFolderModal({
       <DialogContent className="absolute bg-white border tab:w-[534px] border-[#EEEFF1] rounded-[20px] p-6 flex flex-col justify-center items-end gap-6">
         <div className="w-full space-y-6">
           <DialogTitle className="text-title-l text-label-strong">
-            새 프로젝트 만들기
+            프로젝트 지침 추가
           </DialogTitle>
 
-          <input
-            className="w-full border border-line rounded-[10px] px-4 py-3 text-body-m outline-none"
-            value={name}
-            placeholder="프로젝트 이름"
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && name.trim()) {
-                e.preventDefault();
-                handleSubmit();
-              }
-            }}
-          />
+          <div className="space-y-3">
+            <p className="text-body-s text-label-natural">
+              어떻게 하면 ChatGPT가 이 프로젝트를 최대한 도와드릴 수 있을까요?
+              <br />
+              ChatGPT에게 특정 토픽에 집중해 달라고 하거나, 특정한 톤이나
+              포맷으로 응답해 달라고 할 수 있습니다.
+            </p>
+
+            <textarea
+              className="w-full border border-line rounded-[10px] px-4 py-3 text-body-m outline-none min-h-[150px] resize-none"
+              value={guideline}
+              placeholder="AI에게 어떻게 응답해야 할지 지침을 작성해주세요"
+              onChange={(e) => setGuideline(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && e.ctrlKey && guideline.trim()) {
+                  e.preventDefault();
+                  handleSubmit();
+                }
+              }}
+            />
+          </div>
 
           <div className="flex gap-2 justify-end">
             <Button
@@ -68,10 +77,10 @@ export default function CreateFolderModal({
               취소
             </Button>
             <Button
-              disabled={!name.trim()}
+              disabled={!guideline.trim()}
               onClick={handleSubmit}
-              variant="rounded"
               size={"rounded_lg"}
+              variant="rounded"
             >
               저장
             </Button>
