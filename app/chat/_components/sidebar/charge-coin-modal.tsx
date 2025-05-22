@@ -19,7 +19,7 @@ export default function ChargeCoinModal({
     // 쿠폰 적용 성공 후 모달창 자동 닫기
     setTimeout(() => {
       onClose();
-    }, 600);
+    }, 800);
   };
 
   return (
