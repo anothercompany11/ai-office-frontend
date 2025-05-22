@@ -8,14 +8,15 @@ import DragOverlayContent from "./drag-overlay-content";
 import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
 import { useDnDSensors, useDragHighlight } from "@/hooks/use-dnd";
 import SidebarLayout from "./sidebar-layout";
-// import useFolders from "@/hooks/use-folder";
-// import FolderHeader from "../folder/folder-header";
-// import FolderList from "./folder-list";
-// import CreateFolderModal from "./create-folder-modal";
+import useFolders from "@/hooks/use-folder";
+import FolderHeader from "../folder/folder-header";
+import FolderList from "./folder-list";
+import CreateFolderModal from "./create-folder-modal";
 import SidebarChatHeader from "./side-bar-chat-header";
 import ChatGroupList from "./chat-group-list";
 import { Conversation } from "../types";
 import LogoutButton from "@/app/auth/_components/logout-button";
+import { useSidebar } from "@/app/context/SidebarContext";
 
 interface Props {
   conversations: Conversation[];
@@ -23,8 +24,6 @@ interface Props {
   onSelectConversation: (id: string) => void;
   onNewConversation: () => void;
   onDeleteConversation: (id: string) => void;
-  isSidebarVisible: boolean;
-  setIsSidebarVisible: (v: boolean) => void;
 }
 
 export default function ConversationSidebar({
@@ -33,15 +32,14 @@ export default function ConversationSidebar({
   onSelectConversation,
   onNewConversation,
   onDeleteConversation,
-  isSidebarVisible,
-  setIsSidebarVisible,
 }: Props) {
   const isMobile = useGetCurrentDevice() !== "web";
+  const { isSidebarVisible, setIsSidebarVisible } = useSidebar();
   const grouped = useGroupedConversations(
     conversations.filter((c) => !c.folder_id),
   );
-  /** 폴더 관련 주석 처리 */
-  // const { folders, create, rename, remove } = useFolders(conversations);
+  // 폴더
+  const { folders, create, rename, remove } = useFolders(conversations);
 
   // DnD 센서와 훅
   const sensors = useDnDSensors();
@@ -49,6 +47,12 @@ export default function ConversationSidebar({
 
   // 새 대화 생성 모달 노출 여부
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // 폴더 생성 핸들러
+  const handleCreateFolder = async (name: string) => {
+    await create(name);
+    setShowCreateModal(false); // 폴더 생성 성공 시 모달 닫기
+  };
 
   // 새 대화 생성 핸들러
   const handleNewChat = () => {
@@ -71,11 +75,8 @@ export default function ConversationSidebar({
       onDragEnd={onDragEnd}
       modifiers={[restrictToWindowEdges]}
     >
-      <SidebarLayout
-        isVisible={isSidebarVisible}
-        onClose={() => setIsSidebarVisible(false)}
-      >
-        {/* <FolderHeader onNew={() => setShowCreateModal(true)} />
+      <SidebarLayout>
+        <FolderHeader onNew={() => setShowCreateModal(true)} />
         <FolderList
           folders={folders}
           currentConversationId={currentConversationId ?? null}
@@ -86,8 +87,13 @@ export default function ConversationSidebar({
           onCreateFolder={() => setShowCreateModal(true)}
           onDeleteConversation={onDeleteConversation}
         />
+        <CreateFolderModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onConfirm={handleCreateFolder}
+        />
 
-        <div className="border-t border-line my-4" /> */}
+        <div className="border-t border-line my-4" />
 
         <SidebarChatHeader onNew={handleNewChat} />
         <ChatGroupList

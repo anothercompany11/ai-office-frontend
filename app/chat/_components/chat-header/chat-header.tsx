@@ -1,3 +1,5 @@
+"use client";
+
 import { CircleHelp, ChevronsRight } from "lucide-react";
 import {
   Popover,
@@ -13,13 +15,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import SwipeGuideBox from "../guide/swipe-guide-box";
+import { useSidebar } from "@/app/context/SidebarContext";
 
-interface Props {
-  isSidebarVisible: boolean;
-  setIsSidebarVisible: (visible: boolean) => void;
-}
-
-const ChatHeader = ({ isSidebarVisible, setIsSidebarVisible }: Props) => {
+const ChatHeader = () => {
+  const { isSidebarVisible, setIsSidebarVisible } = useSidebar();
+  
   return (
     <div className="px-4 py-3 z-10 fixed top-0 inset-x-0 tab:relative tab:py-5 tab:px-8 flex justify-between items-center">
       <div className="flex items-center">

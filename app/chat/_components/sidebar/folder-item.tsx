@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/popover";
 import RenameFolderModal from "./rename-folder-modal";
 import TwoButtonModal from "./two-button-modal";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // 폴더 내부 대화 타입
 interface Conversation {
@@ -142,6 +144,7 @@ export default function FolderItem({
   onDeleteConversation,
   activeId,
 }: FolderItemProps) {
+  const router = useRouter();
   const [isRenaming, setIsRenaming] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false); // 이름 변경 모달 노출 여부
   const [showDeleteModal, setShowDeleteModal] = useState(false); // 삭제 모달 노출 여부
@@ -218,6 +221,18 @@ export default function FolderItem({
     }
   };
 
+  // 폴더 클릭 핸들러
+  const handleFolderClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFolder(folder.id);
+  };
+
+  // 폴더 이름 클릭 핸들러
+  const handleFolderNameClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/chat/project/${folder.id}`);
+  };
+
   return (
     <div>
       <div
@@ -229,7 +244,7 @@ export default function FolderItem({
             ? "bg-background-alternative border border-dashed border-gray-400"
             : ""
         }`}
-        onClick={() => toggleFolder(folder.id)}
+        onClick={handleFolderClick}
       >
         <div className="flex items-center gap-[9px] flex-grow overflow-hidden py-3">
           <FolderClosed size={16} />
@@ -251,33 +266,16 @@ export default function FolderItem({
                     setIsRenaming(false);
                   }
                 }}
-                className="w-full px-1 py-0.5 text-sm border border-gray-300 rounded"
-                autoFocus
+                onBlur={handleRename}
+                className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-              <div className="flex mt-1 space-x-1">
-                <button
-                  onClick={handleRename}
-                  className="p-1 text-green-600 hover:bg-green-50 rounded"
-                >
-                  <Check size={14} />
-                </button>
-                <button
-                  onClick={() => {
-                    setNewName(folder.name);
-                    setIsRenaming(false);
-                  }}
-                  className="p-1 text-red-600 hover:bg-red-50 rounded"
-                >
-                  <X size={14} />
-                </button>
-              </div>
             </div>
           ) : (
-            <span className="text-body-s text-label-strong truncate">
+            <span
+              className="text-body-s truncate flex-grow"
+              onClick={handleFolderNameClick}
+            >
               {folder.name}
-              {folder.is_default && (
-                <span className="ml-1 text-xs text-gray-500">(기본)</span>
-              )}
             </span>
           )}
         </div>

@@ -6,6 +6,8 @@ interface Props {
   onClose: () => void;
   onConfirm: (e: React.MouseEvent) => void;
   title: string;
+  description?: string;
+  confirmButtonText?: string;
 }
 
 export default function TwoButtonModal({
@@ -13,6 +15,8 @@ export default function TwoButtonModal({
   onClose,
   onConfirm,
   title,
+  description,
+  confirmButtonText
 }: Props) {
   const isMob = useGetCurrentDevice() === "mob";
   return (
@@ -30,7 +34,7 @@ export default function TwoButtonModal({
                   : "text-body-2 tab:whitespace-nowrap text-label-strong"
               }
             >
-              {`삭제된 내용은 다시 복구할 수 없으며\n모든 대화 내용이 영구적으로 삭제됩니다.`}
+              {description}
             </p>
           </div>
           <div className="flex gap-2 w-full text-[14px] justify-end font-bold">
@@ -44,7 +48,7 @@ export default function TwoButtonModal({
               onClick={(e: React.MouseEvent) => onConfirm(e)}
               className="tab:w-[97px] w-full h-12 rounded-full text-title-s bg-[#00AC78] text-white"
             >
-              삭제하기
+              {confirmButtonText}
             </button>
           </div>
         </div>
