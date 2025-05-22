@@ -22,6 +22,11 @@ export default function ProjectPage() {
     }
   }, [projectId, getProjectDetail]);
 
+  // 대화 선택 핸들러
+  const handleSelectConversation = (conversationId: string) => {
+    router.push(`/chat/${conversationId}`);
+  };
+
   // 로딩 상태
   if (isLoading || !user) {
     return (
@@ -37,9 +42,11 @@ export default function ProjectPage() {
       <div className="flex flex-col items-center justify-center h-screen">
         <FolderClosed size={64} className="text-gray-400 mb-4" />
         <h1 className="text-2xl font-bold mb-2">프로젝트를 찾을 수 없습니다</h1>
-        <p className="text-gray-500 mb-6">요청하신 프로젝트가 존재하지 않거나 접근할 수 없습니다.</p>
+        <p className="text-gray-500 mb-6">
+          요청하신 프로젝트가 존재하지 않거나 접근할 수 없습니다.
+        </p>
         <button
-          onClick={() => router.push('/chat')}
+          onClick={() => router.push("/chat")}
           className="px-4 py-2 bg-primary text-white rounded-lg"
         >
           채팅으로 돌아가기
@@ -68,13 +75,13 @@ export default function ProjectPage() {
                 <div
                   key={conv.id}
                   className="p-4 rounded-lg border border-line hover:bg-background-alternative transition-colors cursor-pointer"
-                  onClick={() => router.push(`/chat?id=${conv.id}`)}
+                  onClick={() => handleSelectConversation(conv.id)}
                 >
                   <p className="text-body-l text-label-strong truncate">
                     {conv.title || "제목 없음"}
                   </p>
                   <p className="text-body-s text-label-assistive mt-1">
-                    {new Date(conv.updated_at).toLocaleDateString('ko-KR')}
+                    {new Date(conv.updated_at).toLocaleDateString("ko-KR")}
                   </p>
                   <p className="text-xs text-gray-500 mt-2 truncate">
                     {conv.preview}
@@ -89,7 +96,7 @@ export default function ProjectPage() {
                 이 프로젝트에는 아직 대화가 없습니다.
               </p>
               <button
-                onClick={() => router.push('/chat')}
+                onClick={() => router.push("/chat")}
                 className="px-4 py-2 bg-primary text-white rounded-lg"
               >
                 새 대화 시작하기

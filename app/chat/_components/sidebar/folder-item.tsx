@@ -1,13 +1,6 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { motion } from "framer-motion";
-import {
-  Check,
-  FolderClosed,
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  X,
-} from "lucide-react";
+import { FolderClosed, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   Popover,
@@ -16,7 +9,6 @@ import {
 } from "@/components/ui/popover";
 import RenameFolderModal from "./rename-folder-modal";
 import TwoButtonModal from "./two-button-modal";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 // 폴더 내부 대화 타입
@@ -64,6 +56,7 @@ function FolderConversationItem({
   onSelect: (id: string) => void;
   onDelete: (e: React.MouseEvent, id: string) => void;
 }) {
+  const router = useRouter();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: conversation.id,
@@ -84,6 +77,15 @@ function FolderConversationItem({
       }
     : undefined;
 
+  const handleSelectConversation = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest("button")) {
+      return;
+    }
+    e.stopPropagation();
+    onSelect(conversation.id);
+    router.push(`/chat/${conversation.id}`);
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -93,13 +95,7 @@ function FolderConversationItem({
       className={`flex items-center justify-between px-2 text-body-s rounded-lg cursor-pointer hover:bg-[#EEEFF1] group ${
         isPopoverOpen ? "bg-[#EEEFF1]" : ""
       }`}
-      onClick={(e) => {
-        if ((e.target as HTMLElement).closest("button")) {
-          return;
-        }
-        e.stopPropagation();
-        onSelect(conversation.id);
-      }}
+      onClick={handleSelectConversation}
     >
       <span className="py-3 truncate">{conversation.title}</span>
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>

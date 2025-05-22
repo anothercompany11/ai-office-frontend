@@ -5,7 +5,10 @@ import { LoadIcon } from "../shared/loading";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { SidebarProvider } from "../context/SidebarContext";
-import { ConversationProvider, useConversations } from "../context/ConversationContext";
+import {
+  ConversationProvider,
+  useConversations,
+} from "../context/ConversationContext";
 import { ProjectProvider } from "../context/ProjectContext";
 
 export default function ChatLayout({
@@ -47,7 +50,6 @@ function ConversationWrapper({ children }: { children: React.ReactNode }) {
     isLoadingConversations,
     currentId,
     loadConversations,
-    selectConversation,
     startBlankConversation,
     deleteConversation,
   } = useConversations();
@@ -77,13 +79,10 @@ function ConversationWrapper({ children }: { children: React.ReactNode }) {
       <ConversationSidebar
         conversations={conversations}
         currentConversationId={currentId}
-        onSelectConversation={selectConversation}
         onNewConversation={startBlankConversation}
         onDeleteConversation={deleteConversation}
       />
-      <main className="w-full">
-        {children}
-      </main>
+      <main className="w-full">{children}</main>
     </div>
   );
 }

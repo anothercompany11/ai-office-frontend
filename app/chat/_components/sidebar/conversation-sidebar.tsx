@@ -3,6 +3,7 @@
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useGroupedConversations } from "@/hooks/use-groupped-conversation";
 import DragOverlayContent from "./drag-overlay-content";
 import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
@@ -17,11 +18,11 @@ import ChatGroupList from "./chat-group-list";
 import { Conversation } from "../types";
 import LogoutButton from "@/app/auth/_components/logout-button";
 import { useSidebar } from "@/app/context/SidebarContext";
+import { useConversations } from "@/app/context/ConversationContext";
 
 interface Props {
   conversations: Conversation[];
   currentConversationId?: string | null;
-  onSelectConversation: (id: string) => void;
   onNewConversation: () => void;
   onDeleteConversation: (id: string) => void;
 }
@@ -29,12 +30,13 @@ interface Props {
 export default function ConversationSidebar({
   conversations,
   currentConversationId,
-  onSelectConversation,
   onNewConversation,
   onDeleteConversation,
 }: Props) {
+  const router = useRouter();
   const isMobile = useGetCurrentDevice() !== "web";
   const { isSidebarVisible, setIsSidebarVisible } = useSidebar();
+  const { selectConversation } = useConversations();
   const grouped = useGroupedConversations(
     conversations.filter((c) => !c.folder_id),
   );
@@ -57,17 +59,20 @@ export default function ConversationSidebar({
   // 새 대화 생성 핸들러
   const handleNewChat = () => {
     onNewConversation();
+    router.push("/chat"); // 빈 채팅 페이지로 이동
     if (isMobile) setIsSidebarVisible(false);
   };
 
   // 사이드바 닫기 핸들러
   const handleCloseSidebar = () => setIsSidebarVisible(false);
 
-  // 대화방 선택 핸들러
+  // 대화방 선택 핸들러 - URL 형식 변경
   const handleSelectChat = (id: string) => {
-    onSelectConversation(id);
+    selectConversation(id);
+    router.push(`/chat/${id}`); // 새로운 URL 형식
     isMobile && handleCloseSidebar();
   };
+
   return (
     <DndContext
       sensors={sensors}
@@ -81,7 +86,7 @@ export default function ConversationSidebar({
           folders={folders}
           currentConversationId={currentConversationId ?? null}
           activeId={activeId}
-          onSelectConversation={onSelectConversation}
+          onSelectConversation={handleSelectChat}
           onRenameFolder={rename}
           onDeleteFolder={remove}
           onCreateFolder={() => setShowCreateModal(true)}

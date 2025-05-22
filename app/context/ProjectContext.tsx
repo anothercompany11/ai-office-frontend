@@ -1,8 +1,15 @@
-'use client'
+"use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
-import { folderApi } from '@/app/api';
-import { Folder, FolderDetail } from '@/app/api/dto/folder';
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+  useEffect,
+} from "react";
+import { folderApi } from "@/app/api";
+import { Folder, FolderDetail } from "@/app/api/dto/folder";
 
 interface ProjectContextType {
   folders: Folder[];
@@ -19,7 +26,9 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const [folders, setFolders] = useState<Folder[]>([]);
-  const [currentProject, setCurrentProject] = useState<FolderDetail | null>(null);
+  const [currentProject, setCurrentProject] = useState<FolderDetail | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   // 모든 폴더 목록 로드
@@ -56,55 +65,64 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // 폴더 생성
-  const createFolder = useCallback(async (name: string) => {
-    try {
-      setIsLoading(true);
-      await folderApi.createFolder(name);
-      await loadFolders();
-    } catch (error) {
-      console.error("폴더 생성 오류:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [loadFolders]);
+  const createFolder = useCallback(
+    async (name: string) => {
+      try {
+        setIsLoading(true);
+        await folderApi.createFolder(name);
+        await loadFolders();
+      } catch (error) {
+        console.error("폴더 생성 오류:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [loadFolders],
+  );
 
   // 폴더 이름 수정
-  const updateFolder = useCallback(async (id: string, name: string) => {
-    try {
-      setIsLoading(true);
-      await folderApi.updateFolder(id, name);
-      
-      // 현재 보고 있는 프로젝트라면 상세 정보도 업데이트
-      if (currentProject && currentProject.id === id) {
-        await getProjectDetail(id);
+  const updateFolder = useCallback(
+    async (id: string, name: string) => {
+      try {
+        setIsLoading(true);
+        await folderApi.updateFolder(id, name);
+
+        // 현재 보고 있는 프로젝트라면 상세 정보도 업데이트
+        if (currentProject && currentProject.id === id) {
+          await getProjectDetail(id);
+        }
+
+        await loadFolders();
+      } catch (error) {
+        console.error("폴더 업데이트 오류:", error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      await loadFolders();
-    } catch (error) {
-      console.error("폴더 업데이트 오류:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [loadFolders, getProjectDetail, currentProject]);
+    },
+    [loadFolders, getProjectDetail, currentProject],
+  );
 
   // 폴더 삭제
-  const deleteFolder = useCallback(async (id: string) => {
-    try {
-      setIsLoading(true);
-      await folderApi.deleteFolder(id);
-      
-      // 현재 보고 있는 프로젝트라면 초기화
-      if (currentProject && currentProject.id === id) {
-        setCurrentProject(null);
+  const deleteFolder = useCallback(
+    async (id: string) => {
+      try {
+        setIsLoading(true);
+        await folderApi.deleteFolder(id);
+
+        // 현재 보고 있는 프로젝트라면 초기화
+        if (currentProject && currentProject.id === id) {
+          setCurrentProject(null);
+        }
+
+        await loadFolders();
+      } catch (error) {
+        console.error("폴더 삭제 오류:", error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      await loadFolders();
-    } catch (error) {
-      console.error("폴더 삭제 오류:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [loadFolders, currentProject]);
+    },
+    [loadFolders, currentProject],
+  );
 
   // 초기 폴더 목록 로드
   useEffect(() => {
@@ -121,7 +139,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         getProjectDetail,
         createFolder,
         updateFolder,
-        deleteFolder
+        deleteFolder,
       }}
     >
       {children}
@@ -132,7 +150,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
 export function useProject() {
   const context = useContext(ProjectContext);
   if (context === undefined) {
-    throw new Error('useProject must be used within a ProjectProvider');
+    throw new Error("useProject must be used within a ProjectProvider");
   }
   return context;
-} 
+}

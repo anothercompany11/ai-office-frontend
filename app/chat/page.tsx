@@ -1,22 +1,22 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
-import ChatScreenContainer from "./_components/chat-screen/chat-screen-container";
-import { LoadIcon } from "../shared/loading";
 import { useConversations } from "../context/ConversationContext";
+import EmptyChatScreen from "./_components/chat-screen/empty-chat-screen";
+import ChatHeader from "./_components/chat-header/chat-header";
+import { LoadIcon } from "../shared/loading";
 
 export default function ChatPage() {
+  const router = useRouter();
   const { user, isLoading: isAuthLoading } = useAuth();
+  const { createNewConversation } = useConversations();
 
-  const {
-    currentId,
-    createNewConversation,
-    updateConversation,
-    pendingFirstMsg,
-    clearPendingFirstMsg,
-    assignToFolder,
-    finalizeNewConversation,
-  } = useConversations();
+  // 새 대화 시작 핸들러
+  const handleCreateNewConversation = (firstMsg: string) => {
+    createNewConversation(firstMsg);
+    router.push("/chat/new"); // 'new' 페이지로 리다이렉트
+  };
 
   if (isAuthLoading || !user) {
     return (
@@ -25,16 +25,14 @@ export default function ChatPage() {
       </div>
     );
   }
+
   return (
-    <ChatScreenContainer
-      user={user}
-      currentId={currentId}
-      createNewConversation={createNewConversation}
-      updateConversation={updateConversation}
-      assignToFolder={assignToFolder}
-      pendingFirstMsg={pendingFirstMsg}
-      clearPendingFirstMsg={clearPendingFirstMsg}
-      finalizeNewConversation={finalizeNewConversation}
-    />
+    <div className="flex flex-col web:h-[100vh] h-[100dvh] w-full bg-line-alternative">
+      <ChatHeader />
+      <EmptyChatScreen
+        user={user}
+        createNewConversation={handleCreateNewConversation}
+      />
+    </div>
   );
 }
