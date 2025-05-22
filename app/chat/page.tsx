@@ -12,13 +12,18 @@ export default function ChatPage() {
   const searchParams = useSearchParams();
   const { user, isLoading: isAuthLoading } = useAuth();
   const { createNewConversation } = useConversations();
-  
+
   // URL에서 프로젝트 ID 파라미터를 가져옴
   const projectId = searchParams.get("projectId");
 
   // 새 대화 시작 핸들러
   const handleCreateNewConversation = (firstMsg: string) => {
+    // 빈 메시지는 처리하지 않음
+    if (!firstMsg.trim()) return;
+    
+    // 전체 메시지를 Context에 저장
     createNewConversation(firstMsg);
+    
     // 프로젝트 ID가 있으면 함께 전달
     if (projectId) {
       router.push(`/chat/new?projectId=${projectId}`);

@@ -61,10 +61,9 @@ export default function ProjectPage() {
     <div className="relative h-full bg-background-alternative flex flex-col">
       <ChatHeader />
       <div className="max-w-[680px] bg-white rounded-md p-5 mx-auto w-full">
-
-          <h2 className="text-title-xl text-label-strong">
-            {currentProject.name}
-          </h2>
+        <h2 className="text-title-xl text-label-strong">
+          {currentProject.name}
+        </h2>
 
         <div className="flex-1 overflow-y-auto pb-8">
           <div className="mt-4">

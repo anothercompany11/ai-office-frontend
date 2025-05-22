@@ -31,8 +31,13 @@ export default function useConversations() {
 
   /** 2. 빈 채팅 화면에서 대화 시작 */
   const createNewConversation = (firstMsg: string) => {
+    // 메시지가 비어있는지 확인
+    if (!firstMsg || !firstMsg.trim()) return;
+    
+    // 대화 시작 상태로 설정
     setCurrentId("new");
-    setPendingFirstMsg(firstMsg);
+    // 전체 메시지를 저장
+    setPendingFirstMsg(firstMsg.trim());
   };
 
   /** 3. 목록 불러오기 */
@@ -55,7 +60,7 @@ export default function useConversations() {
     }
   }, []);
 
-  /** 4. 스트리밍 종료 후 ‘new’ → 실제 ID 확정 */
+  /** 4. 스트리밍 종료 후 'new' → 실제 ID 확정 */
   const finalizeNewConversation = useCallback(
     (realId: string) => syncCurrentIdWithStorage(realId),
     [syncCurrentIdWithStorage],

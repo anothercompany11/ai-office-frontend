@@ -94,6 +94,7 @@ export default function ConversationItem({
       </div>
       <TwoButtonModal
         isOpen={isDeleteModalOpen}
+        confirmButtonText="삭제하기"
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={() => {
           onDelete({} as React.MouseEvent, conversation.id);

@@ -24,7 +24,7 @@ export default function ChatDetailPage() {
 
   // URL에서 프로젝트 ID를 가져옴
   const projectId = searchParams.get("projectId");
-  
+
   // ID가 'new'인 경우 새 대화 시작
   const isNewChat = chatId === "new";
 

@@ -146,7 +146,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         createFolder,
         updateFolder,
         deleteFolder,
-        resetCurrentProject
+        resetCurrentProject,
       }}
     >
       {children}

@@ -364,6 +364,7 @@ export default function FolderItem({
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         title="정말 삭제하시나요?"
+        confirmButtonText="삭제하기"
         onConfirm={() => {
           onDeleteFolder(folder.id);
           setShowDeleteModal(false);

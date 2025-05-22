@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
 
@@ -38,18 +39,19 @@ export default function TwoButtonModal({
             </p>
           </div>
           <div className="flex gap-2 w-full text-[14px] justify-end font-bold">
-            <button
+            <Button
               onClick={onClose}
+              variant="outline"
               className="tab:w-[84px] w-full h-12 border border-line-strong rounded-full text-title-s bg-white"
             >
               취소
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={(e: React.MouseEvent) => onConfirm(e)}
               className="tab:w-[97px] w-full h-12 rounded-full text-title-s bg-[#00AC78] text-white"
             >
               {confirmButtonText}
-            </button>
+            </Button>
           </div>
         </div>
       </DialogContent>

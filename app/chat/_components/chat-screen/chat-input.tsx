@@ -30,9 +30,10 @@ const ChatInput = ({ onSend, disabled = false, user }: ChatInputProps) => {
   // 메세지 제출 핸들러
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim() && !disabled) {
+    const trimmedMessage = message.trim();
+    if (trimmedMessage && !disabled && !is_limit_reached) {
       incrementPromptCount(user);
-      onSend(message);
+      onSend(trimmedMessage);
       setMessage("");
     }
   };
@@ -43,8 +44,14 @@ const ChatInput = ({ onSend, disabled = false, user }: ChatInputProps) => {
     if (is_limit_reached) return;
 
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit(e);
+      e.preventDefault(); // 엔터키의 기본 동작 방지
+      
+      const trimmedMessage = message.trim();
+      if (trimmedMessage && !disabled) {
+        incrementPromptCount(user);
+        onSend(trimmedMessage);
+        setMessage("");
+      }
     }
   };
 
