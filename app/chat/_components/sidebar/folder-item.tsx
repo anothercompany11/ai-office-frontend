@@ -10,6 +10,8 @@ import {
 import RenameFolderModal from "./rename-folder-modal";
 import TwoButtonModal from "./two-button-modal";
 import { useRouter } from "next/navigation";
+import { useSidebar } from "@/app/context/SidebarContext";
+import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
 
 // 폴더 내부 대화 타입
 interface Conversation {
@@ -61,6 +63,8 @@ function FolderConversationItem({
 }) {
   const router = useRouter();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const { setIsSidebarVisible } = useSidebar();
+  const isMobile = useGetCurrentDevice() !== "web";
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: conversation.id,
   });
@@ -87,6 +91,11 @@ function FolderConversationItem({
     e.stopPropagation();
     onSelect(conversation.id);
     router.push(`/chat/${conversation.id}`);
+    
+    // 모바일 환경에서 사이드바 닫기
+    if (isMobile) {
+      setIsSidebarVisible(false);
+    }
   };
 
   return (
@@ -154,6 +163,8 @@ export default function FolderItem({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const renameInputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { setIsSidebarVisible } = useSidebar();
+  const isMobile = useGetCurrentDevice() !== "web";
 
   // 폴더를 드롭 영역으로 설정
   const { setNodeRef, isOver } = useDroppable({
@@ -226,12 +237,22 @@ export default function FolderItem({
   const handleFolderClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleFolder(folder.id);
+    
+    // 모바일 환경에서 사이드바 닫기
+    if (isMobile) {
+      setIsSidebarVisible(false);
+    }
   };
 
   // 폴더 이름 클릭 핸들러
   const handleFolderNameClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/chat/project/${folder.id}`);
+    
+    // 모바일 환경에서 사이드바 닫기
+    if (isMobile) {
+      setIsSidebarVisible(false);
+    }
   };
 
   return (
