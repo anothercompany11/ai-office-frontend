@@ -53,9 +53,9 @@ export default function ProjectPage() {
   }
 
   return (
-    <div className="relative h-full bg-background-alternative flex flex-col">
+    <div className="relative h-full px-4 web:px-0 bg-background-alternative flex flex-col">
       <ChatHeader />
-      <div className="max-w-[680px] bg-white rounded-md p-6 mx-auto w-full">
+      <div className="max-w-[680px] mt-12 bg-white rounded-md p-6 web:mx-auto w-full">
         {currentProject.conversations.length > 0 ? (
           <ProjectDashboard currentProject={currentProject} />
         ) : (
