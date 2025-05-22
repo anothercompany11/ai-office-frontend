@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import ChatInput from "./chat-input";
 import ChatMessage from "./chat-message";
 import { User } from "@/app/api/dto";
+import ChargeCoinModal from "../sidebar/charge-coin-modal";
 
 interface ChatInterfaceProps {
   conversationId: string;
@@ -36,6 +37,7 @@ const ChatInterface = ({
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const folderMenuRef = useRef<HTMLDivElement>(null);
+  const [isChargeModalOpen, setIsChargeModalOpen] = useState(false);
 
   const sentInitial = useRef(false); //  전송했는지 여부
 
@@ -337,6 +339,16 @@ const ChatInterface = ({
     }
   };
 
+  // 코인 충전 모달 열기 함수
+  const openChargeModal = () => {
+    setIsChargeModalOpen(true);
+  };
+
+  // 코인 충전 모달 닫기 함수
+  const closeChargeModal = () => {
+    setIsChargeModalOpen(false);
+  };
+
   return (
     <main className="relative h-[calc(100vh-67px)] overflow-hidden transition-all duration-350 mx-auto flex flex-col">
       {/* 채팅 메시지 영역 - 스크롤 가능 영역 */}
@@ -376,9 +388,17 @@ const ChatInterface = ({
             user={user}
             onSend={handleSendMessage}
             disabled={isLoading}
+            onChargeRequest={openChargeModal}
           />
         </div>
       </div>
+
+      {/* 코인 충전 모달 */}
+      <ChargeCoinModal
+        isOpen={isChargeModalOpen}
+        onClose={closeChargeModal}
+        title="코인 충전"
+      />
     </main>
   );
 };

@@ -75,7 +75,7 @@ const ChatHeader = ({ isSidebarVisible, setIsSidebarVisible }: Props) => {
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="font-hakgyo-ansim">
-              AI오피스 프롬프트 가이드
+                AI오피스 프롬프트 가이드
               </DialogTitle>
             </DialogHeader>
 
