@@ -23,7 +23,7 @@ export default function ProjectPage() {
       getProjectDetail(projectId);
     }
   }, [projectId, getProjectDetail]);
-  ``;
+
   // 로딩 상태
   if (isLoading || !user) {
     return (
@@ -59,7 +59,10 @@ export default function ProjectPage() {
         {currentProject.conversations.length > 0 ? (
           <ProjectDashboard currentProject={currentProject} />
         ) : (
-          <EmptyProjectCard projectId={currentProject.id} />
+          <EmptyProjectCard
+            projectId={projectId}
+            currentProject={currentProject}
+          />
         )}
       </div>
     </div>

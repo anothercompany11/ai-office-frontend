@@ -8,22 +8,24 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (guideline: string) => void;
+  initialInstruction?: string;
 }
 
 export default function CreateGuidelineModal({
   isOpen,
   onClose,
   onConfirm,
+  initialInstruction = "",
 }: Props) {
-  const [guideline, setGuideline] = useState("");
+  const [guideline, setGuideline] = useState(initialInstruction);
   const isSubmitting = useRef(false);
 
   useEffect(() => {
     if (isOpen) {
-      setGuideline("");
+      setGuideline(initialInstruction);
       isSubmitting.current = false;
     }
-  }, [isOpen]);
+  }, [isOpen, initialInstruction]);
 
   const handleSubmit = () => {
     if (isSubmitting.current || !guideline.trim()) return;
@@ -48,16 +50,19 @@ export default function CreateGuidelineModal({
 
           <div className="space-y-3">
             <p className="text-body-s text-label-natural">
-              어떻게 하면 ChatGPT가 이 프로젝트를 최대한 도와드릴 수 있을까요?
+              <span className="text-label-strong">
+                어떻게 하면 AI오피스가 이 프로젝트를 최대한 도와드릴 수
+                있을까요?
+              </span>
               <br />
-              ChatGPT에게 특정 토픽에 집중해 달라고 하거나, 특정한 톤이나
+              AI오피스에게 특정 토픽에 집중해 달라고 하거나, 특정한 톤이나
               포맷으로 응답해 달라고 할 수 있습니다.
             </p>
 
             <textarea
               className="w-full border border-line rounded-[10px] px-4 py-3 text-body-m outline-none min-h-[150px] resize-none"
               value={guideline}
-              placeholder="AI에게 어떻게 응답해야 할지 지침을 작성해주세요"
+              placeholder="예: 최신 JavaScript 문법을 사용해서 답변해줘"
               onChange={(e) => setGuideline(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && e.ctrlKey && guideline.trim()) {

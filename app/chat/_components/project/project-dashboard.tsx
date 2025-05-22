@@ -18,7 +18,7 @@ const ProjectDashboard = ({ currentProject }: ProjectDashboardProps) => {
   };
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <h2 className="text-subtitle-l flex items-center text-label-strong">
           <FolderClosed size={24} className="inline-block mr-2" />
           {currentProject.name}
@@ -27,16 +27,14 @@ const ProjectDashboard = ({ currentProject }: ProjectDashboardProps) => {
       </div>
       <ProjectGuidelineButton projectId={currentProject.id} />
       <div className="flex-1 overflow-y-auto">
-        <div className="mt-4">
-          <div className="flex flex-col">
-            {currentProject.conversations.map((conv) => (
-              <ProjectConversationCard
-                key={conv.id}
-                conversation={conv}
-                onSelect={handleSelectConversation}
-              />
-            ))}
-          </div>
+        <div className="flex flex-col">
+          {currentProject.conversations.map((conv) => (
+            <ProjectConversationCard
+              key={conv.id}
+              conversation={conv}
+              onSelect={handleSelectConversation}
+            />
+          ))}
         </div>
       </div>
     </div>

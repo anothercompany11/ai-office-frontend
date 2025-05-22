@@ -25,5 +25,6 @@ export interface FolderDetail extends Folder {
     preview: string;
     created_at: string;
     updated_at: string;
+    instruction?: string;
   }[];
 }

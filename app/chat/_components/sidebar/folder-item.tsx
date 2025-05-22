@@ -28,6 +28,7 @@ export interface ConversationFolder {
   created_at: string;
   updated_at: string;
   conversations: Conversation[];
+  instruction?: string;
 }
 
 interface FolderItemProps {
