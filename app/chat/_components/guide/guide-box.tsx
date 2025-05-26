@@ -40,7 +40,7 @@ const GuideBox = () => {
   return (
     <div className="flex flex-col items-center gap-6">
       <div className="text-center">
-        <p className="text-title-1 font-hakgyo-ansim">{`AI오피스 프롬프트 가이드`}</p>
+        <p className="text-title-1 font-hakgyo-ansim">{`토르 프롬프트 가이드`}</p>
       </div>
       <div className="flex gap-4">
         {GuideData.map((guide) => (

@@ -10,7 +10,7 @@ export const couponSchema = z.object({
   coupon_code: z
     .string()
     .min(1, "쿠폰 코드를 입력해주세요.")
-    .max(50, "쿠폰 코드는 50자 이내로 입력해주세요.")
+    .max(50, "쿠폰 코드는 50자 이내로 입력해주세요."),
 });
 
 // 쿠폰 관련 타입 정의
@@ -36,8 +36,10 @@ export default function useCoupon() {
       setSuccess(null);
 
       // 쿠폰 코드 유효성 검사
-      const validationResult = couponSchema.safeParse({ coupon_code: couponCode });
-      
+      const validationResult = couponSchema.safeParse({
+        coupon_code: couponCode,
+      });
+
       if (!validationResult.success) {
         const errorMessage = "쿠폰 코드 적용에 실패했습니다.";
         setError(errorMessage);
@@ -49,23 +51,26 @@ export default function useCoupon() {
 
       if (response.status === "success" && response.data) {
         // 사용자 정보 업데이트
-        if (response.data.prompt_limit !== undefined && response.data.prompt_count !== undefined) {
+        if (
+          response.data.prompt_limit !== undefined &&
+          response.data.prompt_count !== undefined
+        ) {
           // 충전된 코인 개수 계산 (이전 값이 없는 경우 0으로 가정)
           const prevLimit = user?.prompt_limit || 0;
           const addedCoins = response.data.prompt_limit - prevLimit;
-          
+
           // 성공 메시지 설정
           setSuccess(`${addedCoins}개의 코인이 충전되었습니다.`);
-          
+
           // 사용자 정보 업데이트
           updateUserPromptInfo(
             response.data.prompt_limit,
-            response.data.prompt_count
+            response.data.prompt_count,
           );
         } else {
           setSuccess("쿠폰이 성공적으로 적용되었습니다.");
         }
-        
+
         return true;
       } else {
         setError(response.message || "쿠폰 코드 적용에 실패했습니다.");
@@ -103,4 +108,4 @@ export default function useCoupon() {
     clearSuccess,
     user,
   };
-} 
+}

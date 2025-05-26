@@ -14,7 +14,12 @@ interface ChatInputProps {
   onChargeRequest?: () => void;
 }
 
-const ChatInput = ({ onSend, disabled = false, user, onChargeRequest }: ChatInputProps) => {
+const ChatInput = ({
+  onSend,
+  disabled = false,
+  user,
+  onChargeRequest,
+}: ChatInputProps) => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { incrementPromptCount } = useAuth(); // 요청 횟수 증가 핸들러
@@ -86,11 +91,7 @@ const ChatInput = ({ onSend, disabled = false, user, onChargeRequest }: ChatInpu
         <p className="text-body-s tab:block hidden">AI는 실수할 수 있습니다.</p>
         <div className="flex gap-3">
           {remainingCount === 0 ? (
-            <Button
-              size={"sm"}
-              variant="secondary"
-              onClick={onChargeRequest}
-            >
+            <Button size={"sm"} variant="secondary" onClick={onChargeRequest}>
               원코?
             </Button>
           ) : (
