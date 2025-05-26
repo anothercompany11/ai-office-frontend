@@ -56,7 +56,10 @@ const CopyButton = ({ code }: { code: string }) => {
   );
 };
 
-const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, isMob }) => {
+const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
+  content,
+  isMob,
+}) => {
   const components = {
     h1: ({ node, ...props }: any) => (
       <h1 className="text-2xl font-bold mt-6 mb-4" {...props} />
@@ -74,7 +77,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, isMob }) =
       <p
         className={cn(
           `my-2 text-body-s web:text-body-m leading-relaxed`,
-          isMob ? "text-body-s" : "text-body-m"
+          isMob ? "text-body-s" : "text-body-m",
         )}
         {...props}
       />
@@ -89,15 +92,24 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, isMob }) =
       <li
         className={cn(
           `my-1 text-body-s web:text-body-m`,
-          isMob ? "text-body-s" : "text-body-m"
+          isMob ? "text-body-s" : "text-body-m",
         )}
         {...props}
       />
     ),
     blockquote: ({ node, ...props }: any) => (
-      <blockquote className="border-l-4 border-gray-300 pl-4 italic my-3" {...props} />
+      <blockquote
+        className="border-l-4 border-gray-300 pl-4 italic my-3"
+        {...props}
+      />
     ),
-    code: ({ node, inline, className, children, ...props }: CodeComponentProps) => {
+    code: ({
+      node,
+      inline,
+      className,
+      children,
+      ...props
+    }: CodeComponentProps) => {
       const match = /language-(\w+)/.exec(className || "");
       const language = match && match[1] ? match[1] : "";
       const codeContent = String(children).replace(/\n$/, "");
@@ -114,7 +126,8 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, isMob }) =
       }
 
       const isSingleWord =
-        !codeContent.includes("\n") && codeContent.trim().split(/\s+/).length === 1;
+        !codeContent.includes("\n") &&
+        codeContent.trim().split(/\s+/).length === 1;
 
       if (isSingleWord && codeContent.length < 20) {
         return (
@@ -134,9 +147,14 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, isMob }) =
       let codeContent = "";
 
       if (children && (children as any).props) {
-        const match = /language-(\w+)/.exec((children as any).props.className || "");
+        const match = /language-(\w+)/.exec(
+          (children as any).props.className || "",
+        );
         language = match && match[1] ? match[1] : "";
-        codeContent = String((children as any).props.children).replace(/\n$/, "");
+        codeContent = String((children as any).props.children).replace(
+          /\n$/,
+          "",
+        );
       }
 
       return (
@@ -184,21 +202,31 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, isMob }) =
     ),
     table: ({ node, ...props }: any) => (
       <div className="overflow-x-auto w-full my-2">
-        <table className="min-w-full border-collapse border border-gray-300 text-sm" {...props} />
+        <table
+          className="min-w-full border-collapse border border-gray-300 text-sm"
+          {...props}
+        />
       </div>
     ),
     thead: ({ node, ...props }: any) => <thead {...props} />,
     tbody: ({ node, ...props }: any) => <tbody {...props} />,
     tr: ({ node, ...props }: any) => <tr {...props} />,
     th: ({ node, ...props }: any) => (
-      <th className="px-3 py-2 text-left font-medium border border-gray-300 bg-gray-50" {...props} />
+      <th
+        className="px-3 py-2 text-left font-medium border border-gray-300 bg-gray-50"
+        {...props}
+      />
     ),
     td: ({ node, ...props }: any) => (
       <td className="px-3 py-2 border border-gray-300 katex-cell" {...props} />
     ),
-    strong: ({ node, ...props }: any) => <strong className="font-bold" {...props} />,
+    strong: ({ node, ...props }: any) => (
+      <strong className="font-bold" {...props} />
+    ),
     em: ({ node, ...props }: any) => <em className="italic" {...props} />,
-    hr: ({ node, ...props }: any) => <hr className="my-4 border-gray-700" {...props} />,
+    hr: ({ node, ...props }: any) => (
+      <hr className="my-4 border-gray-700" {...props} />
+    ),
   };
 
   return (
@@ -220,7 +248,10 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, isMob }) =
         rehypePlugins={[
           rehypeKatex,
           rehypeRaw,
-          [rehypeExternalLinks, { target: "_blank", rel: ["noopener", "noreferrer"] }],
+          [
+            rehypeExternalLinks,
+            { target: "_blank", rel: ["noopener", "noreferrer"] },
+          ],
         ]}
         components={components}
         skipHtml={false}

@@ -367,6 +367,8 @@ export default function FolderItem({
 
       {/* ───────── 삭제 확인 모달 ───────── */}
       <TwoButtonModal
+        confirmButtonText="삭제하기"
+        description={`삭제된 내용은 다시 복구할 수 없으며\n모든 대화 내용이 영구적으로 삭제됩니다.`}
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         title="정말 삭제하시나요?"
