@@ -3,37 +3,34 @@ import Image from "next/image";
 const GuideData = [
   {
     src: "conversation",
-    title: "일상 대화",
+    title: `📝 사용 방법`,
     guideList: [
       {
-        title: "메뉴 추천",
-        desc: "지금 계절에 맞는 제철음식을 추천해줘",
+        desc: "궁금한 내용을 채팅창에 입력하면 바로 답을 받을 수 있어요.",
       },
       {
-        title: "날씨 확인",
-        desc: "오늘 날씨랑 미세먼지 농도 알려줘",
+        desc: "사람과 대화하듯 편하게 질문하세요.",
       },
       {
-        title: "할일 정리",
-        desc: "오늘 할일 투두 리스트 만들어줘",
+        desc: "질문이 구체적일 수록 더 정확한 답을 받을 수 있어요.",
       },
     ],
   },
   {
     src: "inquiry",
-    title: "주제 탐구",
+    title: `⚠️ 유의사항`,
     guideList: [
       {
-        title: "논문 검색",
-        desc: "해당 주제에 대한 논문 검색해줘",
+        desc: "질문은 ‘150자 이내’로 작성해야 해요.",
       },
       {
-        title: "심화 질문",
-        desc: "지구 중력은 어떤 원리로 작용하는거야?",
+        desc: "질문을 한 번 할 때마다 코인이 1개씩 줄어들어요.",
       },
       {
-        title: "난이도 설정",
-        desc: "전기 발명 과정을 이해하기 쉽게 알려줘",
+        desc: "코인이 다 떨어지면 더 이상 질문할 수 없어요.",
+      },
+      {
+        desc: "코인을 획득하려면 수업시간의 미션들을 통해 획득할 수 있어요.",
       },
     ],
   },
@@ -43,10 +40,7 @@ const GuideBox = () => {
   return (
     <div className="flex flex-col items-center gap-6">
       <div className="text-center">
-        <p className="text-title-s mb-2 text-label-natural">
-          AI오피스 프롬프트 가이드
-        </p>
-        <p className="text-title-1 font-hakgyo-ansim">{`AI 어떻게 활용하면 좋을까요?`}</p>
+        <p className="text-title-1 font-hakgyo-ansim">{`AI오피스 프롬프트 가이드`}</p>
       </div>
       <div className="flex gap-4">
         {GuideData.map((guide) => (
@@ -60,14 +54,12 @@ export default GuideBox;
 
 interface GuideCardProps {
   src: string;
-  title: string;
   guideList: {
-    title: string;
     desc: string;
   }[];
 }
 
-const GuideCard = ({ src, title, guideList }: GuideCardProps) => {
+const GuideCard = ({ src, guideList }: GuideCardProps) => {
   return (
     <div className="rounded-xl border border-line flex flex-col gap-4 bg-white py-6 px-4 w-[280px]">
       <div className="flex flex-col items-center gap-1">
@@ -77,16 +69,14 @@ const GuideCard = ({ src, title, guideList }: GuideCardProps) => {
           width={59}
           height={60}
         />
-        <p className="text-title-3">{title}</p>
       </div>
       <div className="flex flex-col gap-2">
         {guideList.map((guide) => (
           <div
             className="p-3 bg-background-alternative flex flex-col gap-1 rounded-sm"
-            key={guide.title}
+            key={guide.desc}
           >
-            <p className="text-subtitle-s">{guide.title}</p>
-            <p className="text-body-s text-label">{guide.desc}</p>
+            <p className="text-body-s text-label break-words">{guide.desc}</p>
           </div>
         ))}
       </div>

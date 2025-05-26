@@ -7,36 +7,33 @@ import Image from "next/image";
 const SwipeGuideBox = () => {
   const guideContents = [
     {
-      title: "일반 대화",
+      title: `📝 사용 방법`,
       items: [
         {
-          title: "메뉴 추천",
-          description: "지금 계절에 맞는 제철음식을 추천해줘",
+          description: "궁금한 내용을 채팅창에 입력하면\n바로 답을 받을 수 있어요.",
         },
         {
-          title: "날씨 확인",
-          description: "오늘 날씨랑 미세먼지 농도 알려줘",
+          description: "사람과 대화하듯 편하게 질문하세요.",
         },
         {
-          title: "할일 정리",
-          description: "오늘 할일 투두 리스트 만들어줘",
+          description: "질문이 구체적일 수록 더 정확한 답을 받을 수 있어요.",
         },
       ],
     },
     {
-      title: "주제 탐구",
+      title: `⚠️ 유의사항`,
       items: [
         {
-          title: "논문 검색",
-          description: "해당 주제에 대한 논문 검색해줘",
+          description: "질문은 ‘150자 이내’로 작성해야 해요.",
         },
         {
-          title: "심화 질문",
-          description: "지구 중력은 어떤 원리로 작용하는거야?",
+          description: "질문을 한 번 할 때마다 코인이 1개씩 줄어들어요.",
         },
         {
-          title: "난이도 설정",
-          description: "전기 발명 과정을 이해하기 쉽게 알려줘",
+          description: "코인이 다 떨어지면 더 이상 질문할 수 없어요.",
+        },
+        {
+          description: "코인을 획득하려면 수업시간의 미션들을 통해 획득할 수 있어요.",
         },
       ],
     },
@@ -73,8 +70,7 @@ const SwipeGuideBox = () => {
                     key={itemIndex}
                     className="p-3 space-y-1 bg-background-alternative rounded-lg"
                   >
-                    <h4 className="text-subtitle-s">{item.title}</h4>
-                    <p className="text-body-s text-label">{item.description}</p>
+                    <p className="text-body-s break-words text-label">{item.description}</p>
                   </div>
                 ))}
               </div>

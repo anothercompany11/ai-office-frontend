@@ -1,6 +1,41 @@
 @import "tailwindcss";
 @import "katex/dist/katex.min.css";
 
+.prose .katex,
+.markdown .katex {
+  display: inline-block !important;
+  white-space: nowrap !important;
+  vertical-align: middle !important;
+}
+
+/* 블록 수식 (display-math) */
+.prose .katex-display,
+.markdown .katex-display {
+  display: block !important;
+  margin: 1em auto !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow-x: auto !important;
+}
+
+/* KaTeX 내부 엘리먼트들도 인라인으로 */
+.prose .katex .mord,
+.prose .katex .mopen,
+.prose .katex .mclose,
+.prose .katex .mrel,
+.prose .katex .mpunct,
+.prose .katex .mfrac,
+.prose .katex .msupsub,
+.prose .katex .delimsizing {
+  display: inline !important;
+}
+
+/* Typography 플러그인이 부여하는 마진 조정 (선택) */
+.prose .katex-display + p,
+.markdown .katex-display + p {
+  margin-top: 0.5em;
+}
+
 :root {
   --font-pretendard: "Pretendard", sans-serif;
   --font-hakgyo-ansim: "Hakgyoansim", sans-serif;
