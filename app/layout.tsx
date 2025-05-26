@@ -51,8 +51,8 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "AI 오피스",
-  description: "AI 오피스",
+  title: "토르",
+  description: "토르",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",

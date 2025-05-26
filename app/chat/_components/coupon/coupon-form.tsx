@@ -14,8 +14,15 @@ interface CouponFormProps {
 }
 
 export default function CouponForm({ onSuccess, onClose }: CouponFormProps) {
-  const { submitCoupon, isSubmitting, error, success, clearError, clearSuccess } = useCoupon();
-  
+  const {
+    submitCoupon,
+    isSubmitting,
+    error,
+    success,
+    clearError,
+    clearSuccess,
+  } = useCoupon();
+
   // React Hook Form 설정
   const {
     register,
@@ -32,11 +39,11 @@ export default function CouponForm({ onSuccess, onClose }: CouponFormProps) {
   // 폼 제출 핸들러
   const onSubmit = async (data: CouponFormValues) => {
     const result = await submitCoupon(data.coupon_code);
-    
+
     if (result) {
       // 성공 시 폼 초기화
       reset();
-      
+
       // 성공 콜백 호출
       onSuccess?.();
     }
@@ -47,8 +54,8 @@ export default function CouponForm({ onSuccess, onClose }: CouponFormProps) {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-2">
           <div className="flex flex-col">
-            <label 
-              htmlFor="coupon_code" 
+            <label
+              htmlFor="coupon_code"
               className="text-body-2 text-label-strong mb-1"
             >
               암호
@@ -68,30 +75,23 @@ export default function CouponForm({ onSuccess, onClose }: CouponFormProps) {
               }}
             />
           </div>
-          
+
           {/* 유효성 검사 에러 메시지 */}
           {errors.coupon_code && (
             <p className="text-red-500 text-sm">{errors.coupon_code.message}</p>
           )}
-          
+
           {/* API 에러 메시지 */}
           {error && !errors.coupon_code && (
             <p className="text-red-500 text-sm">{error}</p>
           )}
-          
+
           {/* 성공 메시지 */}
-          {success && (
-            <p className="text-primary text-body-2">{success}</p>
-          )}
+          {success && <p className="text-primary text-body-2">{success}</p>}
         </div>
 
         <div className="flex gap-2 w-full text-[14px] justify-end font-bold">
-          <Button
-            type="button"
-            onClick={onClose}
-            variant="outline"
-            size={"lg"}
-          >
+          <Button type="button" onClick={onClose} variant="outline" size={"lg"}>
             취소
           </Button>
           <Button
@@ -106,4 +106,4 @@ export default function CouponForm({ onSuccess, onClose }: CouponFormProps) {
       </form>
     </div>
   );
-} 
+}

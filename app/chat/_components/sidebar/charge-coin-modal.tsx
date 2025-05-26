@@ -30,7 +30,7 @@ export default function ChargeCoinModal({
             <DialogTitle className="text-title-l text-label-strong">
               {title}
             </DialogTitle>
-            
+
             <div className="w-full">
               <CouponForm onSuccess={handleSuccess} onClose={onClose} />
             </div>
@@ -39,4 +39,4 @@ export default function ChargeCoinModal({
       </DialogContent>
     </Dialog>
   );
-} 
+}

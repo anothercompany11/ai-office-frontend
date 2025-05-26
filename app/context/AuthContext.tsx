@@ -40,8 +40,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // 프롬프트 정보 업데이트 핸들러
   const updateUserPromptInfo = (promptLimit: number, promptCount: number) => {
-    setUser((prev) => 
-      prev ? { ...prev, prompt_limit: promptLimit, prompt_count: promptCount } : prev
+    setUser((prev) =>
+      prev
+        ? { ...prev, prompt_limit: promptLimit, prompt_count: promptCount }
+        : prev,
     );
   };
 

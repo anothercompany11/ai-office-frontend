@@ -1,7 +1,8 @@
 import { cn } from "@/app/lib/utils";
 import React, { forwardRef, InputHTMLAttributes } from "react";
 
-export interface CustomInputProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface CustomInputProps
+  extends InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
   icon?: React.ReactNode;
   helpText?: string;
@@ -17,7 +18,7 @@ const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
               "w-full px-4 py-3 rounded-lg border border-line-natural focus:outline-none text-body-2 transition-colors",
               error && "border-red-500 focus:border-red-500 focus:ring-red-500",
               icon && "pl-10",
-              className
+              className,
             )}
             ref={ref}
             {...props}
@@ -29,15 +30,17 @@ const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
           )}
         </div>
         {helpText && (
-          <p className={`mt-1 text-sm ${error ? "text-red-500" : "text-label-natural"}`}>
+          <p
+            className={`mt-1 text-sm ${error ? "text-red-500" : "text-label-natural"}`}
+          >
             {helpText}
           </p>
         )}
       </div>
     );
-  }
+  },
 );
 
 CustomInput.displayName = "CustomInput";
 
-export default CustomInput; 
+export default CustomInput;

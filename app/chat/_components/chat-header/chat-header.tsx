@@ -42,11 +42,9 @@ const ChatHeader = ({ isSidebarVisible, setIsSidebarVisible }: Props) => {
           </button>
         </div>
         <p className="text-body-l font-hakgyo-ansim block web:hidden absolute left-1/2 -translate-x-1/2">
-          Chat AI 오피스
+          토르
         </p>
-        <p className="text-body-l font-hakgyo-ansim hidden web:block">
-          Chat AI 오피스
-        </p>
+        <p className="text-body-l font-hakgyo-ansim hidden web:block">토르</p>
       </div>
 
       <div className="hidden web:block">
@@ -75,7 +73,7 @@ const ChatHeader = ({ isSidebarVisible, setIsSidebarVisible }: Props) => {
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="font-hakgyo-ansim">
-                AI오피스 프롬프트 가이드
+                토르 프롬프트 가이드
               </DialogTitle>
             </DialogHeader>
 
