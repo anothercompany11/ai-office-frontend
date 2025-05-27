@@ -54,12 +54,13 @@ export default GuideBox;
 
 interface GuideCardProps {
   src: string;
+  title: string;
   guideList: {
     desc: string;
   }[];
 }
 
-const GuideCard = ({ src, guideList }: GuideCardProps) => {
+const GuideCard = ({ src, title, guideList }: GuideCardProps) => {
   return (
     <div className="rounded-xl border border-line flex flex-col gap-4 bg-white py-6 px-4 w-[280px]">
       <div className="flex flex-col items-center gap-1">
@@ -70,15 +71,20 @@ const GuideCard = ({ src, guideList }: GuideCardProps) => {
           height={60}
         />
       </div>
-      <div className="flex flex-col gap-2">
-        {guideList.map((guide) => (
-          <div
-            className="p-3 bg-background-alternative flex flex-col gap-1 rounded-sm"
-            key={guide.desc}
-          >
-            <p className="text-body-s text-label break-words">{guide.desc}</p>
-          </div>
-        ))}
+      <div>
+        <h3 className="text-center text-title-2 font-hakgyo-ansim mb-4">
+          {title}
+        </h3>
+        <div className="flex flex-col gap-2">
+          {guideList.map((guide) => (
+            <div
+              className="p-3 bg-background-alternative flex flex-col gap-1 rounded-sm"
+              key={guide.desc}
+            >
+              <p className="text-body-s text-label break-words">{guide.desc}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -55,7 +55,7 @@ const ChatInput = ({
 
       // React state에서 현재 메시지 값을 사용
       const trimmedMessage = message.trim();
-      
+
       if (trimmedMessage && !disabled) {
         incrementPromptCount(user);
         onSend(trimmedMessage);

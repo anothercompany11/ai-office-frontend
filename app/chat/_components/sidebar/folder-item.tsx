@@ -92,7 +92,7 @@ function FolderConversationItem({
     e.stopPropagation();
     onSelect(conversation.id);
     router.push(`/chat/${conversation.id}`);
-    
+
     // 모바일 환경에서 사이드바 닫기
     if (isMobile) {
       setIsSidebarVisible(false);
@@ -136,7 +136,7 @@ function FolderConversationItem({
           </button>
         </PopoverContent>
       </Popover>
-      
+
       {/* 삭제 확인 모달 */}
       <TwoButtonModal
         isOpen={isDeleteModalOpen}
@@ -246,7 +246,7 @@ export default function FolderItem({
   const handleFolderClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleFolder(folder.id);
-    
+
     // 모바일 환경에서 사이드바 닫기
     if (isMobile) {
       setIsSidebarVisible(false);
@@ -257,7 +257,7 @@ export default function FolderItem({
   const handleFolderNameClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/chat/project/${folder.id}`);
-    
+
     // 모바일 환경에서 사이드바 닫기
     if (isMobile) {
       setIsSidebarVisible(false);
