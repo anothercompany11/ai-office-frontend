@@ -134,11 +134,11 @@ const ChatHeader = ({ projectId }: ChatHeaderProps) => {
       <div className="block web:hidden">
         <Dialog>
           <DialogTrigger asChild>
-            <button className="flex items-center justify-center">
+            <button className="flex items-center justify-center outline-none tap-highlight-none">
               <CircleHelp className="size-6 text-primary" />
             </button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="outline-none tap-highlight-none">
             <DialogHeader>
               <DialogTitle className="font-hakgyo-ansim">
                 토르 프롬프트 가이드
