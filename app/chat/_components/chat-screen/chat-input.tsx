@@ -112,13 +112,13 @@ const ChatInput = ({
               <span className="text-body-l">{remainingCount}</span>
             </p>
           </div>
-         {is_limit_reached &&  <Button
+          <Button
             size={"sm"}
             className="py-2 web:py-3 web:text-body-m text-body-s"
             onClick={onChargeRequest}
           >
             코인 충전
-          </Button>}
+          </Button>
         </div>
       </div>
     </div>
