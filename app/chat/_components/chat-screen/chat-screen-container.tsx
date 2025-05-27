@@ -1,7 +1,10 @@
+"use client";
+
 import { User } from "@/app/api/dto";
 import ChatHeader from "../chat-header/chat-header";
 import ChatInterface from "./chat-interface";
 import EmptyChatScreen from "./empty-chat-screen";
+import { useSidebar } from "@/app/context/SidebarContext";
 
 interface ChatScreenContainerProps {
   user: User; // 사용자 정보
@@ -15,8 +18,6 @@ interface ChatScreenContainerProps {
   pendingFirstMsg: string | null;
   clearPendingFirstMsg: () => void;
   finalizeNewConversation: (realId: string) => void;
-  isSidebarVisible: boolean;
-  setIsSidebarVisible: (visible: boolean) => void;
 }
 
 const ChatScreenContainer = ({
@@ -28,15 +29,10 @@ const ChatScreenContainer = ({
   pendingFirstMsg,
   clearPendingFirstMsg,
   finalizeNewConversation,
-  isSidebarVisible,
-  setIsSidebarVisible,
 }: ChatScreenContainerProps) => {
   return (
-    <div className="flex flex-col w-full bg-line-alternative">
-      <ChatHeader
-        isSidebarVisible={isSidebarVisible}
-        setIsSidebarVisible={setIsSidebarVisible}
-      />
+    <div className="flex flex-col web:h-[100vh] h-[100dvh] w-full bg-line-alternative">
+      <ChatHeader />
 
       {/* 대화가 선택된 경우 */}
       {currentId ? (

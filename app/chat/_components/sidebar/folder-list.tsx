@@ -29,6 +29,8 @@ interface FolderListProps {
   onCreateFolder: () => void;
   onDeleteConversation?: (id: string) => void;
   activeId?: string | null;
+  hoveredFolderId?: string | null;
+  folderPrefix?: string;
 }
 
 export default function FolderList({
@@ -40,6 +42,8 @@ export default function FolderList({
   onCreateFolder,
   onDeleteConversation,
   activeId,
+  hoveredFolderId,
+  folderPrefix = "folder-",
 }: FolderListProps) {
   const [expandedFolders, setExpandedFolders] = useState<
     Record<string, boolean>
@@ -95,6 +99,8 @@ export default function FolderList({
             onDeleteFolder={onDeleteFolder}
             onDeleteConversation={onDeleteConversation}
             activeId={activeId}
+            isHovered={hoveredFolderId === folder.id}
+            folderPrefix={folderPrefix}
           />
         ))
       )}

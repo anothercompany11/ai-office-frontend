@@ -1,48 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import ConversationSidebar from "./_components/sidebar/conversation-sidebar";
-import useConversations from "@/hooks/use-conversation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
-import ChatScreenContainer from "./_components/chat-screen/chat-screen-container";
+import { useConversations } from "../context/ConversationContext";
+import EmptyChatScreen from "./_components/chat-screen/empty-chat-screen";
+import ChatHeader from "./_components/chat-header/chat-header";
 import { LoadIcon } from "../shared/loading";
 
 export default function ChatPage() {
-  const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-  const [initialLoaded, setInitialLoaded] = useState(false);
+  const searchParams = useSearchParams();
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const { createNewConversation } = useConversations();
 
-  // 채팅 관리 훅
-  const {
-    conversations,
-    isLoadingConversations,
-    currentId,
-    loadConversations,
-    selectConversation,
-    startBlankConversation,
-    createNewConversation,
-    deleteConversation,
-    updateConversation,
-    pendingFirstMsg,
-    clearPendingFirstMsg,
-    assignToFolder,
-    finalizeNewConversation,
-  } = useConversations();
+  // URL에서 프로젝트 ID 파라미터를 가져옴
+  const projectId = searchParams.get("projectId");
 
-  // 최초 로드 여부 업데이트
-  useEffect(() => {
-    if (!isLoadingConversations) setInitialLoaded(true);
-  }, [isLoadingConversations]);
+  // 새 대화 시작 핸들러
+  const handleCreateNewConversation = (firstMsg: string) => {
+    // 빈 메시지는 처리하지 않음
+    if (!firstMsg.trim()) return;
 
-  // 로그인 유무에 따른 처리
-  useEffect(() => {
-    if (!isAuthLoading && !user) router.push("/auth");
-    if (user) loadConversations();
-  }, [user, isAuthLoading, router, loadConversations]);
+    // 전체 메시지를 Context에 저장
+    createNewConversation(firstMsg);
 
-  if (isAuthLoading || (!initialLoaded && isLoadingConversations) || !user) {
+    // 프로젝트 ID가 있으면 함께 전달
+    if (projectId) {
+      router.push(`/chat/new?projectId=${projectId}`);
+    } else {
+      router.push("/chat/new");
+    }
+  };
+
+  if (isAuthLoading || !user) {
     return (
       <div className="flex h-screen items-center justify-center">
         <LoadIcon />
@@ -51,28 +41,12 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex web:h-[100vh] h-[100dvh] bg-white">
-      <ConversationSidebar
-        conversations={conversations}
-        currentConversationId={currentId}
-        onSelectConversation={selectConversation}
-        onNewConversation={startBlankConversation}
-        onDeleteConversation={deleteConversation}
-        isSidebarVisible={isSidebarVisible}
-        setIsSidebarVisible={setIsSidebarVisible}
-      />
-
-      <ChatScreenContainer
+    <div className="flex flex-col web:h-[100vh] h-[100dvh] w-full bg-line-alternative">
+      <ChatHeader projectId={projectId || undefined} />
+      <EmptyChatScreen
         user={user}
-        currentId={currentId}
-        createNewConversation={createNewConversation}
-        updateConversation={updateConversation}
-        assignToFolder={assignToFolder}
-        pendingFirstMsg={pendingFirstMsg}
-        clearPendingFirstMsg={clearPendingFirstMsg}
-        finalizeNewConversation={finalizeNewConversation}
-        isSidebarVisible={isSidebarVisible}
-        setIsSidebarVisible={setIsSidebarVisible}
+        projectId={projectId || undefined}
+        createNewConversation={handleCreateNewConversation}
       />
     </div>
   );

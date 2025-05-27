@@ -14,17 +14,21 @@ interface Props {
   conversation: Conversation;
   onSelect: (id: string) => void;
   onDelete: (e: React.MouseEvent, id: string) => void;
+  conversationPrefix?: string;
+  isActive?: boolean;
 }
 
 export default function ConversationItem({
   conversation,
   onSelect,
   onDelete,
+  conversationPrefix = "conversation-",
+  isActive = false,
 }: Props) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: conversation.id,
+    id: `${conversationPrefix}${conversation.id}`,
   });
 
   const style = transform
@@ -50,7 +54,7 @@ export default function ConversationItem({
         {...attributes}
         className={`group rounded-lg hover:bg-[#eeeff1] ${
           isPopoverOpen ? "bg-[#eeeff1]" : ""
-        }`}
+        } ${isActive ? "bg-[#eeeff1] border-2 border-primary" : ""}`}
       >
         <div
           className="flex items-center justify-between px-2 cursor-pointer"
@@ -96,6 +100,7 @@ export default function ConversationItem({
         confirmButtonText="삭제하기"
         description={`삭제된 내용은 다시 복구할 수 없으며\n모든 대화 내용이 영구적으로 삭제됩니다.`}
         isOpen={isDeleteModalOpen}
+        confirmButtonText="삭제하기"
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={() => {
           onDelete({} as React.MouseEvent, conversation.id);

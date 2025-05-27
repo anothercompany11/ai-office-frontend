@@ -8,16 +8,14 @@ interface Props {
   onConfirm: (e: React.MouseEvent) => void;
   title: string;
   description?: string;
-  confirmButtonText?: string;
 }
 
-export default function TwoButtonModal({
+export default function OneButtonModal({
   isOpen,
   onClose,
   onConfirm,
   title,
   description,
-  confirmButtonText,
 }: Props) {
   const isMob = useGetCurrentDevice() === "mob";
   return (
@@ -39,18 +37,8 @@ export default function TwoButtonModal({
             </p>
           </div>
           <div className="flex gap-2 w-full text-[14px] justify-end font-bold">
-            <Button
-              onClick={onClose}
-              variant="outline"
-              className="tab:w-[84px] w-full h-12 border border-line-strong rounded-full text-title-s bg-white"
-            >
-              취소
-            </Button>
-            <Button
-              onClick={(e: React.MouseEvent) => onConfirm(e)}
-              className="tab:w-[97px] w-full h-12 rounded-full text-title-s bg-[#00AC78] text-white"
-            >
-              {confirmButtonText}
+            <Button onClick={(e: React.MouseEvent) => onConfirm(e)} size={"lg"}>
+              확인
             </Button>
           </div>
         </div>

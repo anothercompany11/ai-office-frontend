@@ -48,6 +48,7 @@ export interface UpdateConversationRequest {
 export interface SendMessageRequest {
   message: string;
   conversation_id?: string;
+  folder_id?: string;
 }
 
 export interface MessageResponse {

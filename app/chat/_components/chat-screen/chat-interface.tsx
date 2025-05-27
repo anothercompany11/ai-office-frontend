@@ -17,6 +17,7 @@ interface ChatInterfaceProps {
   onInitialHandled?: () => void;
   finalizeNewConversation: (realId: string) => void;
   user: User;
+  projectId?: string; // 프로젝트 ID
 }
 
 const ChatInterface = ({
@@ -27,6 +28,7 @@ const ChatInterface = ({
   onInitialHandled,
   finalizeNewConversation,
   user,
+  projectId,
 }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<ClientMessage[]>(() => []);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,8 +46,14 @@ const ChatInterface = ({
   /* 메세지 리스트가 있으면 메세지 전송 */
   useEffect(() => {
     if (initialMessage && isNewChat && !sentInitial.current) {
+      // 초기 메시지가 있고 새 채팅인 경우에만 실행
       sentInitial.current = true;
-      handleSendMessage(initialMessage);
+
+      // 트리밍한 메시지를 전송
+      if (initialMessage.trim()) {
+        handleSendMessage(initialMessage);
+      }
+
       onInitialHandled?.(); // 버퍼 비우기
     }
   }, [initialMessage, isNewChat]);
@@ -237,6 +245,7 @@ const ChatInterface = ({
       const stream = await conversationApi.sendStreamingMessage(
         content,
         conversationId,
+        projectId, // 프로젝트 ID(폴더 ID) 전달
       );
       if (!stream) throw new Error("스트리밍 응답을 받을 수 없습니다.");
 

@@ -1,13 +1,6 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { motion } from "framer-motion";
-import {
-  Check,
-  FolderClosed,
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  X,
-} from "lucide-react";
+import { FolderClosed, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   Popover,
@@ -16,6 +9,9 @@ import {
 } from "@/components/ui/popover";
 import RenameFolderModal from "./rename-folder-modal";
 import TwoButtonModal from "./two-button-modal";
+import { useRouter } from "next/navigation";
+import { useSidebar } from "@/app/context/SidebarContext";
+import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
 
 // 폴더 내부 대화 타입
 interface Conversation {
@@ -34,6 +30,7 @@ export interface ConversationFolder {
   created_at: string;
   updated_at: string;
   conversations: Conversation[];
+  instruction?: string;
 }
 
 interface FolderItemProps {
@@ -46,6 +43,8 @@ interface FolderItemProps {
   onDeleteFolder: (folderId: string) => void;
   onDeleteConversation?: (id: string) => void;
   activeId?: string | null;
+  isHovered?: boolean;
+  folderPrefix?: string;
 }
 
 // 폴더 내부 대화 항목 컴포넌트 - 드래그 가능하게 수정
@@ -60,9 +59,13 @@ function FolderConversationItem({
   isCurrentConversation: boolean;
   isActive: boolean;
   onSelect: (id: string) => void;
-  onDelete: (e: React.MouseEvent, id: string) => void;
+  onDelete: (e: React.MouseEvent | null, id: string) => void;
 }) {
+  const router = useRouter();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { setIsSidebarVisible } = useSidebar();
+  const isMobile = useGetCurrentDevice() !== "web";
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: conversation.id,
   });
@@ -82,6 +85,20 @@ function FolderConversationItem({
       }
     : undefined;
 
+  const handleSelectConversation = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest("button")) {
+      return;
+    }
+    e.stopPropagation();
+    onSelect(conversation.id);
+    router.push(`/chat/${conversation.id}`);
+    
+    // 모바일 환경에서 사이드바 닫기
+    if (isMobile) {
+      setIsSidebarVisible(false);
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -91,13 +108,7 @@ function FolderConversationItem({
       className={`flex items-center justify-between px-2 text-body-s rounded-lg cursor-pointer hover:bg-[#EEEFF1] group ${
         isPopoverOpen ? "bg-[#EEEFF1]" : ""
       }`}
-      onClick={(e) => {
-        if ((e.target as HTMLElement).closest("button")) {
-          return;
-        }
-        e.stopPropagation();
-        onSelect(conversation.id);
-      }}
+      onClick={handleSelectConversation}
     >
       <span className="py-3 truncate">{conversation.title}</span>
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -114,11 +125,9 @@ function FolderConversationItem({
         <PopoverContent className="absolute w-[140px] p-2 space-y-3 border border-line bg-white rounded-lg top-[-25px] left-[-10px]">
           <button
             onClick={(e) => {
-              if ((e.target as HTMLElement).closest("button")) {
-                return;
-              }
               e.stopPropagation();
-              onDelete(e, conversation.id);
+              setIsPopoverOpen(false);
+              setIsDeleteModalOpen(true);
             }}
             className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
           >
@@ -127,6 +136,18 @@ function FolderConversationItem({
           </button>
         </PopoverContent>
       </Popover>
+      
+      {/* 삭제 확인 모달 */}
+      <TwoButtonModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="정말 삭제하시나요?"
+        confirmButtonText="삭제하기"
+        onConfirm={() => {
+          onDelete(null, conversation.id);
+          setIsDeleteModalOpen(false);
+        }}
+      />
     </div>
   );
 }
@@ -141,7 +162,10 @@ export default function FolderItem({
   onDeleteFolder,
   onDeleteConversation,
   activeId,
+  isHovered = false,
+  folderPrefix = "folder-",
 }: FolderItemProps) {
+  const router = useRouter();
   const [isRenaming, setIsRenaming] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false); // 이름 변경 모달 노출 여부
   const [showDeleteModal, setShowDeleteModal] = useState(false); // 삭제 모달 노출 여부
@@ -150,10 +174,12 @@ export default function FolderItem({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const renameInputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { setIsSidebarVisible } = useSidebar();
+  const isMobile = useGetCurrentDevice() !== "web";
 
   // 폴더를 드롭 영역으로 설정
   const { setNodeRef, isOver } = useDroppable({
-    id: `folder-${folder.id}`,
+    id: `${folderPrefix}${folder.id}`,
   });
 
   useEffect(() => {
@@ -209,12 +235,32 @@ export default function FolderItem({
 
   // 대화 삭제 핸들러
   const handleDeleteConversation = (
-    e: React.MouseEvent,
+    e: React.MouseEvent | null,
     conversationId: string,
   ) => {
+    e?.stopPropagation();
+    onDeleteConversation?.(conversationId);
+  };
+
+  // 폴더 클릭 핸들러
+  const handleFolderClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm("이 대화를 삭제하시겠습니까?")) {
-      onDeleteConversation?.(conversationId);
+    toggleFolder(folder.id);
+    
+    // 모바일 환경에서 사이드바 닫기
+    if (isMobile) {
+      setIsSidebarVisible(false);
+    }
+  };
+
+  // 폴더 이름 클릭 핸들러
+  const handleFolderNameClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/chat/project/${folder.id}`);
+    
+    // 모바일 환경에서 사이드바 닫기
+    if (isMobile) {
+      setIsSidebarVisible(false);
     }
   };
 
@@ -225,11 +271,11 @@ export default function FolderItem({
         className={`flex items-center px-[13.5px] cursor-pointer rounded-lg hover:bg-[#F9FAFA] group ${
           isPopoverOpen ? "bg-[#F9FAFA]" : ""
         } ${
-          isOver
+          isOver || isHovered
             ? "bg-background-alternative border border-dashed border-gray-400"
             : ""
         }`}
-        onClick={() => toggleFolder(folder.id)}
+        onClick={handleFolderClick}
       >
         <div className="flex items-center gap-[9px] flex-grow overflow-hidden py-3">
           <FolderClosed size={16} />
@@ -251,33 +297,16 @@ export default function FolderItem({
                     setIsRenaming(false);
                   }
                 }}
-                className="w-full px-1 py-0.5 text-sm border border-gray-300 rounded"
-                autoFocus
+                onBlur={handleRename}
+                className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-              <div className="flex mt-1 space-x-1">
-                <button
-                  onClick={handleRename}
-                  className="p-1 text-green-600 hover:bg-green-50 rounded"
-                >
-                  <Check size={14} />
-                </button>
-                <button
-                  onClick={() => {
-                    setNewName(folder.name);
-                    setIsRenaming(false);
-                  }}
-                  className="p-1 text-red-600 hover:bg-red-50 rounded"
-                >
-                  <X size={14} />
-                </button>
-              </div>
             </div>
           ) : (
-            <span className="text-body-s text-label-strong truncate">
+            <span
+              className="text-body-s truncate flex-grow"
+              onClick={handleFolderNameClick}
+            >
               {folder.name}
-              {folder.is_default && (
-                <span className="ml-1 text-xs text-gray-500">(기본)</span>
-              )}
             </span>
           )}
         </div>
@@ -372,6 +401,7 @@ export default function FolderItem({
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         title="정말 삭제하시나요?"
+        confirmButtonText="삭제하기"
         onConfirm={() => {
           onDeleteFolder(folder.id);
           setShowDeleteModal(false);

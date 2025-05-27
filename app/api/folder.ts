@@ -56,12 +56,16 @@ export const folderApi = {
   async updateFolder(
     id: string,
     name: string,
+    instruction?: string, // 지침
     is_default?: boolean,
   ): Promise<ApiResponse<Folder>> {
     try {
       const updateData: UpdateFolderRequest = { name };
       if (is_default !== undefined) {
         updateData.is_default = is_default;
+      }
+      if (instruction !== undefined) {
+        updateData.instruction = instruction;
       }
 
       return await put<Folder, UpdateFolderRequest>(
