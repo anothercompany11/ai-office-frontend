@@ -100,7 +100,6 @@ export default function ConversationItem({
         confirmButtonText="삭제하기"
         description={`삭제된 내용은 다시 복구할 수 없으며\n모든 대화 내용이 영구적으로 삭제됩니다.`}
         isOpen={isDeleteModalOpen}
-        confirmButtonText="삭제하기"
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={() => {
           onDelete({} as React.MouseEvent, conversation.id);
