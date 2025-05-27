@@ -21,6 +21,7 @@ const ChatInput = ({
   onChargeRequest,
 }: ChatInputProps) => {
   const [message, setMessage] = useState("");
+  const [isComposing, setIsComposing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { incrementPromptCount } = useAuth(); // 요청 횟수 증가 핸들러
   const is_limit_reached = user.prompt_count === user.prompt_limit; // 요청 횟수 초과 여부
@@ -34,9 +35,8 @@ const ChatInput = ({
     }
   }, [message]);
 
-  // 메세지 제출 핸들러
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // 공통 메시지 전송 함수
+  const sendMessage = () => {
     const trimmedMessage = message.trim();
     if (trimmedMessage && !disabled && !is_limit_reached) {
       incrementPromptCount(user);
@@ -45,23 +45,30 @@ const ChatInput = ({
     }
   };
 
+  // 메세지 제출 핸들러
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendMessage();
+  };
+
   // 엔터키 핸들러
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // 최대 요청 가능 횟수 초과시
     if (is_limit_reached) return;
 
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !isComposing) {
       e.preventDefault(); // 엔터키의 기본 동작 방지
-
-      // React state에서 현재 메시지 값을 사용
-      const trimmedMessage = message.trim();
-
-      if (trimmedMessage && !disabled) {
-        incrementPromptCount(user);
-        onSend(trimmedMessage);
-        setMessage("");
-      }
+      sendMessage();
     }
+  };
+
+  // IME 입력 처리
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
   };
 
   const isDisabled = !message.trim() || disabled || is_limit_reached;
@@ -74,6 +81,8 @@ const ChatInput = ({
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
+            onCompositionStart={handleCompositionStart}
+            onCompositionEnd={handleCompositionEnd}
             placeholder="무엇을 도와드릴까요?"
             className="w-full bg-white disabled:placeholder:text-gray-300 disabled:bg-gray-100 rounded-lg shadow-[0px_16px_14px_0px_rgba(0,0,0,0.1)] tab:rounded-[20px] resize-none text-body-2 focus-visible:outline-none py-6 px-6"
             rows={1}
