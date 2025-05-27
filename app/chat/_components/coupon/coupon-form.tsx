@@ -97,7 +97,6 @@ export default function CouponForm({ onSuccess, onClose }: CouponFormProps) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            variant="secondary"
             size={"lg"}
           >
             {isSubmitting ? "충전 중" : "충전하기"}

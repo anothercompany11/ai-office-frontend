@@ -98,26 +98,27 @@ const ChatInput = ({
       <div className="pl-3 text-label-natural items-center flex justify-between">
         <p className="text-caption tab:hidden">AI는 실수할 수 있습니다.</p>
         <p className="text-body-s tab:block hidden">AI는 실수할 수 있습니다.</p>
-        <div className="flex gap-3">
-          {remainingCount === 0 ? (
-            <Button size={"sm"} variant="secondary" onClick={onChargeRequest}>
-              원코?
-            </Button>
-          ) : (
-            <div className="flex gap-1 items-center">
-              <Image
-                src={"/svg/token.svg"}
-                alt="대화 토큰"
-                width={28}
-                height={28}
-                className="size-[28px]"
-              />
-              <p className="flex gap-1 items-center">
-                <span className="text-label-alternative text-caption">x</span>
-                <span className="text-body-l">{remainingCount}</span>
-              </p>
-            </div>
-          )}
+        <div className="flex gap-4">
+          <div className="flex gap-1 items-center">
+            <Image
+              src={"/svg/token.svg"}
+              alt="대화 토큰"
+              width={28}
+              height={28}
+              className="size-[28px]"
+            />
+            <p className="flex gap-1 items-center">
+              <span className="text-label-alternative text-caption">x</span>
+              <span className="text-body-l">{remainingCount}</span>
+            </p>
+          </div>
+         {is_limit_reached &&  <Button
+            size={"sm"}
+            className="py-2 web:py-3 web:text-body-m text-body-s"
+            onClick={onChargeRequest}
+          >
+            코인 충전
+          </Button>}
         </div>
       </div>
     </div>
