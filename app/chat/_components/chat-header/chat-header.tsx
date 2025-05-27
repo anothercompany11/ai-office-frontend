@@ -109,9 +109,7 @@ const ChatHeader = ({ projectId }: ChatHeaderProps) => {
         )}
 
         {!currentProject && (
-          <p className="text-body-l font-hakgyo-ansim hidden web:block">
-            토르
-          </p>
+          <p className="text-body-l font-hakgyo-ansim hidden web:block">토르</p>
         )}
       </div>
 
