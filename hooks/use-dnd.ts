@@ -17,7 +17,7 @@ const CONVERSATION_PREFIX = "conversation-";
 export function useDnDSensors() {
   return useSensors(
     useSensor(MouseSensor, {
-      activationConstraint: { delay: 200, tolerance: 5 },
+      activationConstraint: { delay: 300, tolerance: 5 },
     }),
     useSensor(TouchSensor, {
       activationConstraint: { delay: 500, tolerance: 5 },
