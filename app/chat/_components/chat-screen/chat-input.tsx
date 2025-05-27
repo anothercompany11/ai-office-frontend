@@ -46,7 +46,9 @@ const ChatInput = ({ onSend, disabled = false, user }: ChatInputProps) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault(); // 엔터키의 기본 동작 방지
 
+      // React state에서 현재 메시지 값을 사용
       const trimmedMessage = message.trim();
+      
       if (trimmedMessage && !disabled) {
         incrementPromptCount(user);
         onSend(trimmedMessage);

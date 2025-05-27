@@ -59,10 +59,11 @@ function FolderConversationItem({
   isCurrentConversation: boolean;
   isActive: boolean;
   onSelect: (id: string) => void;
-  onDelete: (e: React.MouseEvent, id: string) => void;
+  onDelete: (e: React.MouseEvent | null, id: string) => void;
 }) {
   const router = useRouter();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { setIsSidebarVisible } = useSidebar();
   const isMobile = useGetCurrentDevice() !== "web";
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -124,11 +125,9 @@ function FolderConversationItem({
         <PopoverContent className="absolute w-[140px] p-2 space-y-3 border border-line bg-white rounded-lg top-[-25px] left-[-10px]">
           <button
             onClick={(e) => {
-              if ((e.target as HTMLElement).closest("button")) {
-                return;
-              }
               e.stopPropagation();
-              onDelete(e, conversation.id);
+              setIsPopoverOpen(false);
+              setIsDeleteModalOpen(true);
             }}
             className="flex items-center justify-between w-full rounded-lg p-2 hover:bg-[#F9FAFA]"
           >
@@ -137,6 +136,18 @@ function FolderConversationItem({
           </button>
         </PopoverContent>
       </Popover>
+      
+      {/* 삭제 확인 모달 */}
+      <TwoButtonModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="정말 삭제하시나요?"
+        confirmButtonText="삭제하기"
+        onConfirm={() => {
+          onDelete(null, conversation.id);
+          setIsDeleteModalOpen(false);
+        }}
+      />
     </div>
   );
 }
@@ -224,13 +235,11 @@ export default function FolderItem({
 
   // 대화 삭제 핸들러
   const handleDeleteConversation = (
-    e: React.MouseEvent,
+    e: React.MouseEvent | null,
     conversationId: string,
   ) => {
-    e.stopPropagation();
-    if (window.confirm("이 대화를 삭제하시겠습니까?")) {
-      onDeleteConversation?.(conversationId);
-    }
+    e?.stopPropagation();
+    onDeleteConversation?.(conversationId);
   };
 
   // 폴더 클릭 핸들러
