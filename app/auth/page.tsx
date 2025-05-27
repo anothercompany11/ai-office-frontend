@@ -12,7 +12,7 @@ export default function LoginPage() {
           <Logo />
           <Image
             src={"/svg/logo-text.svg"}
-            alt="AI 오피스"
+            alt="토르"
             width={232}
             height={52}
           />
@@ -25,7 +25,7 @@ export default function LoginPage() {
             height={108}
             className="mx-auto"
           />
-          <p className="text-subtitle-s text-center">{`GREEN FIT 에 입사하신 여러분 환영합니다!\n코드를 입력하여 AI 오피스에 입장해주세요.`}</p>
+          <p className="text-subtitle-s text-center">{`GREEN FIT에 입사하신 여러분 환영합니다!\n코드를 입력하여 토르에 입장해주세요.`}</p>
         </div>
         <LoginForm />
       </div>

@@ -1,22 +1,21 @@
+import "katex/dist/katex.min.css";
+import React, { useState } from "react";
 import { cn, formatLatex } from "@/app/lib/utils";
 import remarkMath from "remark-math";
+import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
-import { Check, Copy } from "lucide-react";
-import React, { useState } from "react";
-import type { Components } from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import rehypeExternalLinks from "rehype-external-links";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import rehypeExternalLinks from "rehype-external-links";
-import rehypeRaw from "rehype-raw";
-import remarkGfm from "remark-gfm";
+import { Check, Copy } from "lucide-react";
 
 interface MarkdownRendererProps {
   content: string;
   isMob?: boolean;
 }
 
-// code 컴포넌트를 위한 타입 정의
 interface CodeComponentProps {
   node?: any;
   inline?: boolean;
@@ -24,10 +23,8 @@ interface CodeComponentProps {
   children?: React.ReactNode;
 }
 
-// 코드 복사 버튼 컴포넌트
 const CopyButton = ({ code }: { code: string }) => {
   const [copied, setCopied] = useState(false);
-
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(code);
@@ -63,7 +60,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   content,
   isMob,
 }) => {
-  const components: Components = {
+  const components = {
     h1: ({ node, ...props }: any) => (
       <h1 className="text-2xl font-bold mt-6 mb-4" {...props} />
     ),
@@ -106,7 +103,6 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         {...props}
       />
     ),
-    // 코드 블록 구문 강조 및 복사 버튼 처리
     code: ({
       node,
       inline,
@@ -116,9 +112,8 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
     }: CodeComponentProps) => {
       const match = /language-(\w+)/.exec(className || "");
       const language = match && match[1] ? match[1] : "";
-      const content = String(children).replace(/\n$/, "");
+      const codeContent = String(children).replace(/\n$/, "");
 
-      // 인라인 코드 처리 - ChatGPT 스타일로 개선
       if (inline) {
         return (
           <code
@@ -130,12 +125,11 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         );
       }
 
-      // 외부에서 코드 블록 내용이 한 줄인지 확인
       const isSingleWord =
-        !content.includes("\n") && content.trim().split(/\s+/).length === 1;
+        !codeContent.includes("\n") &&
+        codeContent.trim().split(/\s+/).length === 1;
 
-      // 단일 단어나 짧은 코드는 인라인 스타일로 처리 (옵션)
-      if (isSingleWord && content.length < 20) {
+      if (isSingleWord && codeContent.length < 20) {
         return (
           <code
             className="bg-gray-100 text-pink-500 dark:bg-gray-800 dark:text-pink-400 px-1.5 py-0.5 rounded text-sm font-mono"
@@ -146,48 +140,42 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         );
       }
 
-      // 코드 블록은 일반 코드 태그로 처리하지 않고, 대신 별도의 사용자 정의 요소로 대체
       return null;
     },
-    // 코드 블록을 위한 별도 컴포넌트 - pre 태그 안에서 처리하여 p 태그 내부에 div가 들어가는 문제 방지
     pre: ({ children, className, ...props }: any) => {
-      // pre 태그의 자식 요소에서 code 태그와 언어 정보 추출
       let language = "";
-      let content = "";
+      let codeContent = "";
 
-      // children이 있고 유효한 code 요소인지 확인
-      if (children && children.props) {
-        // code 태그의 className에서 언어 추출
-        const match = /language-(\w+)/.exec(children.props.className || "");
+      if (children && (children as any).props) {
+        const match = /language-(\w+)/.exec(
+          (children as any).props.className || "",
+        );
         language = match && match[1] ? match[1] : "";
-        // 코드 내용 추출
-        content = String(children.props.children).replace(/\n$/, "");
+        codeContent = String((children as any).props.children).replace(
+          /\n$/,
+          "",
+        );
       }
 
       return (
         <div className="my-4 contain-inline-size rounded-md border-[0.5px] border-token-border-medium relative bg-gray-900">
-          {/* 언어 표시 및 코드 블록 헤더 */}
           <div className="flex items-center text-gray-400 px-4 py-2 text-xs font-sans justify-between h-9 bg-gray-800 select-none rounded-t-[5px]">
             {language || "코드"}
           </div>
-
-          {/* 복사 버튼 컨테이너 */}
           <div className="sticky top-9">
             <div className="absolute end-0 bottom-0 flex h-9 items-center pe-2">
               <div className="bg-gray-800 text-gray-400 flex items-center rounded-sm px-2 font-sans text-xs">
-                <CopyButton code={content} />
+                <CopyButton code={codeContent} />
               </div>
             </div>
           </div>
-
-          {/* 코드 블록 본문 */}
           <div className="overflow-y-auto p-4" dir="ltr">
             <SyntaxHighlighter
               style={vscDarkPlus}
               language={language || "text"}
               showLineNumbers={false}
               PreTag="div"
-              wrapLongLines={true}
+              wrapLongLines
               customStyle={{
                 margin: 0,
                 padding: 0,
@@ -198,7 +186,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
                 className: "whitespace-pre! language-" + language,
               }}
             >
-              {content}
+              {codeContent}
             </SyntaxHighlighter>
           </div>
         </div>
@@ -237,33 +225,33 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
     ),
     em: ({ node, ...props }: any) => <em className="italic" {...props} />,
     hr: ({ node, ...props }: any) => (
-      <hr className="my-4 border-gray-700" style={{}} {...props} />
+      <hr className="my-4 border-gray-700" {...props} />
     ),
   };
 
   return (
     <div className="markdown prose dark:prose-invert w-full break-words dark">
       <style jsx global>{`
-        .katex-cell .katex {
-          font-size: 1em;
-          line-height: 1.4;
-          display: inline-flex;
-          align-items: center;
-        }
         .katex-display {
+          display: block;
+          margin: 1.5em auto;
           overflow-x: auto;
-          max-width: 100%;
+        }
+        .katex {
+          font-size: 1em;
+          line-height: 1.25;
+          vertical-align: middle;
         }
       `}</style>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[
+          rehypeKatex,
           rehypeRaw,
           [
             rehypeExternalLinks,
             { target: "_blank", rel: ["noopener", "noreferrer"] },
           ],
-          rehypeKatex,
         ]}
         components={components}
         skipHtml={false}

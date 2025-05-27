@@ -90,7 +90,6 @@ const ChatHeader = ({ projectId }: ChatHeaderProps) => {
             <ChevronsRight className="size-6 text-component" />
           </button>
         </div>
-
         {currentProject && !isProjectPage ? (
           <div className="flex items-center">
             <p className="text-body-l font-hakgyo-ansim">
@@ -105,13 +104,13 @@ const ChatHeader = ({ projectId }: ChatHeaderProps) => {
           </div>
         ) : (
           <p className="text-body-l font-hakgyo-ansim block web:hidden absolute left-1/2 -translate-x-1/2">
-            Chat AI 오피스
+            토르
           </p>
         )}
 
         {!currentProject && (
           <p className="text-body-l font-hakgyo-ansim hidden web:block">
-            Chat AI 오피스
+            토르
           </p>
         )}
       </div>
@@ -141,11 +140,8 @@ const ChatHeader = ({ projectId }: ChatHeaderProps) => {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <p className="text-title-s text-label-assistive">
-                AI오피스 프롬프트 가이드{" "}
-              </p>
               <DialogTitle className="font-hakgyo-ansim">
-                AI 어떻게 활용하면 좋을까요?
+                토르 프롬프트 가이드
               </DialogTitle>
             </DialogHeader>
 

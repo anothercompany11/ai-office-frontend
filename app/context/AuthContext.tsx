@@ -17,6 +17,7 @@ interface AuthContextType extends AuthState {
   logout: () => Promise<void>;
   refreshSession: () => Promise<boolean>;
   incrementPromptCount: (user: User) => void;
+  updateUserPromptInfo: (promptLimit: number, promptCount: number) => void;
 }
 
 // 인증 컨텍스트 생성
@@ -34,6 +35,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const incrementPromptCount = () => {
     setUser((prev) =>
       prev ? { ...prev, prompt_count: prev.prompt_count + 1 } : prev,
+    );
+  };
+
+  // 프롬프트 정보 업데이트 핸들러
+  const updateUserPromptInfo = (promptLimit: number, promptCount: number) => {
+    setUser((prev) =>
+      prev
+        ? { ...prev, prompt_limit: promptLimit, prompt_count: promptCount }
+        : prev,
     );
   };
 
@@ -169,6 +179,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     refreshSession,
     incrementPromptCount,
+    updateUserPromptInfo,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
