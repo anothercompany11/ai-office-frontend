@@ -73,10 +73,16 @@ export default function useCoupon() {
 
         return true;
       } else {
+        if (response.code === "404") {
+          setError("유효하지 않은 코드 입니다.");
+          return false;
+        }
+
         setError(response.message || "쿠폰 코드 적용에 실패했습니다.");
         return false;
       }
     } catch (err) {
+
       console.error("쿠폰 적용 중 오류 발생:", err);
       setError("쿠폰 적용 중 오류가 발생했습니다. 다시 시도해주세요.");
       return false;
