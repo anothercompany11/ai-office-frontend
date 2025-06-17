@@ -1,4 +1,4 @@
-import { ApiResponse, del, get, post, put } from "./client";
+import { ApiResponse, del, get, post, put, streamRequest } from "./client";
 import {
   Conversation,
   CreateConversationRequest,
@@ -132,25 +132,7 @@ export const conversationApi = {
         request.folder_id = folderId;
       }
 
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/chat/stream`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-          body: JSON.stringify(request),
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP 오류! 상태: ${response.status}`);
-      }
-
-      return response.body;
+      return await streamRequest("/chat/stream", request);
     } catch (error) {
       console.error("스트리밍 메시지 전송 오류:", error);
       return null;

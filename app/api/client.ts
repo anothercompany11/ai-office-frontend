@@ -112,11 +112,14 @@ const processQueue = (error: any = null) => {
 
 export const refreshToken = async (): Promise<boolean> => {
   try {
+    console.log('여기로 들어옴 33')
     const csrfToken = CSRFTokenService.getToken();
+    console.log('여기로 들어옴 44', csrfToken);
     if (!csrfToken) {
+      console.log('여기로 들어옴 55');
       return false;
     }
-
+    console.log('여기로 들어옴 66');
     const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
       method: "POST",
       headers: {
@@ -126,17 +129,22 @@ export const refreshToken = async (): Promise<boolean> => {
       credentials: "include", // 쿠키 포함
     });
 
+    console.log('여기로 들어옴 77');
     const responseData = await response.json();
+    console.log('여기로 들어옴 88', responseData);
     if (responseData.status === "success" && responseData.data?.access_token) {
+      console.log('여기로 들어옴 99');
       TokenService.setToken(responseData.data.access_token);
-
+      console.log('여기로 들어옴 100');
       // 새 CSRF 토큰이 있으면 저장
       if (responseData.data.csrf_token) {
         CSRFTokenService.setToken(responseData.data.csrf_token);
+        console.log('여기로 들어옴 101');
       }
 
       return true;
     }
+    console.log('여기로 들어옴 102');
     return false;
   } catch (error) {
     console.error("토큰 갱신 오류:", error);
@@ -314,4 +322,56 @@ export async function del<T = any>(
     headers: createHeaders(needsAuth),
     credentials: "include", // 쿠키 포함
   });
+}
+
+// 스트리밍 요청 함수 (토큰 갱신 지원)
+export async function streamRequest<T = any>(
+  endpoint: string,
+  body?: T,
+  needsAuth: boolean = true,
+): Promise<ReadableStream<Uint8Array> | null> {
+  const makeRequest = async (): Promise<Response> => {
+    return fetch(`${API_BASE_URL}${endpoint}`, {
+      method: "POST",
+      headers: createHeaders(needsAuth),
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: "include",
+    });
+  };
+
+  try {
+    let response = await makeRequest();
+
+    // 401 에러 처리 및 토큰 갱신
+    if (response.status === 401) {
+      const refreshed = await refreshToken();
+      if (refreshed) {
+        // 토큰 갱신 성공 시 재요청
+        response = await makeRequest();
+      } else {
+        // 토큰 갱신 실패 시 로그아웃 처리
+        if (typeof window !== "undefined") {
+          TokenService.removeToken();
+          CSRFTokenService.removeToken();
+          
+          if (
+            !window.location.pathname.includes("/auth") &&
+            !window.location.pathname.includes("/login")
+          ) {
+            window.location.href = "/auth";
+          }
+        }
+        return null;
+      }
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP 오류! 상태: ${response.status}`);
+    }
+
+    return response.body;
+  } catch (error) {
+    console.error(`스트리밍 요청 오류 (${endpoint}):`, error);
+    return null;
+  }
 }
