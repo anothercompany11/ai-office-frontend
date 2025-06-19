@@ -3,6 +3,7 @@
 import { User } from "@/app/api/dto";
 import { useAuth } from "@/app/context/AuthContext";
 import { Button } from "@/components/ui/button";
+import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
 import { ArrowUp } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -20,6 +21,7 @@ const ChatInput = ({
   user,
   onChargeRequest,
 }: ChatInputProps) => {
+  const device = useGetCurrentDevice(); // "mob" | "tab" | "web"
   const [message, setMessage] = useState("");
   const [isComposing, setIsComposing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -56,7 +58,7 @@ const ChatInput = ({
     // 최대 요청 가능 횟수 초과시
     if (is_limit_reached) return;
 
-    if (e.key === "Enter" && !e.shiftKey && !isComposing) {
+    if (e.key === "Enter" && !e.shiftKey && !isComposing && device === "web") {
       e.preventDefault(); // 엔터키의 기본 동작 방지
       sendMessage();
     }
