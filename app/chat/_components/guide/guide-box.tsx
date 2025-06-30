@@ -1,21 +1,21 @@
 import Image from "next/image";
 
 const GuideData = [
-  {
-    src: "conversation",
-    title: `📝 사용 방법`,
-    guideList: [
-      {
-        desc: "궁금한 내용을 채팅창에 입력하면 바로 답을 받을 수 있어요.",
-      },
-      {
-        desc: "사람과 대화하듯 편하게 질문하세요.",
-      },
-      {
-        desc: "질문이 구체적일 수록 더 정확한 답을 받을 수 있어요.",
-      },
-    ],
-  },
+  // {
+  //   src: "conversation",
+  //   title: `📝 사용 방법`,
+  //   guideList: [
+  //     {
+  //       desc: "궁금한 내용을 채팅창에 입력하면 바로 답을 받을 수 있어요.",
+  //     },
+  //     {
+  //       desc: "사람과 대화하듯 편하게 질문하세요.",
+  //     },
+  //     {
+  //       desc: "질문이 구체적일 수록 더 정확한 답을 받을 수 있어요.",
+  //     },
+  //   ],
+  // },
   {
     src: "inquiry",
     title: `⚠️ 유의사항`,
@@ -39,9 +39,9 @@ const GuideData = [
 const GuideBox = () => {
   return (
     <div className="flex flex-col items-center gap-6">
-      <div className="text-center">
-        <p className="text-title-1 font-hakgyo-ansim">{`토르 프롬프트 가이드`}</p>
-      </div>
+      {/* <div className="text-center">
+        <p className="text-title-1 font-hakgyo-ansim">{`AI 토르`}</p>
+      </div> */}
       <div className="flex gap-4">
         {GuideData.map((guide) => (
           <GuideCard key={guide.src} {...guide} />
@@ -62,7 +62,7 @@ interface GuideCardProps {
 
 const GuideCard = ({ src, title, guideList }: GuideCardProps) => {
   return (
-    <div className="rounded-xl border border-line flex flex-col gap-4 bg-white py-6 px-4 w-[280px]">
+    <div className="rounded-xl border border-line flex flex-col gap-4 bg-white py-6 px-4 w-[330px]">
       <div className="flex flex-col items-center gap-1">
         <Image
           src={`/png/icon/${src}.png`}
