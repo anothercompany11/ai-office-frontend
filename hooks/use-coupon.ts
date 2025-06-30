@@ -82,7 +82,6 @@ export default function useCoupon() {
         return false;
       }
     } catch (err) {
-
       console.error("쿠폰 적용 중 오류 발생:", err);
       setError("쿠폰 적용 중 오류가 발생했습니다. 다시 시도해주세요.");
       return false;
