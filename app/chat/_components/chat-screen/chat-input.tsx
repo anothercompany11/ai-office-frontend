@@ -2,25 +2,19 @@
 
 import { User } from "@/app/api/dto";
 import { useAuth } from "@/app/context/AuthContext";
-import { Button } from "@/components/ui/button";
 import { useGetCurrentDevice } from "@/hooks/use-get-current-device";
 import { ArrowUp } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import CoinChargeButton from "../button/coin-charge-button";
 
 interface ChatInputProps {
   onSend: (content: string) => void;
   disabled?: boolean;
   user: User;
-  onChargeRequest?: () => void;
 }
 
-const ChatInput = ({
-  onSend,
-  disabled = false,
-  user,
-  onChargeRequest,
-}: ChatInputProps) => {
+const ChatInput = ({ onSend, disabled = false, user }: ChatInputProps) => {
   const device = useGetCurrentDevice(); // "mob" | "tab" | "web"
   const [message, setMessage] = useState("");
   const [isComposing, setIsComposing] = useState(false);
@@ -109,27 +103,21 @@ const ChatInput = ({
       <div className="pl-3 text-label-natural items-center flex justify-between">
         <p className="text-caption tab:hidden">AI는 실수할 수 있습니다.</p>
         <p className="text-body-s tab:block hidden">AI는 실수할 수 있습니다.</p>
-        <div className="flex gap-4">
-          <div className="flex gap-1 items-center">
+        <div className="flex gap-[6px]">
+          <div className="flex px-[10px] tab:px-[13px] bg-[#DADADA] rounded-full gap-1 items-center">
             <Image
-              src={"/svg/token.svg"}
+              src={"/png/icon/coin.png"}
               alt="대화 토큰"
-              width={28}
-              height={28}
-              className="size-[28px]"
+              width={23}
+              height={22}
+              className="w-[23px] -mt-[0.5px] h-[22px]"
             />
-            <p className="flex gap-1 items-center">
-              <span className="text-label-alternative text-caption">x</span>
-              <span className="text-body-l">{remainingCount}</span>
+            <p className="flex -mb-[1px] text-[#212121] gap-1 leading-[22px] items-center text-[13px] tab:text-[18px] font-extrabold">
+              <span className="">COIN X</span>
+              <span className="">{remainingCount}</span>
             </p>
           </div>
-          <Button
-            size={"sm"}
-            className="py-2 web:py-3 web:text-body-m text-body-s"
-            onClick={onChargeRequest}
-          >
-            코인 충전
-          </Button>
+          <CoinChargeButton />
         </div>
       </div>
     </div>

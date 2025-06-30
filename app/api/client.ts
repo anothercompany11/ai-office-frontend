@@ -112,14 +112,14 @@ const processQueue = (error: any = null) => {
 
 export const refreshToken = async (): Promise<boolean> => {
   try {
-    console.log('여기로 들어옴 33')
+    console.log("여기로 들어옴 33");
     const csrfToken = CSRFTokenService.getToken();
-    console.log('여기로 들어옴 44', csrfToken);
+    console.log("여기로 들어옴 44", csrfToken);
     if (!csrfToken) {
-      console.log('여기로 들어옴 55');
+      console.log("여기로 들어옴 55");
       return false;
     }
-    console.log('여기로 들어옴 66');
+    console.log("여기로 들어옴 66");
     const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
       method: "POST",
       headers: {
@@ -129,22 +129,22 @@ export const refreshToken = async (): Promise<boolean> => {
       credentials: "include", // 쿠키 포함
     });
 
-    console.log('여기로 들어옴 77');
+    console.log("여기로 들어옴 77");
     const responseData = await response.json();
-    console.log('여기로 들어옴 88', responseData);
+    console.log("여기로 들어옴 88", responseData);
     if (responseData.status === "success" && responseData.data?.access_token) {
-      console.log('여기로 들어옴 99');
+      console.log("여기로 들어옴 99");
       TokenService.setToken(responseData.data.access_token);
-      console.log('여기로 들어옴 100');
+      console.log("여기로 들어옴 100");
       // 새 CSRF 토큰이 있으면 저장
       if (responseData.data.csrf_token) {
         CSRFTokenService.setToken(responseData.data.csrf_token);
-        console.log('여기로 들어옴 101');
+        console.log("여기로 들어옴 101");
       }
 
       return true;
     }
-    console.log('여기로 들어옴 102');
+    console.log("여기로 들어옴 102");
     return false;
   } catch (error) {
     console.error("토큰 갱신 오류:", error);
@@ -353,7 +353,7 @@ export async function streamRequest<T = any>(
         if (typeof window !== "undefined") {
           TokenService.removeToken();
           CSRFTokenService.removeToken();
-          
+
           if (
             !window.location.pathname.includes("/auth") &&
             !window.location.pathname.includes("/login")

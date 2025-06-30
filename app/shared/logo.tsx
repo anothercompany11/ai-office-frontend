@@ -4,7 +4,7 @@ import Link from "next/link";
 const Logo = () => {
   return (
     <Link href={"/"}>
-      <Image src={"/svg/logo.svg"} alt="토르" width={100} height={21} />
+      <Image src={"/svg/logo.svg"} alt="AI 토르" width={100} height={21} />
     </Link>
   );
 };

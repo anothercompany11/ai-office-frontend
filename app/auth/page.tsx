@@ -12,20 +12,20 @@ export default function LoginPage() {
           <Logo />
           <Image
             src={"/svg/logo-text.svg"}
-            alt="토르"
+            alt="AI 토르"
             width={232}
             height={52}
           />
         </div>
-        <div className="flex flex-col gap-4 text-white">
+        <div className="flex flex-col gap-3 text-white">
           <Image
-            src={"/png/char-smile.png"}
+            src={"/png/char.png"}
             alt="환영하는 얼굴"
-            width={120}
+            width={126}
             height={108}
             className="mx-auto"
           />
-          <p className="text-subtitle-s text-center">{`GREEN FIT에 입사하신 여러분 환영합니다!\n코드를 입력하여 토르에 입장해주세요.`}</p>
+          <p className="text-subtitle-s text-center">{`GREEN FIT에 입사하신 여러분 환영합니다!\n코드를 입력하여 AI 토르에 입장해주세요.`}</p>
         </div>
         <LoginForm />
       </div>
