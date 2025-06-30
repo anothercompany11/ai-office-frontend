@@ -33,7 +33,9 @@ const EmptyChatScreen = ({
         </p>
       </div> */}
 
-      <GuideBox />
+      <div className="pb-[70px] tab:pb-0">
+        <GuideBox />
+      </div>
 
       <div className="w-full web:mt-0 absolute web:relative pb-4 web:pb-0 max-w-[680px] px-4 web:px-0 bg-line-alternative mx-auto bottom-0 z-10">
         <div className="tab:pb-10 tab:px-0 web:pb-20 mx-auto">
