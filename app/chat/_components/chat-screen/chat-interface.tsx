@@ -397,7 +397,6 @@ const ChatInterface = ({
             user={user}
             onSend={handleSendMessage}
             disabled={isLoading}
-            onChargeRequest={openChargeModal}
           />
         </div>
       </div>
