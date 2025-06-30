@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useSearchParams, usePathname } from "next/navigation";
-import { ChevronsRight, FolderClosed } from "lucide-react"; 
+import { ChevronsRight, FolderClosed } from "lucide-react";
 import { useSidebar } from "@/app/context/SidebarContext";
 import { useProject } from "@/app/context/ProjectContext";
 import Link from "next/link";
