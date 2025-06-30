@@ -2,25 +2,12 @@
 
 import { useEffect } from "react";
 import { useSearchParams, usePathname } from "next/navigation";
-import { CircleHelp, ChevronsRight, FolderClosed } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import GuideBox from "../guide/guide-box";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import SwipeGuideBox from "../guide/swipe-guide-box";
+import { ChevronsRight, FolderClosed } from "lucide-react"; 
 import { useSidebar } from "@/app/context/SidebarContext";
 import { useProject } from "@/app/context/ProjectContext";
 import Link from "next/link";
 import { cn } from "@/app/lib/utils";
+import CoinChargeButton from "../button/coin-charge-button";
 
 interface ChatHeaderProps {
   projectId?: string;
@@ -104,16 +91,20 @@ const ChatHeader = ({ projectId }: ChatHeaderProps) => {
           </div>
         ) : (
           <p className="text-body-l font-hakgyo-ansim block web:hidden absolute left-1/2 -translate-x-1/2">
-            토르
+            AI 토르
           </p>
         )}
 
         {!currentProject && (
-          <p className="text-body-l font-hakgyo-ansim hidden web:block">토르</p>
+          <p className="text-body-l font-hakgyo-ansim hidden web:block">
+            AI 토르
+          </p>
         )}
       </div>
 
-      <div className="hidden web:block">
+      <CoinChargeButton />
+
+      {/* <div className="hidden web:block">
         <Popover>
           <PopoverTrigger asChild>
             <button className="flex items-center justify-center">
@@ -127,9 +118,9 @@ const ChatHeader = ({ projectId }: ChatHeaderProps) => {
             <GuideBox />
           </PopoverContent>
         </Popover>
-      </div>
+      </div> */}
 
-      <div className="block web:hidden">
+      {/* <div className="block web:hidden">
         <Dialog>
           <DialogTrigger asChild>
             <button className="flex items-center justify-center outline-none tap-highlight-none">
@@ -139,14 +130,14 @@ const ChatHeader = ({ projectId }: ChatHeaderProps) => {
           <DialogContent className="outline-none tap-highlight-none">
             <DialogHeader>
               <DialogTitle className="font-hakgyo-ansim">
-                토르 프롬프트 가이드
+                AI 토르 프롬프트 가이드
               </DialogTitle>
             </DialogHeader>
 
             <SwipeGuideBox />
           </DialogContent>
         </Dialog>
-      </div>
+      </div> */}
     </div>
   );
 };
