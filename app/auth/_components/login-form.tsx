@@ -17,9 +17,9 @@ import { z } from "zod";
 const loginSchema = z.object({
   code: z
     .string()
-    .length(8, "인증 코드는 8자리여야 합니다.")
+    .length(7, "인증 코드는 7자리여야 합니다.")
     .regex(
-      /^[A-Za-z0-9]{8}$/,
+      /^[A-Za-z0-9]{7}$/,
       "인증 코드는 영문자와 숫자로만 구성되어야 합니다.",
     ),
 });
