@@ -1,6 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+
+// useSearchParams 사용으로 인한 빌드 시 prerendering 방지
+export const dynamic = 'force-dynamic';
 import { useAuth } from "../context/AuthContext";
 import { useConversations } from "../context/ConversationContext";
 import EmptyChatScreen from "./_components/chat-screen/empty-chat-screen";

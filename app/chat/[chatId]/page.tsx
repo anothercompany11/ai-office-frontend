@@ -2,6 +2,9 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+
+// useSearchParams 사용으로 인한 빌드 시 prerendering 방지
+export const dynamic = 'force-dynamic';
 import { useAuth } from "@/app/context/AuthContext";
 import { useConversations } from "@/app/context/ConversationContext";
 import ChatHeader from "../_components/chat-header/chat-header";
