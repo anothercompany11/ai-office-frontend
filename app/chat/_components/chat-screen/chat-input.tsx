@@ -82,7 +82,7 @@ const ChatInput = ({ onSend, disabled = false, user }: ChatInputProps) => {
             placeholder="무엇을 도와드릴까요?"
             className="w-full bg-white disabled:placeholder:text-gray-300 disabled:bg-gray-100 rounded-lg shadow-[0px_16px_14px_0px_rgba(0,0,0,0.1)] tab:rounded-[20px] resize-none text-body-2 focus-visible:outline-none py-6 px-6"
             rows={1}
-            maxLength={150}
+            // maxLength={150}
             disabled={disabled || is_limit_reached}
           />
 
