@@ -25,7 +25,7 @@ const SwipeGuideBox = () => {
       title: `⚠️ 유의사항`,
       items: [
         {
-          description: "질문은 ‘150자 이내’로 작성해야 해요.",
+          description: "질문은 ‘200자 이내’로 작성해야 해요.",
         },
         {
           description: "질문을 한 번 할 때마다 코인이 1개씩 줄어들어요.",
