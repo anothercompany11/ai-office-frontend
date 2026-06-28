@@ -14,10 +14,10 @@ const CoinChargeButton = () => {
   return (
     <>
       <Button
-        className="bg-gradient-to-b text-[13px] web:text-[16px] font-hakgyo-ansim rounded-[5px] px-[13px] h-[33px] text-black from-[#96FEB7] to-[#28CC92] shadow-[inset_0.43px_0.43px_1.06px_0px_#FFFFFFCC,inset_-0.43px_-0.43px_1.06px_0px_#F0924180]"
+        className="bg-gradient-to-b from-[#93DAC5] to-[#B5E3D5] text-[#015750] text-[13px] web:text-[16px] font-extrabold rounded-full px-[18px] h-[33px] shadow-[inset_0px_1px_2px_0px_#FFFFFF99]"
         onClick={openChargeModal}
       >
-        코인 충전
+        코인충전
       </Button>
 
       <ChargeCoinModal

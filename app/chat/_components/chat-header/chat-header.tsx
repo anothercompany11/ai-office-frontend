@@ -79,7 +79,7 @@ const ChatHeader = ({ projectId }: ChatHeaderProps) => {
         </div>
         {currentProject && !isProjectPage ? (
           <div className="flex items-center">
-            <p className="text-body-l font-hakgyo-ansim">
+            <p className="text-title-l">
               <Link
                 href={`/chat/project/${currentProject.id}`}
                 className="flex items-center gap-2 hover:text-primary"
@@ -90,13 +90,13 @@ const ChatHeader = ({ projectId }: ChatHeaderProps) => {
             </p>
           </div>
         ) : (
-          <p className="text-body-l font-hakgyo-ansim block web:hidden absolute left-1/2 -translate-x-1/2">
+          <p className="text-title-l block web:hidden absolute left-1/2 -translate-x-1/2">
             AI 토르
           </p>
         )}
 
         {!currentProject && (
-          <p className="text-body-l font-hakgyo-ansim hidden web:block">
+          <p className="text-title-l hidden web:block">
             AI 토르
           </p>
         )}

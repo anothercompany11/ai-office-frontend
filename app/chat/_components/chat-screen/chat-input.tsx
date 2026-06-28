@@ -104,7 +104,7 @@ const ChatInput = ({ onSend, disabled = false, user }: ChatInputProps) => {
         <p className="text-caption tab:hidden">AI는 실수할 수 있습니다.</p>
         <p className="text-body-s tab:block hidden">AI는 실수할 수 있습니다.</p>
         <div className="flex gap-[6px]">
-          <div className="flex px-[10px] tab:px-[13px] bg-[#DADADA] rounded-full gap-1 items-center">
+          <div className="flex px-[10px] tab:px-[13px] bg-gradient-to-b from-[#C4C5C5] to-[#D1D2D2] rounded-full gap-1 items-center">
             <Image
               src={"/png/icon/coin.png"}
               alt="대화 토큰"
