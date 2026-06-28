@@ -72,7 +72,7 @@ const GuideCard = ({ src, title, guideList }: GuideCardProps) => {
         />
       </div>
       <div>
-        <h3 className="text-center text-title-2 font-hakgyo-ansim mb-4">
+        <h3 className="text-center text-title-2 font-bold mb-4">
           {title}
         </h3>
         <div className="flex flex-col gap-2">

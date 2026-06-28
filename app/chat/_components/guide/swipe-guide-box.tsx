@@ -63,7 +63,7 @@ const SwipeGuideBox = () => {
               />
             </div>
             <div className="px-3 pt-4 pb-6">
-              <h3 className="text-center text-title-2 font-hakgyo-ansim mb-4">
+              <h3 className="text-center text-title-2 font-bold mb-4">
                 {section.title}
               </h3>
               <div className="space-y-2">
