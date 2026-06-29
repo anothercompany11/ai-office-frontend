@@ -87,6 +87,9 @@ const LoginForm = () => {
                   placeholder="인증 코드를 입력하세요"
                   className=""
                   {...field}
+                  onChange={(e) =>
+                    field.onChange(e.target.value.toUpperCase())
+                  }
                   disabled={isLoading}
                 />
               </FormControl>
