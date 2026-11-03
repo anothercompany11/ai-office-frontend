@@ -8,6 +8,11 @@ import ChatInput from "./chat-input";
 import ChatMessage from "./chat-message";
 import { User } from "@/app/api/dto";
 import ChargeCoinModal from "../sidebar/charge-coin-modal";
+import SpecProgressPanel from "../spec/spec-progress-panel";
+import SpecResultModal from "../spec/spec-result-modal";
+import TwoButtonModal from "../sidebar/two-button-modal";
+import OneButtonModal from "../sidebar/one-button-modal";
+import { useSpec } from "@/hooks/use-spec";
 
 interface ChatInterfaceProps {
   conversationId: string;
@@ -40,6 +45,19 @@ const ChatInterface = ({
   const titleInputRef = useRef<HTMLInputElement>(null);
   const folderMenuRef = useRef<HTMLDivElement>(null);
   const [isChargeModalOpen, setIsChargeModalOpen] = useState(false);
+
+  /* 기획 완성도와 구현 명세 */
+  const {
+    coverage,
+    spec,
+    generating,
+    error: specError,
+    clearError: clearSpecError,
+    refreshCoverage,
+    generate,
+  } = useSpec(conversationId);
+  const [isSpecModalOpen, setIsSpecModalOpen] = useState(false);
+  const [isEarlyConfirmOpen, setIsEarlyConfirmOpen] = useState(false);
 
   const sentInitial = useRef(false); //  전송했는지 여부
 
@@ -343,9 +361,25 @@ const ChatInterface = ({
       ]);
     } finally {
       setIsLoading(false);
+      // 서버가 응답 직후 백그라운드로 완성도를 다시 판정하므로 갱신을 요청한다
+      void refreshCoverage();
       // 폴더 관련 상태 주석처리
       // setCurrentAssistantMessage("");
     }
+  };
+
+  /* 명세 만들기 — 아직 덜 찼으면 한 번 되묻는다 */
+  const handleGenerateClick = () => {
+    if (coverage && !coverage.ready) {
+      setIsEarlyConfirmOpen(true);
+      return;
+    }
+    void runGenerate();
+  };
+
+  const runGenerate = async () => {
+    const created = await generate();
+    if (created) setIsSpecModalOpen(true);
   };
 
   // 코인 충전 모달 열기 함수
@@ -393,6 +427,13 @@ const ChatInterface = ({
       {/* 채팅 입력 영역 - 고정 위치 */}
       <div className="w-full sticky max-w-[680px] px-4 web:px-0 bg-line-alternative mx-auto mt-5 bottom-0 z-10">
         <div className="tab:pb-10 tab:px-0 web:pb-20 mx-auto">
+          <SpecProgressPanel
+            coverage={coverage}
+            generating={generating}
+            hasSpec={!!spec}
+            onGenerate={handleGenerateClick}
+            onOpenSpec={() => setIsSpecModalOpen(true)}
+          />
           <ChatInput
             user={user}
             onSend={handleSendMessage}
@@ -406,6 +447,40 @@ const ChatInterface = ({
         isOpen={isChargeModalOpen}
         onClose={closeChargeModal}
         title="코인 충전"
+      />
+
+      {/* 완성된 명세 */}
+      <SpecResultModal
+        isOpen={isSpecModalOpen}
+        onClose={() => setIsSpecModalOpen(false)}
+        spec={spec}
+        onRegenerate={runGenerate}
+        regenerating={generating}
+      />
+
+      {/* 덜 채워진 상태로 만들려 할 때 한 번만 되묻는다 */}
+      <TwoButtonModal
+        isOpen={isEarlyConfirmOpen}
+        onClose={() => setIsEarlyConfirmOpen(false)}
+        onConfirm={() => {
+          setIsEarlyConfirmOpen(false);
+          void runGenerate();
+        }}
+        title="아직 더 이야기할 게 남았어요"
+        description={
+          coverage
+            ? `${coverage.total - coverage.filled}가지가 아직 정해지지 않았어요. 지금 만들면 내용이 얕아질 수 있어요. 그래도 만들까요?`
+            : "지금 만들면 내용이 얕아질 수 있어요. 그래도 만들까요?"
+        }
+      />
+
+      {/* 명세 생성 실패 */}
+      <OneButtonModal
+        isOpen={!!specError}
+        onClose={clearSpecError}
+        onConfirm={clearSpecError}
+        title="명세를 만들지 못했어요"
+        description={specError || ""}
       />
     </main>
   );
