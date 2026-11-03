@@ -11,12 +11,15 @@ interface ChatMessageProps {
   content: string;
   timestamp?: string;
   streaming?: boolean;
+  /** 아직 글자가 오기 전에 서버가 무엇을 하는 중인지 알려주는 한 줄 */
+  statusHint?: string;
 }
 
 const ChatMessage = ({
   role,
   content,
   streaming = false,
+  statusHint,
 }: ChatMessageProps) => {
   const isUser = role === MessageRole.USER;
   const isMob = useGetCurrentDevice() === "mob";
@@ -60,7 +63,16 @@ const ChatMessage = ({
             <div className="break-words max-w-[90%] py-2 px-4 rounded-lg whitespace-normal border border-line bg-white">
               <div className="markdown prose w-full break-words">
                 {/* 1) 스트리밍 중이면서 아직 텍스트가 없으면 점 애니메이션 */}
-                {streaming && !content && TypingDots}
+                {streaming && !content && (
+                  <span className="inline-flex items-center">
+                    {statusHint ? (
+                      <span className="text-body-s text-label-natural">
+                        {statusHint}
+                      </span>
+                    ) : null}
+                    {TypingDots}
+                  </span>
+                )}
 
                 {/* 2) 텍스트가 존재할 땐 렌더러 */}
                 {content && (

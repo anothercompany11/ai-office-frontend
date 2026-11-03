@@ -46,18 +46,25 @@ const ChatInterface = ({
   const folderMenuRef = useRef<HTMLDivElement>(null);
   const [isChargeModalOpen, setIsChargeModalOpen] = useState(false);
 
-  /* 기획 완성도와 구현 명세 */
+  /* 결과물 준비 상태와 결과물 */
   const {
     coverage,
     spec,
     generating,
     error: specError,
+    checklistReset,
     clearError: clearSpecError,
+    clearChecklistReset,
     refreshCoverage,
     generate,
   } = useSpec(conversationId);
   const [isSpecModalOpen, setIsSpecModalOpen] = useState(false);
   const [isEarlyConfirmOpen, setIsEarlyConfirmOpen] = useState(false);
+  // 첫 턴에는 서버가 체크리스트를 쓰는 동안 첫 글자가 늦는다. 무슨 일이 일어나는지
+  // 알려주지 않으면 멈춘 것처럼 보인다.
+  const [isPlanning, setIsPlanning] = useState(false);
+  // 스트림 루프 안에서는 state 가 아직 갱신되지 않으므로 ref 로 같이 들고 있는다
+  const isPlanningRef = useRef(false);
 
   const sentInitial = useRef(false); //  전송했는지 여부
 
@@ -257,6 +264,7 @@ const ChatInterface = ({
     };
     setMessages((prev) => [...prev, userMessage, loadingMsg]);
     setIsLoading(true);
+    clearChecklistReset();
 
     try {
       /* 3. 스트리밍 호출 */
@@ -299,8 +307,19 @@ const ChatInterface = ({
             continue;
           }
 
+          // 서버가 이 대화에서 무엇을 정해야 하는지 쓰는 중이다. 첫 턴에만 온다.
+          if (parsed.status === "planning") {
+            isPlanningRef.current = true;
+            setIsPlanning(true);
+            continue;
+          }
+
           if (parsed.content) {
             full += parsed.content;
+            if (isPlanningRef.current) {
+              isPlanningRef.current = false;
+              setIsPlanning(false);
+            }
 
             /* 3-1. 로딩 말풍선 내용 실시간 업데이트 */
             setMessages((prev) =>
@@ -361,7 +380,9 @@ const ChatInterface = ({
       ]);
     } finally {
       setIsLoading(false);
-      // 서버가 응답 직후 백그라운드로 완성도를 다시 판정하므로 갱신을 요청한다
+      isPlanningRef.current = false;
+      setIsPlanning(false);
+      // 서버가 응답 직후 백그라운드로 준비 상태를 다시 판정하므로 갱신을 요청한다
       void refreshCoverage();
       // 폴더 관련 상태 주석처리
       // setCurrentAssistantMessage("");
@@ -413,6 +434,11 @@ const ChatInterface = ({
                 content={message.content}
                 timestamp={message.created_at}
                 streaming={message.streaming}
+                statusHint={
+                  message.streaming && isPlanning
+                    ? "무엇을 정리해야 할지 살펴보고 있어요"
+                    : undefined
+                }
               />
             ))}
           </div>
@@ -431,6 +457,7 @@ const ChatInterface = ({
             coverage={coverage}
             generating={generating}
             hasSpec={!!spec}
+            checklistReset={checklistReset}
             onGenerate={handleGenerateClick}
             onOpenSpec={() => setIsSpecModalOpen(true)}
           />
@@ -474,7 +501,7 @@ const ChatInterface = ({
         }
       />
 
-      {/* 명세 생성 실패 */}
+      {/* 결과물 생성 실패 */}
       <OneButtonModal
         isOpen={!!specError}
         onClose={clearSpecError}
