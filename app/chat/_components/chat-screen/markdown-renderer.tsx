@@ -18,7 +18,6 @@ interface MarkdownRendererProps {
 
 interface CodeComponentProps {
   node?: any;
-  inline?: boolean;
   className?: string;
   children?: React.ReactNode;
 }
@@ -103,45 +102,17 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         {...props}
       />
     ),
-    code: ({
-      node,
-      inline,
-      className,
-      children,
-      ...props
-    }: CodeComponentProps) => {
-      const match = /language-(\w+)/.exec(className || "");
-      const language = match && match[1] ? match[1] : "";
-      const codeContent = String(children).replace(/\n$/, "");
-
-      if (inline) {
-        return (
-          <code
-            className="bg-gray-100 text-pink-500 dark:bg-gray-800 dark:text-pink-400 px-1 py-0.5 rounded text-sm font-mono"
-            {...props}
-          >
-            {children}
-          </code>
-        );
-      }
-
-      const isSingleWord =
-        !codeContent.includes("\n") &&
-        codeContent.trim().split(/\s+/).length === 1;
-
-      if (isSingleWord && codeContent.length < 20) {
-        return (
-          <code
-            className="bg-gray-100 text-pink-500 dark:bg-gray-800 dark:text-pink-400 px-1.5 py-0.5 rounded text-sm font-mono"
-            {...props}
-          >
-            {children}
-          </code>
-        );
-      }
-
-      return null;
-    },
+    // 여기로 오는 것은 인라인 코드뿐이다. 코드 블록(``` 펜스·들여쓰기)은 아래 pre 가
+    // 자식에서 직접 내용을 꺼내 통째로 그린다.
+    //
+    // react-markdown 9 부터 inline 플래그를 넘겨주지 않는다. 플래그로 가르고 나머지를
+    // 버리면 백틱으로 감싼 말이 화면에서 통째로 사라진다 — 쉼표만 남아 "예를 들어 , ,
+    // 처럼요" 가 된다. 그래서 가르지 않고 전부 그린다.
+    code: ({ children }: CodeComponentProps) => (
+      <code className="bg-gray-100 text-pink-500 dark:bg-gray-800 dark:text-pink-400 px-1 py-0.5 rounded text-sm font-mono">
+        {children}
+      </code>
+    ),
     pre: ({ children, className, ...props }: any) => {
       let language = "";
       let codeContent = "";
