@@ -30,3 +30,5 @@ node_modules
 .DS_Store
 # TypeScript 증분 빌드 캐시
 *.tsbuildinfo
+.vercel
+.env*
