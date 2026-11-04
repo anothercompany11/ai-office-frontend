@@ -42,6 +42,10 @@ const ChatInterface = ({
   const [newTitle, setNewTitle] = useState("");
   const [showFolderOptions, setShowFolderOptions] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  // 입력 블록(진행 패널 + 입력창). 높이가 변하면 메시지 영역이 그만큼 짧아진다
+  const composerRef = useRef<HTMLDivElement>(null);
+  // 사용자가 바닥에 붙어 있었는지. 과거 대화를 읽는 중이면 따라 내리지 않는다
+  const stickToBottomRef = useRef(true);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const folderMenuRef = useRef<HTMLDivElement>(null);
   const [isChargeModalOpen, setIsChargeModalOpen] = useState(false);
@@ -67,6 +71,25 @@ const ChatInterface = ({
   const isPlanningRef = useRef(false);
 
   const sentInitial = useRef(false); //  전송했는지 여부
+
+  // 바닥에서 이 정도 안쪽이면 '붙어 있다'고 본다. 스트리밍 중 한 줄씩 늘어나는
+  // 동안에도 붙어 있는 것으로 읽히도록 한 줄보다 넉넉하게 잡는다
+  const BOTTOM_STICK_THRESHOLD_PX = 80;
+
+  const isNearBottom = () => {
+    const el = chatContainerRef.current;
+    if (!el) return true;
+    return (
+      el.scrollHeight - el.scrollTop - el.clientHeight <=
+      BOTTOM_STICK_THRESHOLD_PX
+    );
+  };
+
+  const scrollToBottom = () => {
+    const el = chatContainerRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  };
 
   /* 메세지 리스트가 있으면 메세지 전송 */
   useEffect(() => {
@@ -163,13 +186,36 @@ const ChatInterface = ({
     }
   }, [conversationId, isNewChat]);
 
-  // 메시지 목록이 변경될 때마다 스크롤을 아래로 이동
+  // 메시지 목록이 변경되면 바닥에 붙어 있었을 때만 따라 내린다
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
+    if (stickToBottomRef.current) scrollToBottom();
   }, [messages]);
+
+  // 어디를 보고 있는지 기억한다. 위로 올려 과거 대화를 읽는 중이면 끌어내리지 않는다
+  useEffect(() => {
+    const el = chatContainerRef.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      stickToBottomRef.current = isNearBottom();
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // 진행 패널이 생기거나 힌트가 늘면 입력 블록이 커지고, 그만큼 메시지 영역이
+  // 짧아진다. scrollTop 은 그대로이므로 방금 읽던 답변이 화면 밖으로 밀려난다.
+  // 높이 변화를 직접 보고 바닥을 다시 맞춘다.
+  useEffect(() => {
+    const composer = composerRef.current;
+    if (!composer || typeof ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver(() => {
+      if (stickToBottomRef.current) scrollToBottom();
+    });
+    observer.observe(composer);
+    return () => observer.disconnect();
+  }, []);
 
   // 타이틀 편집 상태일 때 외부 클릭 감지
   useEffect(() => {
@@ -262,6 +308,8 @@ const ChatInterface = ({
       content: "",
       streaming: true,
     };
+    // 내가 보낸 말은 어디를 보고 있었든 보여야 한다
+    stickToBottomRef.current = true;
     setMessages((prev) => [...prev, userMessage, loadingMsg]);
     setIsLoading(true);
     clearChecklistReset();
@@ -451,7 +499,10 @@ const ChatInterface = ({
       </div>
 
       {/* 채팅 입력 영역 - 고정 위치 */}
-      <div className="w-full sticky max-w-[680px] px-4 web:px-0 bg-line-alternative mx-auto mt-5 bottom-0 z-10">
+      <div
+        ref={composerRef}
+        className="w-full sticky max-w-[680px] px-4 web:px-0 bg-line-alternative mx-auto mt-5 bottom-0 z-10"
+      >
         <div className="tab:pb-10 tab:px-0 web:pb-20 mx-auto">
           <SpecProgressPanel
             coverage={coverage}
